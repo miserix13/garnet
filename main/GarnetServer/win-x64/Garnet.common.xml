@@ -1,0 +1,3597 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Garnet.common</name>
+    </assembly>
+    <members>
+        <member name="T:Garnet.common.AsciiUtils">
+            <summary>
+            Utilites for ASCII parsing and manipulation.
+            </summary>
+            <remarks>
+            This class polyfills various <see cref="T:System.Char"/> and <c>Ascii</c> methods for .NET 6.
+            </remarks>
+        </member>
+        <member name="M:Garnet.common.AsciiUtils.IsBetween(System.Byte,System.Char,System.Char)">
+            <summary>Indicates whether a character is within the specified inclusive range.</summary>
+            <param name="c">The character to evaluate.</param>
+            <param name="minInclusive">The lower bound, inclusive.</param>
+            <param name="maxInclusive">The upper bound, inclusive.</param>
+            <returns>true if <paramref name="c"/> is within the specified range; otherwise, false.</returns>
+            <remarks>
+            The method does not validate that <paramref name="maxInclusive"/> is greater than or equal
+            to <paramref name="minInclusive"/>.  If <paramref name="maxInclusive"/> is less than
+            <paramref name="minInclusive"/>, the behavior is undefined.
+            </remarks>
+        </member>
+        <member name="M:Garnet.common.AsciiUtils.ToUpperInPlace(System.Span{System.Byte})">
+            <summary>
+            Convert ASCII Span to upper case
+            </summary>
+        </member>
+        <member name="M:Garnet.common.AsciiUtils.ToLowerInPlace(System.Span{System.Byte})">
+            <summary>
+            Convert ASCII Span to lower case
+            </summary>
+        </member>
+        <member name="M:Garnet.common.AsciiUtils.EqualsUpperCaseSpanIgnoringCase(System.Span{System.Byte},System.ReadOnlySpan{System.Byte})">
+            <inheritdoc cref="M:Garnet.common.AsciiUtils.EqualsUpperCaseSpanIgnoringCase(System.ReadOnlySpan{System.Byte},System.ReadOnlySpan{System.Byte})"/>
+        </member>
+        <member name="M:Garnet.common.AsciiUtils.EqualsUpperCaseSpanIgnoringCase(System.ReadOnlySpan{System.Byte},System.ReadOnlySpan{System.Byte})">
+            <summary>
+            Check if two byte spans are equal, where right is an all-upper-case span, ignoring case if there are ASCII bytes.
+            </summary>
+        </member>
+        <member name="M:Garnet.common.AsciiUtils.EqualsUpperCaseSpanIgnoringCase(System.ReadOnlySpan{System.Byte},System.ReadOnlySpan{System.Byte},System.Boolean)">
+            <summary>
+            Check if two byte spans are equal, where right is an all-upper-case span, ignoring case if there are ASCII bytes.
+            </summary>
+        </member>
+        <member name="M:Garnet.common.AsciiUtils.EqualsLowerCaseSpanIgnoringCase(System.ReadOnlySpan{System.Byte},System.ReadOnlySpan{System.Byte},System.Boolean)">
+            <summary>
+            Check if two byte spans are equal, where right is an all-lower-case span, ignoring case if there are ASCII bytes.
+            </summary>
+        </member>
+        <member name="T:Garnet.common.ClientBase">
+            <summary>
+            Abstract base class for client session provider.
+            </summary>
+        </member>
+        <member name="F:Garnet.common.ClientBase.endpoint">
+            <summary>
+            The host endpoint
+            </summary>
+        </member>
+        <member name="F:Garnet.common.ClientBase.connected">
+            <summary>
+            connection status
+            </summary>
+        </member>
+        <member name="F:Garnet.common.ClientBase.Buffersize">
+            <summary>
+            Buffersize
+            </summary>
+        </member>
+        <member name="F:Garnet.common.ClientBase.numPendingRequests">
+            <summary>
+            outstanding requests
+            </summary>
+        </member>
+        <member name="F:Garnet.common.ClientBase.networkSender">
+            <summary>
+            networkSender
+            </summary>
+        </member>
+        <member name="M:Garnet.common.ClientBase.#ctor(System.Net.EndPoint,System.Int32)">
+            <summary>
+            Create client
+            </summary>
+            <param name="endpoint">The host endpoint to connect to</param>   
+            <param name="bufferSize">The buffer size</param>        
+        </member>
+        <member name="M:Garnet.common.ClientBase.GetInternalBufferHead">
+            <summary>
+            Get head of internal buffer
+            </summary>
+        </member>
+        <member name="M:Garnet.common.ClientBase.GetInternalBufferTail">
+            <summary>
+            Get tail of internal buffer
+            </summary>
+        </member>
+        <member name="M:Garnet.common.ClientBase.Connect">
+            <summary>
+            Connect
+            </summary>
+        </member>
+        <member name="M:Garnet.common.ClientBase.Send(System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            Send specified number of bytes from buffer array.
+            </summary>
+            <param name="buf"></param>
+            <param name="len"></param>
+            <param name="numTokens"></param>
+        </member>
+        <member name="M:Garnet.common.ClientBase.Send(System.Int32,System.Int32)">
+            <summary>
+            Send specified number of bytes from buffer pointer.
+            </summary>        
+            <param name="len"></param>
+            <param name="numTokens"></param>
+        </member>
+        <member name="M:Garnet.common.ClientBase.CompletePendingRequests(System.Int32,System.Threading.CancellationToken)">
+            <summary>
+            Spin-wait for all responses to come back. 
+            Return true if pending requests have been completed or false if the timeout specified has been reached.
+            </summary>
+        </member>
+        <member name="M:Garnet.common.ClientBase.Authenticate(System.String)">
+            <summary>
+            Authenticate
+            </summary>
+            <param name="auth">Auth string</param>
+        </member>
+        <member name="M:Garnet.common.ClientBase.Dispose">
+            <summary>
+            Dispose
+            </summary>
+        </member>
+        <member name="T:Garnet.common.CircularBuffer`1">
+            <summary>
+            Circular buffer
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="T:Garnet.common.ElasticCircularBuffer`1">
+            <summary>
+            Elastic circular buffer
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="M:Garnet.common.ElasticCircularBuffer`1.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:Garnet.common.ElasticCircularBuffer`1.Enqueue(`0@)">
+            <summary>
+            Enqueue
+            </summary>
+            <param name="value"></param>
+        </member>
+        <member name="M:Garnet.common.ElasticCircularBuffer`1.Enqueue(`0)">
+            <summary>
+            Enqueue
+            </summary>
+            <param name="value"></param>
+        </member>
+        <member name="M:Garnet.common.ElasticCircularBuffer`1.Dequeue">
+            <summary>
+            Dequeue
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.common.ElasticCircularBuffer`1.PeekFirst">
+            <summary>
+            Peek at head
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.common.ElasticCircularBuffer`1.PeekLast">
+            <summary>
+            Peek at tail
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.common.ElasticCircularBuffer`1.IsEmpty">
+            <summary>
+            Is empty
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.common.ElasticCircularBuffer`1.GetEnumerator">
+            <summary>
+            Get enumerator
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.common.ElasticCircularBuffer`1.System#Collections#IEnumerable#GetEnumerator">
+            <summary>
+            Get enumerator
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Garnet.common.ReadOptimizedConcurrentSet`1">
+            <summary>
+            Concurrent set optimized for read-mostly workloads.
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="M:Garnet.common.ReadOptimizedConcurrentSet`1.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="P:Garnet.common.ReadOptimizedConcurrentSet`1.Count">
+            <summary>
+            Number of items in the set
+            </summary>
+        </member>
+        <member name="M:Garnet.common.ReadOptimizedConcurrentSet`1.TryAdd(`0)">
+            <summary>
+            Try to add an item to the set
+            </summary>
+            <param name="item"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.common.ReadOptimizedConcurrentSet`1.TryAdd(`0,System.Int32@)">
+            <summary>
+            Try to add an item to the set
+            </summary>
+            <param name="item">Item to be added</param>
+            <param name="count">Count of items in set after the operation</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.common.ReadOptimizedConcurrentSet`1.TryAddAndGet(`0,`0@)">
+            <summary>
+            Try to add an item to the set and return the added (or existing) item
+            </summary>
+            <param name="item">Item to be added</param>
+            <param name="addedItem">Added or existing item</param>
+            <returns>Whether provided item was added</returns>
+        </member>
+        <member name="M:Garnet.common.ReadOptimizedConcurrentSet`1.TryRemove(`0)">
+            <summary>
+            Try to remove an item from the set
+            </summary>
+            <param name="item"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.common.ReadOptimizedConcurrentSet`1.Iterate(System.Int32@,`0@)">
+            <summary>
+            Iterator for the set
+            </summary>
+            <param name="index">Current index (start at 0)</param>
+            <param name="item">Item</param>
+            <returns>Whether iteration ended</returns>
+        </member>
+        <member name="M:Garnet.common.ReadOptimizedConcurrentSet`1.Clear">
+            <summary>
+            Clear the set
+            </summary>
+        </member>
+        <member name="T:Garnet.common.ConvertUtils">
+            <summary>
+            Convert data primitives.
+            </summary>
+        </member>
+        <member name="F:Garnet.common.ConvertUtils._unixEpochTicks">
+            <summary>
+            Contains the number of ticks representing 1970/1/1. Value is equal to new DateTime(1970, 1, 1).Ticks
+            </summary>
+        </member>
+        <member name="M:Garnet.common.ConvertUtils.SecondsFromDiffUtcNowTicks(System.Int64)">
+            <summary>
+            Convert diff ticks - utcNow.ticks to seconds.
+            </summary>
+            <param name="ticks"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.common.ConvertUtils.MillisecondsFromDiffUtcNowTicks(System.Int64)">
+            <summary>
+            Convert diff ticks - utcNow.ticks to milliseconds.
+            </summary>
+            <param name="ticks"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.common.ConvertUtils.UnixTimestampInSecondsToTicks(System.Int64)">
+            <summary>
+            Converts a Unix timestamp in seconds to ticks.
+            </summary>
+            <param name="unixTimestamp">The Unix timestamp in seconds.</param>
+            <returns>The equivalent number of ticks.</returns>
+        </member>
+        <member name="M:Garnet.common.ConvertUtils.UnixTimestampInMillisecondsToTicks(System.Int64)">
+            <summary>
+            Converts a Unix timestamp in milliseconds to ticks.
+            </summary>
+            <param name="unixTimestamp">The Unix timestamp in milliseconds.</param>
+            <returns>The equivalent number of ticks.</returns>
+        </member>
+        <member name="M:Garnet.common.ConvertUtils.UnixTimeInSecondsFromTicks(System.Int64)">
+            <summary>
+            Convert ticks to Unix time in seconds.
+            </summary>
+            <param name="ticks">The ticks to convert.</param>
+            <returns>The Unix time in seconds.</returns>
+        </member>
+        <member name="M:Garnet.common.ConvertUtils.UnixTimeInMillisecondsFromTicks(System.Int64)">
+            <summary>
+            Convert ticks to Unix time in milliseconds.
+            </summary>
+            <param name="ticks">The ticks to convert.</param>
+            <returns>The Unix time in milliseconds.</returns>
+        </member>
+        <member name="T:Garnet.common.Crc64">
+            <summary>
+            Port of redis crc64 from https://github.com/redis/redis/blob/7.2/src/crc64.c
+            </summary>
+        </member>
+        <member name="F:Garnet.common.Crc64.POLY">
+            <summary>
+            Polynomial (same as redis)
+            </summary>
+        </member>
+        <member name="M:Garnet.common.Crc64.Reflect64(System.UInt64)">
+            <summary>
+            Reverse all bits in a 64-bit value (bit reflection).
+            Only used for data_len == 64 in this code.
+            </summary>
+        </member>
+        <member name="M:Garnet.common.Crc64.Crc64Bitwise(System.ReadOnlySpan{System.Byte})">
+            <summary>
+            A direct bit-by-bit CRC64 calculation (like _crc64 in C).
+            </summary>
+        </member>
+        <member name="M:Garnet.common.Crc64.Hash(System.ReadOnlySpan{System.Byte})">
+            <summary>
+            Computes crc64
+            </summary>
+            <param name="data"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Garnet.common.EnumUtils">
+            <summary>
+            Utilities for enums
+            </summary>
+        </member>
+        <member name="M:Garnet.common.EnumUtils.GetEnumNameToDescription``1">
+            <summary>
+            Gets a mapping between an enum's string value to its description, for each of the enum's values
+            </summary>
+            <typeparam name="T">Enum type</typeparam>
+            <returns>A dictionary mapping between the enum's string value to its description</returns>
+        </member>
+        <member name="M:Garnet.common.EnumUtils.GetEnumDescriptions``1(``0)">
+            <summary>
+            If enum does not have the 'Flags' attribute, gets an array of size 1 with the description of the enum's value.
+            If no description exists, returns the ToString() value of the input value. 
+            If enum has the 'Flags' attribute, gets an array with all the descriptions of the flags which are turned on in the input value.
+            If no description exists, returns the ToString() value of the flag.
+            </summary>
+            <typeparam name="T">Enum type</typeparam>
+            <param name="value">Enum value</param>
+            <returns>Array of descriptions</returns>
+        </member>
+        <member name="M:Garnet.common.EnumUtils.TryParseEnumsFromDescription``1(System.String,System.Collections.Generic.IEnumerable{``0}@)">
+            <summary>
+            Gets an enum's values based on the description attribute
+            </summary>
+            <typeparam name="T">Enum type</typeparam>
+            <param name="strVal">Enum description</param>
+            <param name="vals">Enum values</param>
+            <returns>True if matched more than one value successfully</returns>
+        </member>
+        <member name="M:Garnet.common.EnumUtils.TryParseEnumFromDescription``1(System.String,``0@)">
+            <summary>
+            Gets an enum's value based on its description attribute
+            If more than one values match the same description, returns the first one
+            </summary>
+            <typeparam name="T">Enum type</typeparam>
+            <param name="strVal">Enum description</param>
+            <param name="val">Enum value</param>
+            <returns>True if successful</returns>
+        </member>
+        <member name="T:Garnet.common.ExceptionInjectionHelper">
+            <summary>
+            Exception injection helper - used only in debug mode for testing
+            </summary>
+        </member>
+        <member name="F:Garnet.common.ExceptionInjectionHelper.ExceptionInjectionTypes">
+            <summary>
+            Array of exception injection types
+            </summary>
+        </member>
+        <member name="M:Garnet.common.ExceptionInjectionHelper.IsEnabled(Garnet.common.ExceptionInjectionType)">
+            <summary>
+            Check if exception is enabled
+            </summary>
+            <param name="exceptionType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.common.ExceptionInjectionHelper.EnableException(Garnet.common.ExceptionInjectionType)">
+            <summary>
+            Enable exception scenario (NOTE: enable at beginning of test to trigger the exception at runtime)
+            </summary>
+            <param name="exceptionType"></param>
+        </member>
+        <member name="M:Garnet.common.ExceptionInjectionHelper.DisableException(Garnet.common.ExceptionInjectionType)">
+            <summary>
+            Disable exception scenario (NOTE: for tests you need to always call disable at the end of the test to avoid breaking other tests in the line)
+            </summary>
+            <param name="exceptionType"></param>
+        </member>
+        <member name="M:Garnet.common.ExceptionInjectionHelper.TriggerException(Garnet.common.ExceptionInjectionType)">
+            <summary>
+            Trigger exception scenario (NOTE: add this to the location where the exception should be emulated/triggered)
+            </summary>
+            <param name="exceptionType"></param>
+            <exception cref="T:Garnet.common.GarnetException"></exception>
+        </member>
+        <member name="M:Garnet.common.ExceptionInjectionHelper.TriggerCondition(Garnet.common.ExceptionInjectionType)">
+            <summary>
+            Trigger condition and reset it
+            </summary>
+            <param name="exceptionType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.common.ExceptionInjectionHelper.WaitOnSet(Garnet.common.ExceptionInjectionType)">
+            <summary>
+            Wait on set condition
+            </summary>
+            <param name="exceptionType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.common.ExceptionInjectionHelper.WaitOnClearAsync(Garnet.common.ExceptionInjectionType)">
+            <summary>
+            Wait on clear condition
+            </summary>
+            <param name="exceptionType"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Garnet.common.ExceptionInjectionType">
+            <summary>
+            Exception injection types - used only in debug mode for testing
+            </summary>
+        </member>
+        <member name="F:Garnet.common.ExceptionInjectionType.None">
+            <summary>
+            Placeholder for "no fault"
+            </summary>
+        </member>
+        <member name="F:Garnet.common.ExceptionInjectionType.Network_After_GarnetServerTcp_Handler_Created">
+            <summary>
+            Network failure after GarnetServerTcp handler created
+            </summary>
+        </member>
+        <member name="F:Garnet.common.ExceptionInjectionType.Network_After_TcpNetworkHandlerBase_Start_Server">
+            <summary>
+            Network failure after TcpNetworkHandlerBase start server
+            </summary>
+        </member>
+        <member name="F:Garnet.common.ExceptionInjectionType.Replication_Fail_Before_Background_AOF_Stream_Task_Start">
+            <summary>
+            Primary replication sync orchestration failure right before background aof stream starts
+            </summary>
+        </member>
+        <member name="F:Garnet.common.ExceptionInjectionType.Replication_Acquire_Checkpoint_Entry_Fail_Condition">
+            <summary>
+            Acquire checkpoint entry from memory entries
+            </summary>
+        </member>
+        <member name="F:Garnet.common.ExceptionInjectionType.Replication_Wait_After_Checkpoint_Acquisition">
+            <summary>
+            Wait after checkpoint acquisition
+            </summary>
+        </member>
+        <member name="F:Garnet.common.ExceptionInjectionType.Migration_Slot_End_Scan_Range_Acquisition">
+            <summary>
+            Wait at migration slot driver right after acquiring the end scan range
+            </summary>
+        </member>
+        <member name="F:Garnet.common.ExceptionInjectionType.Divergent_AOF_Stream">
+            <summary>
+            AOF on replica has diverged from stream coming from primary.
+            </summary>
+        </member>
+        <member name="F:Garnet.common.ExceptionInjectionType.Aof_Sync_Task_Consume">
+            <summary>
+            Consume callback on ReplicaSyncTask faults.
+            </summary>
+        </member>
+        <member name="F:Garnet.common.ExceptionInjectionType.Replication_Failed_To_AddAofSyncTask_UnknownNode">
+            <summary>
+            Failed to add AOF sync task due to unknown node
+            </summary>
+        </member>
+        <member name="F:Garnet.common.ExceptionInjectionType.Replication_Timeout_On_Receive_Checkpoint">
+            <summary>
+            Delay response on receive checkpoint to trigger timeout
+            </summary>
+        </member>
+        <member name="F:Garnet.common.ExceptionInjectionType.Replication_InProgress_During_DiskBased_Replica_Attach_Sync">
+            <summary>
+            Replication InProgress during disk-based replica attach sync operation
+            </summary>
+        </member>
+        <member name="F:Garnet.common.ExceptionInjectionType.Replication_InProgress_During_Diskless_Replica_Attach_Sync">
+            <summary>
+            Replication InProgress during diskless replica attach sync operation
+            </summary>
+        </member>
+        <member name="F:Garnet.common.ExceptionInjectionType.Replication_Diskless_Sync_Reset_Cts">
+            <summary>
+            Replication diskless sync reset cts
+            </summary>
+        </member>
+        <member name="T:Garnet.common.FailoverOption">
+            <summary>
+            Failover option flags
+            </summary>
+        </member>
+        <member name="F:Garnet.common.FailoverOption.DEFAULT">
+            <summary>
+            Internal use only
+            </summary>
+        </member>
+        <member name="F:Garnet.common.FailoverOption.INVALID">
+            <summary>
+            Internal use only
+            </summary>
+        </member>
+        <member name="F:Garnet.common.FailoverOption.TO">
+            <summary>
+            Failover endpoint input marker
+            </summary>
+        </member>
+        <member name="F:Garnet.common.FailoverOption.FORCE">
+            <summary>
+            Force failover flag
+            </summary>
+        </member>
+        <member name="F:Garnet.common.FailoverOption.ABORT">
+            <summary>
+            Issue abort of ongoing failover
+            </summary>
+        </member>
+        <member name="F:Garnet.common.FailoverOption.TIMEOUT">
+            <summary>
+            Timeout marker
+            </summary>
+        </member>
+        <member name="F:Garnet.common.FailoverOption.TAKEOVER">
+            <summary>
+            Issue takeover without consensus to replica
+            </summary>
+        </member>
+        <member name="T:Garnet.common.FailoverUtils">
+            <summary>
+            Utils for info command
+            </summary>
+        </member>
+        <member name="M:Garnet.common.FailoverUtils.GetRespFormattedFailoverOption(Garnet.common.FailoverOption)">
+            <summary>
+            Return resp formatted failover option
+            </summary>
+            <param name="failoverOption"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Garnet.common.FileUtils">
+            <summary>
+            Utility class with helper methods for handling local files
+            </summary>
+        </member>
+        <member name="M:Garnet.common.FileUtils.TryGetFiles(System.Collections.Generic.IEnumerable{System.String},System.String[]@,System.String@,System.String[],System.Collections.Generic.IEnumerable{System.String},System.IO.SearchOption)">
+            <summary>
+            Receives a list of paths and searches for files matching the extensions given in the input
+            </summary>
+            <param name="paths">Paths to files or directories</param>
+            <param name="extensions">Extensions to match files (defaults to any)</param>
+            <param name="ignoreFileNames">File names to ignore</param>
+            <param name="searchOption">In case path is a directory, determines whether to search only top directory or all subdirectories</param>
+            <param name="files">Files that match the extensions</param>
+            <param name="errorMessage">Error message, if applicable</param>
+            <returns>True if successfully enumerated all directories</returns>
+        </member>
+        <member name="M:Garnet.common.FileUtils.IsFileInDirectory(System.String,System.String)">
+            <summary>
+            Checks if specified file path is contained in directory at any level
+            </summary>
+            <param name="filePath">Path to file</param>
+            <param name="dirPath">Path to directory</param>
+            <returns>True if path is contained in directory at any level</returns>
+        </member>
+        <member name="M:Garnet.common.FileUtils.TryLoadAssemblies(System.Collections.Generic.IEnumerable{System.String},System.Collections.Generic.IEnumerable{System.Reflection.Assembly}@,System.String@)">
+            <summary>
+            Receives a list of file paths and attempts to load assemblies from these paths
+            </summary>
+            <param name="assemblyPaths">List of file paths pointing to assembly files</param>
+            <param name="loadedAssemblies">Returned list of loaded assemblies</param>
+            <param name="errorMessage">Error message, if applicable</param>
+            <returns>True if all assemblies loaded successfully</returns>
+        </member>
+        <member name="M:Garnet.common.FileUtils.ConvertToAbsolutePaths(System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Converts a list of paths to absolute paths
+            </summary>
+            <param name="paths">Paths to convert</param>
+            <returns>Converted paths</returns>
+        </member>
+        <member name="T:Garnet.common.Format">
+            <summary>
+            Formatting primitives
+            </summary>
+        </member>
+        <member name="M:Garnet.common.Format.TryParseAddressList(System.String,System.Int32,System.Net.EndPoint[]@,System.String@,System.Boolean,Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            Parse address list string containing address separated by whitespace
+            </summary>
+            <param name="addressList">Space separated string of IP addresses</param>
+            <param name="port">Endpoint Port</param>
+            <param name="endpoints">List of endpoints generated from the input IPs</param>
+            <param name="errorHostnameOrAddress">Output error if any</param>
+            <param name="protectedMode">Is protected mode enabled?</param>
+            <param name="logger">Logger</param>
+            <returns>True if parse and address validation was successful, otherwise false</returns>
+        </member>
+        <member name="M:Garnet.common.Format.TryCreateEndpoint(System.String,System.Int32,System.Boolean,Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            Try to create an endpoint from address and port
+            </summary>
+            <param name="singleAddressOrHostname">This could be an address or a hostname that the method tries to resolve</param>
+            <param name="port">Port number to use for the endpoints</param>
+            <param name="tryConnect">Whether to try to connect to the created endpoints to ensure that it is reachable</param>
+            <param name="logger">Logger</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.common.Format.TryValidateAddress(System.String,System.Int32,System.Net.EndPoint@)">
+            <summary>
+            Parse address (hostname) and port to endpoint
+            </summary>
+            <param name="address"></param>
+            <param name="port"></param>
+            <param name="endpoint"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.common.Format.GetHostName(Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            Resolve host from Ip
+            </summary>
+            <param name="logger"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Garnet.common.GarnetException">
+            <summary>
+            Garnet exception base type
+            </summary>
+        </member>
+        <member name="P:Garnet.common.GarnetException.LogLevel">
+            <summary>
+            LogLevel for this exception
+            </summary>
+        </member>
+        <member name="M:Garnet.common.GarnetException.#ctor(Microsoft.Extensions.Logging.LogLevel,System.Boolean,System.Boolean,System.Boolean)">
+            <summary>
+            Throw Garnet exception.
+            </summary>
+            <param name="logLevel"></param>
+            <param name="clientResponse"></param>
+            <param name="panic"></param>
+            <param name="disposeSession"></param>
+        </member>
+        <member name="M:Garnet.common.GarnetException.#ctor(System.String,Microsoft.Extensions.Logging.LogLevel,System.Boolean,System.Boolean,System.Boolean)">
+            <summary>
+            Throw Garnet exception with message.
+            </summary>
+            <param name="message"></param>
+            <param name="logLevel"></param>
+            <param name="clientResponse"></param>
+            <param name="panic"></param>
+            <param name="disposeSession"></param>
+        </member>
+        <member name="M:Garnet.common.GarnetException.#ctor(System.String,System.Exception,Microsoft.Extensions.Logging.LogLevel,System.Boolean,System.Boolean,System.Boolean)">
+            <summary>
+            Throw Garnet exception with message and inner exception.
+            </summary>
+            <param name="message"></param>
+            <param name="innerException"></param>
+            <param name="logLevel"></param>
+            <param name="clientResponse"></param>
+            <param name="panic"></param>
+            <param name="disposeSession"></param>
+        </member>
+        <member name="M:Garnet.common.GarnetException.Throw(System.String,Microsoft.Extensions.Logging.LogLevel)">
+            <summary>
+            Throw helper that throws a GarnetException.
+            </summary>
+            <param name="message"></param>
+            <param name="logLevel"></param>
+            <exception cref="T:Garnet.common.GarnetException"></exception>
+        </member>
+        <member name="T:Garnet.common.Generator">
+            <summary>
+            Collection of methods generating hex ids
+            </summary>
+        </member>
+        <member name="M:Garnet.common.Generator.CreateHexId(System.Int32)">
+            <summary>
+            Generates a random hex string of specified length
+            </summary>
+            <param name="size">The length of the hex identifier string</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.common.Generator.DefaultHexId(System.Int32)">
+            <summary>
+            Generates a default hex string of specified length (all zeros)
+            </summary>
+            <param name="size">The length of the hex identifier string</param>
+            <returns></returns>
+        </member>
+        <member name="P:Garnet.common.HashSlotUtils.Crc16Table">
+            <summary>
+            This table is based on the CRC-16-CCITT polynomial (0x1021)
+            </summary>
+        </member>
+        <member name="M:Garnet.common.HashSlotUtils.Hash(System.Byte*,System.Int32)">
+            <summary>
+            Generate a ushort hash value using the CRC16 algorithm
+            </summary>
+            <param name="data">Pointer to head of data byte sequence</param>
+            <param name="len">Length of byte sequence</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.common.HashSlotUtils.HashSlot(Tsavorite.core.SpanByte@)">
+            <summary>
+            Compute hash slot from the given SpanByte
+            </summary>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.common.HashSlotUtils.HashSlot(System.Span{System.Byte})">
+            <summary>
+            Compute hash slot of given data
+            </summary>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.common.HashSlotUtils.HashSlot(System.Byte*,System.Int32)">
+            <summary>
+            Compute hash slot of given data
+            </summary>
+            <param name="keyPtr"></param>
+            <param name="ksize"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Garnet.common.HashUtils">
+            <summary>
+            Hash utilities
+            </summary>
+        </member>
+        <member name="M:Garnet.common.HashUtils.Rotl64(System.UInt64,System.Int32)">
+            <inheritdoc cref="M:System.Numerics.BitOperations.RotateLeft(System.UInt64,System.Int32)"/>
+        </member>
+        <member name="M:Garnet.common.HashUtils.MurmurHash3x64A(System.Byte*,System.Int32,System.UInt32)">
+            <summary>
+            MurmurHash3 - 64 bit fast
+            </summary>
+            <param name="bString"></param>
+            <param name="len"></param>
+            <param name="seed"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.common.HashUtils.MurmurHash3x64(System.Byte*,System.Int32,System.UInt32)">
+            <summary>
+            Murmurhash 3 - 64 bit
+            </summary>
+            <param name="bString"></param>
+            <param name="len"></param>
+            <param name="seed"></param>
+            <returns></returns>        
+        </member>
+        <member name="M:Garnet.common.HashUtils.MurmurHash3x128(System.Byte*,System.Int32,System.UInt32)">
+            <summary>
+            Murmurhash 3 - 128 bit
+            </summary>
+            <param name="bString"></param>
+            <param name="len"></param>
+            <param name="seed"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.common.HashUtils.MurmurHash2x64A(System.Byte*,System.Int32,System.UInt32)">
+            <summary>
+            MurmurHash2 Get 64-bit hash code for a byte array
+            </summary>
+            <param name="bString"></param>
+            <param name="len"></param>
+            <param name="seed"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Garnet.common.LightClient">
+            <summary>
+            Light remote client
+            </summary>
+        </member>
+        <member name="T:Garnet.common.LightClient.OnResponseDelegateUnsafe">
+            <summary>
+            On response delegate function.
+            </summary>
+            <param name="buf"></param>
+            <param name="bytesRead"></param>
+            <param name="opType"></param>        
+            <returns></returns>
+        </member>
+        <member name="F:Garnet.common.LightClient.opType">
+            <summary>
+            Operation type
+            </summary>
+        </member>
+        <member name="M:Garnet.common.LightClient.#ctor(System.Net.EndPoint,System.Int32,Garnet.common.LightClient.OnResponseDelegateUnsafe,System.Int32,System.Net.Security.SslClientAuthenticationOptions,Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            Create client instance to connect to specfied destination
+            </summary>
+            <param name="endpoint">The server endpoint</param>
+            <param name="opType">Op type</param>
+            <param name="onResponseDelegateUnsafe">Callback that takes in a byte array and length, and returns the number of bytes read and the number of requests processed</param>
+            <param name="BufferSize">Message buffer size.</param>
+            <param name="sslOptions">SSL options</param>
+        </member>
+        <member name="M:Garnet.common.LightClient.Authenticate(System.String)">
+            <summary>
+            Authenticate
+            </summary>
+            <param name="auth">Auth string</param>
+        </member>
+        <member name="M:Garnet.common.LightClient.ReadOnly">
+            <summary>
+            Send readonly request to that node
+            </summary>
+        </member>
+        <member name="P:Garnet.common.LightClient.ResponseBuffer">
+            <summary>
+            Response buffer used by client
+            </summary>
+        </member>
+        <member name="P:Garnet.common.LightClient.Disposed">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.common.LightClient.Connect">
+            <summary>
+            Connect
+            </summary>
+        </member>
+        <member name="M:Garnet.common.LightClient.ConnectSendSocketAsync(System.Threading.CancellationToken)">
+            <summary>
+            Connect client send socket
+            </summary>
+        </member>
+        <member name="M:Garnet.common.LightClient.TryConnectSocketAsync(System.Net.Sockets.Socket,System.Net.EndPoint,System.Threading.CancellationToken)">
+            <summary>
+            Try to establish connection for <paramref name="socket"/> using <paramref name="endpoint"/>
+            </summary>
+            <param name="socket"></param>
+            <param name="endpoint"></param>
+            <param name="cancellationToken">The cancellation token</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.common.LightClient.Send(System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            Send len bytes from given buffer
+            </summary>
+            <param name="buf"></param>
+            <param name="len"></param>
+            <param name="numTokens">Number of symbols expected in the response</param>
+        </member>
+        <member name="M:Garnet.common.LightClient.Send(System.Byte*,System.Int32,System.Int32)">
+            <summary>
+            Send len bytes from given buffer
+            </summary>
+            <param name="ptr"></param>
+            <param name="len"></param>
+            <param name="numTokens">Number of symbols expected in the response</param>
+        </member>
+        <member name="M:Garnet.common.LightClient.Send(System.Int32,System.Int32)">
+            <summary>
+            Send len bytes from networkSender buffer.
+            </summary>
+            <param name="len"></param>
+            <param name="numTokens"></param>
+        </member>
+        <member name="M:Garnet.common.LightClient.Dispose">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.common.LightClient.TryCreateMessageConsumer(System.Span{System.Byte},Garnet.networking.INetworkSender,Garnet.networking.IMessageConsumer@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.common.LightClient.DisposeMessageConsumer(Garnet.networking.INetworkHandler)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.common.LightClient.TryConsumeMessages(System.Byte*,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="F:Garnet.common.LightClientRequest.countResponseType">
+            <summary>
+            How to count the response length
+            </summary>
+        </member>
+        <member name="M:Garnet.common.LightClientRequest.Dispose">
+            <summary>
+            Dispose
+            </summary>
+        </member>
+        <member name="M:Garnet.common.LightClientRequest.BuildRequest(System.String)">
+            <summary>
+            Formats the command for RESP
+            </summary>
+        </member>
+        <member name="T:Garnet.common.FileLoggerProviderExtensions">
+            <summary>
+            Extension methods to configure ILoggingBuilder with FileLoggerProvider
+            </summary>
+        </member>
+        <member name="M:Garnet.common.FileLoggerProviderExtensions.AddFile(Microsoft.Extensions.Logging.ILoggingBuilder,System.String,System.Int32)">
+            <summary>
+            Add FileLoggerProvider for filename
+            </summary>
+            <param name="builder">The logging builder.</param>
+            <param name="filename">The log file path</param>
+            <param name="flushInterval">The flush interval in milliseconds</param>
+            <returns>The logging builder.</returns>
+        </member>
+        <member name="T:Garnet.common.FileLoggerOutput">
+            <summary>
+            Output to file for logging
+            </summary>
+        </member>
+        <member name="M:Garnet.common.FileLoggerOutput.#ctor(System.String,System.Int32)">
+            <summary>
+            Create a file logger output
+            </summary>
+            <param name="filename"></param>
+            <param name="flushInterval"></param>
+        </member>
+        <member name="M:Garnet.common.FileLoggerOutput.Dispose">
+            <summary>
+            Dispose FileLoggerOutput
+            </summary>
+        </member>
+        <member name="M:Garnet.common.FileLoggerOutput.Log``1(Microsoft.Extensions.Logging.LogLevel,Microsoft.Extensions.Logging.EventId,``0,System.Exception,System.Func{``0,System.Exception,System.String},System.String)">
+            <summary>
+            Logs a message.
+            </summary>
+            <typeparam name="TState">The type of <paramref name="state"/>.</typeparam>
+            <param name="logLevel">The log level.</param>
+            <param name="eventId">The event identifier.</param>
+            <param name="state">The state.</param>
+            <param name="exception">The exception.</param>
+            <param name="formatter">The formatter.</param>
+            <param name="categoryName">The category.</param>
+        </member>
+        <member name="T:Garnet.common.FileLoggerProvider">
+            <summary>
+            FileLoggerProvider
+            </summary>
+        </member>
+        <member name="M:Garnet.common.FileLoggerProvider.#ctor(Garnet.common.FileLoggerOutput)">
+            <summary>
+            FileLoggerProvider constructor
+            </summary>
+        </member>
+        <member name="M:Garnet.common.FileLoggerProvider.CreateLogger(System.String)">
+            <summary>
+            Create FileLogger instance
+            </summary>
+            <param name="categoryName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.common.FileLoggerProvider.Dispose">
+            <summary>
+            Dispose FileLoggerProvider
+            </summary>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
+        <member name="T:Garnet.common.LogFormatter">
+            <summary>
+            Log formatter primitives
+            </summary>
+        </member>
+        <member name="M:Garnet.common.LogFormatter.FormatDate(System.DateTime)">
+            <summary>
+            Format date
+            </summary>
+            <param name="dateTime"></param>
+        </member>
+        <member name="M:Garnet.common.LogFormatter.FormatTime(System.DateTime)">
+            <summary>
+            Format time
+            </summary>
+            <param name="dateTime"></param>
+        </member>
+        <member name="T:Garnet.common.MemoryResult`1">
+            <summary>
+            Wrapper struct for memory result from shared pool, of particular actual length
+            </summary>
+            <typeparam name="T">Type of memory elements</typeparam>
+        </member>
+        <member name="M:Garnet.common.MemoryResult`1.#ctor(System.Buffers.IMemoryOwner{`0})">
+            <summary>
+            Create memory result
+            </summary>
+        </member>
+        <member name="M:Garnet.common.MemoryResult`1.#ctor(System.Buffers.IMemoryOwner{`0},System.Int32)">
+            <summary>
+            Create memory result
+            </summary>
+        </member>
+        <member name="M:Garnet.common.MemoryResult`1.Create(System.Buffers.MemoryPool{`0},System.Int32)">
+            <summary>
+            Create memory result
+            </summary>
+        </member>
+        <member name="F:Garnet.common.MemoryResult`1.MemoryOwner">
+            <summary>
+            Memory owner
+            </summary>
+        </member>
+        <member name="F:Garnet.common.MemoryResult`1.Length">
+            <summary>
+            Actual length of result
+            </summary>
+        </member>
+        <member name="P:Garnet.common.MemoryResult`1.Span">
+            <summary>
+            Get Span of actual length
+            </summary>
+        </member>
+        <member name="P:Garnet.common.MemoryResult`1.Memory">
+            <summary>
+            Get Memory of actual length
+            </summary>
+        </member>
+        <member name="M:Garnet.common.MemoryResult`1.Dispose">
+            <inheritdoc />
+        </member>
+        <member name="T:Garnet.common.LimitedFixedBufferPool">
+            <summary>
+            LimitedFixedBufferPool is a pool of memory. 
+            Internally, it is organized as an array of concurrent queues where each concurrent
+            queue represents a memory of size in particular range. queue[i] contains memory 
+            segments each of size (2^i * sectorSize).
+            </summary>
+        </member>
+        <member name="F:Garnet.common.LimitedFixedBufferPool.maxAllocationSize">
+            <summary>
+            This is the maximum allocated buffer size that the instance can support based on the number of pool levels.
+            </summary>
+        </member>
+        <member name="P:Garnet.common.LimitedFixedBufferPool.MinAllocationSize">
+            <summary>
+            Min allocation size
+            </summary>
+        </member>
+        <member name="F:Garnet.common.LimitedFixedBufferPool.totalReferences">
+            <summary>
+            Total outstanding allocation references
+            </summary>
+        </member>
+        <member name="F:Garnet.common.LimitedFixedBufferPool.totalOutOfBoundAllocations">
+            <summary>
+            Total out of bound allocation requests
+            </summary>
+        </member>
+        <member name="M:Garnet.common.LimitedFixedBufferPool.#ctor(System.Int32,System.Int32,System.Int32,Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:Garnet.common.LimitedFixedBufferPool.Validate(Garnet.common.NetworkBufferSettings)">
+            <summary>
+            Validate if provided settings against the provided pool instance
+            </summary>
+            <param name="settings"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.common.LimitedFixedBufferPool.Return(Garnet.common.PoolEntry)">
+            <summary>
+            Return
+            </summary>
+        </member>
+        <member name="M:Garnet.common.LimitedFixedBufferPool.Get(System.Int32)">
+            <summary>
+            Get buffer
+            </summary>
+            <param name="size"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.common.LimitedFixedBufferPool.Purge">
+            <summary>
+            Purge pool entries from all levels
+            NOTE:
+                This is used to reclaim any unused buffer pool entries that were previously allocated.
+                It does not wait for all referenced buffers to be returned.
+                Use Dispose of you want to destroy this instance.
+            </summary>
+        </member>
+        <member name="M:Garnet.common.LimitedFixedBufferPool.Dispose">
+            <summary>
+            Dipose pool entries from all levels
+            NOTE:
+                This is used to destroy the instance and reclaim all allocated buffer pool entries.
+                As a consequence it spin waits until totalReferences goes back down to 0 and blocks any future allocations.
+            </summary>
+        </member>
+        <member name="M:Garnet.common.LimitedFixedBufferPool.GetStats">
+            <summary>
+            Get statistics for this buffer pool
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.common.LimitedFixedBufferPool.GetLevel(System.Int32,System.Int32)">
+            <summary>
+            Calculate level from minAllocationSize and requestedSize
+            </summary>
+            <param name="minAllocationSize"></param>
+            <param name="requestedSize"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Garnet.common.PoolEntry">
+            <summary>
+            Pool entry
+            </summary>
+        </member>
+        <member name="F:Garnet.common.PoolEntry.entry">
+            <summary>
+            Entry
+            </summary>
+        </member>
+        <member name="F:Garnet.common.PoolEntry.entryPtr">
+            <summary>
+            Entry pointer
+            </summary>
+        </member>
+        <member name="M:Garnet.common.PoolEntry.#ctor(System.Int32,Garnet.common.LimitedFixedBufferPool)">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:Garnet.common.PoolEntry.Dispose">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.common.PoolEntry.Reuse">
+            <summary>
+            Reuse
+            </summary>
+        </member>
+        <member name="T:Garnet.common.PoolLevel">
+            <summary>
+            Pool level
+            </summary>
+        </member>
+        <member name="F:Garnet.common.PoolLevel.size">
+            <summary>
+            Size
+            </summary>
+        </member>
+        <member name="F:Garnet.common.PoolLevel.items">
+            <summary>
+            Items
+            </summary>
+        </member>
+        <member name="M:Garnet.common.PoolLevel.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="T:Garnet.common.InfoMetricsType">
+            <summary>
+            Types of info metrics exposed by Garnet server
+            </summary>
+        </member>
+        <member name="F:Garnet.common.InfoMetricsType.SERVER">
+            <summary>
+            Server info
+            </summary>
+        </member>
+        <member name="F:Garnet.common.InfoMetricsType.MEMORY">
+            <summary>
+            Memory info
+            </summary>
+        </member>
+        <member name="F:Garnet.common.InfoMetricsType.CLUSTER">
+            <summary>
+            Cluster info
+            </summary>
+        </member>
+        <member name="F:Garnet.common.InfoMetricsType.REPLICATION">
+            <summary>
+            Replication info
+            </summary>
+        </member>
+        <member name="F:Garnet.common.InfoMetricsType.STATS">
+            <summary>
+            Stats info
+            </summary>
+        </member>
+        <member name="F:Garnet.common.InfoMetricsType.STORE">
+            <summary>
+            Store info
+            </summary>
+        </member>
+        <member name="F:Garnet.common.InfoMetricsType.OBJECTSTORE">
+            <summary>
+            Object store info
+            </summary>
+        </member>
+        <member name="F:Garnet.common.InfoMetricsType.STOREHASHTABLE">
+            <summary>
+            Store hash table info
+            </summary>
+        </member>
+        <member name="F:Garnet.common.InfoMetricsType.OBJECTSTOREHASHTABLE">
+            <summary>
+            Object store hash table info
+            </summary>
+        </member>
+        <member name="F:Garnet.common.InfoMetricsType.STOREREVIV">
+            <summary>
+            Store revivification info
+            </summary>
+        </member>
+        <member name="F:Garnet.common.InfoMetricsType.OBJECTSTOREREVIV">
+            <summary>
+            Object store hash table info
+            </summary>
+        </member>
+        <member name="F:Garnet.common.InfoMetricsType.PERSISTENCE">
+            <summary>
+            Persistence information
+            </summary>
+        </member>
+        <member name="F:Garnet.common.InfoMetricsType.CLIENTS">
+            <summary>
+            Clients connections stats
+            </summary>
+        </member>
+        <member name="F:Garnet.common.InfoMetricsType.KEYSPACE">
+            <summary>
+            Database related stats
+            </summary>
+        </member>
+        <member name="F:Garnet.common.InfoMetricsType.MODULES">
+            <summary>
+            Modules info
+            </summary>
+        </member>
+        <member name="F:Garnet.common.InfoMetricsType.BPSTATS">
+            <summary>
+            Shared buffer pool stats
+            </summary>
+        </member>
+        <member name="F:Garnet.common.InfoMetricsType.CINFO">
+            <summary>
+            Checkpoint information used for cluster
+            </summary>
+        </member>
+        <member name="F:Garnet.common.InfoMetricsType.HLOGSCAN">
+            <summary>
+            Scan and return distribution of in-memory portion of hybrid logs for main store and object store
+            </summary>
+        </member>
+        <member name="T:Garnet.common.InfoCommandUtils">
+            <summary>
+            Utils for info command
+            </summary>
+        </member>
+        <member name="M:Garnet.common.InfoCommandUtils.GetRespFormattedInfoSection(Garnet.common.InfoMetricsType)">
+            <summary>
+            Return resp formatted info section
+            </summary>
+            <param name="infoMetricsType"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Garnet.common.LatencyMetricsType">
+            <summary>
+            Types of latency metrics exposed by Garnet server
+            </summary>
+        </member>
+        <member name="F:Garnet.common.LatencyMetricsType.NET_RS_LAT">
+            <summary>
+            Latency of processing, per network receive call (server side) - consider batches with only non-admin requests
+            Measured from when we start processing the first request in packet, until when we finishing processing the last request in packet (including sending responses).
+            Only calls that result in at least one request processed, are considered.
+            </summary>
+        </member>
+        <member name="F:Garnet.common.LatencyMetricsType.NET_RS_LAT_ADMIN">
+            <summary>
+            Latency of processing, per network receive call (server side) - consider batches with at least one non-admin request
+            </summary>
+        </member>
+        <member name="F:Garnet.common.LatencyMetricsType.PENDING_LAT">
+            <summary>
+            Pending request completion latency
+            </summary>
+        </member>
+        <member name="F:Garnet.common.LatencyMetricsType.TX_PROC_LAT">
+            <summary>
+            Transaction proc latency monitoring
+            </summary>
+        </member>
+        <member name="F:Garnet.common.LatencyMetricsType.NET_RS_BYTES">
+            <summary>
+            Bytes processed, per network receive call (server side)
+            </summary>
+        </member>
+        <member name="F:Garnet.common.LatencyMetricsType.NET_RS_OPS">
+            <summary>
+            Ops processed, per network receive call (server side)
+            </summary>
+        </member>
+        <member name="T:Garnet.common.MetricsItem">
+            <summary>
+            Metrics item (or row), contains metric name and value
+            </summary>
+        </member>
+        <member name="F:Garnet.common.MetricsItem.Name">
+            <summary>
+            Name of metric
+            </summary>
+        </member>
+        <member name="F:Garnet.common.MetricsItem.Value">
+            <summary>
+            Value of metrics
+            </summary>
+        </member>
+        <member name="M:Garnet.common.MetricsItem.#ctor(System.String,System.String)">
+            <summary>
+            Metrics Item Constructor
+            </summary>
+            <param name="Name"></param>
+            <param name="Value"></param>
+        </member>
+        <member name="T:Garnet.common.NetworkBufferSettings">
+            <summary>
+            Definition of NetworkBufferSettings object
+            </summary>
+        </member>
+        <member name="F:Garnet.common.NetworkBufferSettings.sendBufferSize">
+            <summary>
+            Send buffer size.
+            (NOTE: Send buffers are fixed and cannot grow automatically. Caller responsible for allocating correct amount and handling larger payloads.)
+            </summary>
+        </member>
+        <member name="F:Garnet.common.NetworkBufferSettings.initialReceiveBufferSize">
+            <summary>
+            Initial allocation size for receive network buffer.
+            (NOTE: Receive buffers can automatically grow to accommodate larger payloads.)
+            </summary>
+        </member>
+        <member name="F:Garnet.common.NetworkBufferSettings.maxReceiveBufferSize">
+            <summary>
+            Max allocation size for receive network buffer
+            </summary>
+        </member>
+        <member name="M:Garnet.common.NetworkBufferSettings.#ctor">
+            <summary>
+            Default constructor
+            </summary>
+        </member>
+        <member name="M:Garnet.common.NetworkBufferSettings.#ctor(System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Set network buffer sizes without allocating them
+            </summary>
+            <param name="sendBufferSize"></param>
+            <param name="initialReceiveBufferSize"></param>
+            <param name="maxReceiveBufferSize"></param>
+        </member>
+        <member name="M:Garnet.common.NetworkBufferSettings.GetInclusive(Garnet.common.NetworkBufferSettings[])">
+            <summary>
+            Return inclusive size for array of settings
+            </summary>
+            <param name="settings"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.common.NetworkBufferSettings.CreateBufferPool(System.Int32,Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            Allocate network buffer pool
+            </summary>
+            <param name="maxEntriesPerLevel"></param>
+            <param name="logger"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Garnet.common.GarnetSaeaBuffer">
+            <summary>
+            Buffer of SocketAsyncEventArgs and pinned byte array for transport
+            </summary>
+        </member>
+        <member name="F:Garnet.common.GarnetSaeaBuffer.socketEventAsyncArgs">
+            <summary>
+            SocketAsyncEventArgs
+            </summary>
+        </member>
+        <member name="F:Garnet.common.GarnetSaeaBuffer.buffer">
+            <summary>
+            Byte buffer used by instance
+            </summary>
+        </member>
+        <member name="M:Garnet.common.GarnetSaeaBuffer.#ctor(System.EventHandler{System.Net.Sockets.SocketAsyncEventArgs},Garnet.common.NetworkBufferSettings,Garnet.common.LimitedFixedBufferPool)">
+            <summary>
+            Construct new instance
+            </summary>
+            <param name="eventHandler">Event handler</param>
+            <param name="networkBufferSettings"></param>
+        </member>
+        <member name="M:Garnet.common.GarnetSaeaBuffer.Dispose">
+            <summary>
+            Dispose instance
+            </summary>
+        </member>
+        <member name="T:Garnet.common.GarnetTcpNetworkSender">
+            <summary>
+            TCP network sender
+            </summary>
+        </member>
+        <member name="F:Garnet.common.GarnetTcpNetworkSender.socket">
+            <summary>
+            Socket
+            </summary>
+        </member>
+        <member name="F:Garnet.common.GarnetTcpNetworkSender.responseObject">
+            <summary>
+            Response object
+            </summary>
+        </member>
+        <member name="F:Garnet.common.GarnetTcpNetworkSender.saeaStack">
+            <summary>
+            Reusable SeaaBuffer
+            </summary>
+        </member>
+        <member name="F:Garnet.common.GarnetTcpNetworkSender.throttle">
+            <summary>
+            Throttle
+            </summary>
+        </member>
+        <member name="F:Garnet.common.GarnetTcpNetworkSender.throttleCount">
+            <summary>
+            Count of sends for throttling
+            </summary>
+        </member>
+        <member name="F:Garnet.common.GarnetTcpNetworkSender.ThrottleMax">
+            <summary>
+            Max concurrent sends (per session) for throttling
+            </summary>
+        </member>
+        <member name="F:Garnet.common.GarnetTcpNetworkSender.spinLock">
+            <summary>
+            NOTE: This variable should not be marked as readonly as it is a mutable struct
+            </summary>
+        </member>
+        <member name="M:Garnet.common.GarnetTcpNetworkSender.#ctor(System.Net.Sockets.Socket,Garnet.common.NetworkBufferSettings,Garnet.common.LimitedFixedBufferPool,System.Int32)">
+            <summary>
+            GarnetTcpNetworkSender Constructor
+            </summary>
+            <param name="socket"></param>
+            <param name="networkBufferSettings"></param>
+            <param name="throttleMax"></param>
+        </member>
+        <member name="P:Garnet.common.GarnetTcpNetworkSender.RemoteEndpointName">
+            <inheritdoc />
+        </member>
+        <member name="P:Garnet.common.GarnetTcpNetworkSender.LocalEndpointName">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.common.GarnetTcpNetworkSender.IsLocalConnection">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.common.GarnetTcpNetworkSender.Enter">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.common.GarnetTcpNetworkSender.EnterAndGetResponseObject(System.Byte*@,System.Byte*@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.common.GarnetTcpNetworkSender.Exit">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.common.GarnetTcpNetworkSender.ExitAndReturnResponseObject">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.common.GarnetTcpNetworkSender.GetResponseObject">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.common.GarnetTcpNetworkSender.ReturnResponseObject">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.common.GarnetTcpNetworkSender.GetResponseObjectHead">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.common.GarnetTcpNetworkSender.GetResponseObjectTail">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.common.GarnetTcpNetworkSender.SendResponse(System.Int32,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.common.GarnetTcpNetworkSender.SendResponse(System.Byte[],System.Int32,System.Int32,System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.common.GarnetTcpNetworkSender.SendCallback(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.common.GarnetTcpNetworkSender.Dispose">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.common.GarnetTcpNetworkSender.DisposeNetworkSender(System.Boolean)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.common.GarnetTcpNetworkSender.Throttle">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.common.GarnetTcpNetworkSender.TryClose">
+            <inheritdoc />
+        </member>
+        <member name="T:Garnet.common.TcpNetworkHandler`1">
+            <summary>
+            TCP network handler
+            </summary>
+            <typeparam name="TServerHook"></typeparam>
+        </member>
+        <member name="M:Garnet.common.TcpNetworkHandler`1.#ctor(`0,System.Net.Sockets.Socket,Garnet.common.NetworkBufferSettings,Garnet.common.LimitedFixedBufferPool,System.Boolean,Garnet.networking.IMessageConsumer,System.Int32,Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="T:Garnet.common.TcpNetworkHandlerBase`2">
+            <summary>
+            TCP network handler
+            </summary>
+            <typeparam name="TServerHook"></typeparam>
+            <typeparam name="TNetworkSender"></typeparam>
+        </member>
+        <member name="M:Garnet.common.TcpNetworkHandlerBase`2.#ctor(`0,`1,System.Net.Sockets.Socket,Garnet.common.NetworkBufferSettings,Garnet.common.LimitedFixedBufferPool,System.Boolean,Garnet.networking.IMessageConsumer,Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="P:Garnet.common.TcpNetworkHandlerBase`2.RemoteEndpointName">
+            <inheritdoc />
+        </member>
+        <member name="P:Garnet.common.TcpNetworkHandlerBase`2.LocalEndpointName">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.common.TcpNetworkHandlerBase`2.IsLocalConnection">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.common.TcpNetworkHandlerBase`2.Start(System.Net.Security.SslServerAuthenticationOptions,System.String,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.common.TcpNetworkHandlerBase`2.StartAsync(System.Net.Security.SslServerAuthenticationOptions,System.String,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.common.TcpNetworkHandlerBase`2.Start(System.Net.Security.SslClientAuthenticationOptions,System.String,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.common.TcpNetworkHandlerBase`2.StartAsync(System.Net.Security.SslClientAuthenticationOptions,System.String,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.common.TcpNetworkHandlerBase`2.TryClose">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.common.TcpNetworkHandlerBase`2.Start(System.Boolean)">
+            <summary>
+            Start the socket receive - after this call, NetworkHandler may get disposed at any time
+            such as when the socket is disconnected.
+            </summary>
+            <param name="useTLS"></param>
+        </member>
+        <member name="M:Garnet.common.TcpNetworkHandlerBase`2.Dispose">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.common.TcpNetworkHandlerBase`2.DisposeResources">
+            <summary>
+            Dispose resources - call ONLY if Start was not called on network handler
+            </summary>
+        </member>
+        <member name="T:Garnet.common.Numerics.IBinaryOperator">
+            <summary>Operator that takes two input values and returns a single value.</summary>
+        </member>
+        <member name="M:Garnet.common.Numerics.IBinaryOperator.Invoke``1(``0,``0)">
+            <summary>
+            Computes the binary operation of two scalar values.
+            </summary>
+        </member>
+        <member name="M:Garnet.common.Numerics.IBinaryOperator.Invoke(System.Runtime.Intrinsics.Vector128{System.Byte},System.Runtime.Intrinsics.Vector128{System.Byte})">
+            <summary>
+            Computes the binary operation of two vectors.
+            </summary>
+        </member>
+        <member name="M:Garnet.common.Numerics.IBinaryOperator.Invoke(System.Runtime.Intrinsics.Vector256{System.Byte},System.Runtime.Intrinsics.Vector256{System.Byte})">
+            <inheritdoc cref="M:Garnet.common.Numerics.IBinaryOperator.Invoke(System.Runtime.Intrinsics.Vector128{System.Byte},System.Runtime.Intrinsics.Vector128{System.Byte})"/>
+        </member>
+        <member name="M:Garnet.common.Numerics.IBinaryOperator.Invoke(System.Runtime.Intrinsics.Vector512{System.Byte},System.Runtime.Intrinsics.Vector512{System.Byte})">
+            <inheritdoc cref="M:Garnet.common.Numerics.IBinaryOperator.Invoke(System.Runtime.Intrinsics.Vector128{System.Byte},System.Runtime.Intrinsics.Vector128{System.Byte})"/>
+        </member>
+        <member name="T:Garnet.common.Numerics.BitwiseAndOperator">
+            <summary><c>x &amp; y</c></summary>
+        </member>
+        <member name="M:Garnet.common.Numerics.BitwiseAndOperator.Invoke``1(``0,``0)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Garnet.common.Numerics.BitwiseAndOperator.Invoke(System.Runtime.Intrinsics.Vector128{System.Byte},System.Runtime.Intrinsics.Vector128{System.Byte})">
+            <inheritdoc/>
+        </member>
+        <member name="M:Garnet.common.Numerics.BitwiseAndOperator.Invoke(System.Runtime.Intrinsics.Vector256{System.Byte},System.Runtime.Intrinsics.Vector256{System.Byte})">
+            <inheritdoc/>
+        </member>
+        <member name="M:Garnet.common.Numerics.BitwiseAndOperator.Invoke(System.Runtime.Intrinsics.Vector512{System.Byte},System.Runtime.Intrinsics.Vector512{System.Byte})">
+            <inheritdoc/>
+        </member>
+        <member name="T:Garnet.common.Numerics.BitwiseOrOperator">
+            <summary><c>x | y</c></summary>
+        </member>
+        <member name="M:Garnet.common.Numerics.BitwiseOrOperator.Invoke``1(``0,``0)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Garnet.common.Numerics.BitwiseOrOperator.Invoke(System.Runtime.Intrinsics.Vector128{System.Byte},System.Runtime.Intrinsics.Vector128{System.Byte})">
+            <inheritdoc/>
+        </member>
+        <member name="M:Garnet.common.Numerics.BitwiseOrOperator.Invoke(System.Runtime.Intrinsics.Vector256{System.Byte},System.Runtime.Intrinsics.Vector256{System.Byte})">
+            <inheritdoc/>
+        </member>
+        <member name="M:Garnet.common.Numerics.BitwiseOrOperator.Invoke(System.Runtime.Intrinsics.Vector512{System.Byte},System.Runtime.Intrinsics.Vector512{System.Byte})">
+            <inheritdoc/>
+        </member>
+        <member name="T:Garnet.common.Numerics.BitwiseXorOperator">
+            <summary><c>x ^ y</c></summary>
+        </member>
+        <member name="M:Garnet.common.Numerics.BitwiseXorOperator.Invoke``1(``0,``0)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Garnet.common.Numerics.BitwiseXorOperator.Invoke(System.Runtime.Intrinsics.Vector128{System.Byte},System.Runtime.Intrinsics.Vector128{System.Byte})">
+            <inheritdoc/>
+        </member>
+        <member name="M:Garnet.common.Numerics.BitwiseXorOperator.Invoke(System.Runtime.Intrinsics.Vector256{System.Byte},System.Runtime.Intrinsics.Vector256{System.Byte})">
+            <inheritdoc/>
+        </member>
+        <member name="M:Garnet.common.Numerics.BitwiseXorOperator.Invoke(System.Runtime.Intrinsics.Vector512{System.Byte},System.Runtime.Intrinsics.Vector512{System.Byte})">
+            <inheritdoc/>
+        </member>
+        <member name="T:Garnet.common.Numerics.BitwiseAndNotOperator">
+            <summary><c>x &amp; ~y</c></summary>
+        </member>
+        <member name="M:Garnet.common.Numerics.BitwiseAndNotOperator.Invoke``1(``0,``0)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Garnet.common.Numerics.BitwiseAndNotOperator.Invoke(System.Runtime.Intrinsics.Vector128{System.Byte},System.Runtime.Intrinsics.Vector128{System.Byte})">
+            <inheritdoc/>
+        </member>
+        <member name="M:Garnet.common.Numerics.BitwiseAndNotOperator.Invoke(System.Runtime.Intrinsics.Vector256{System.Byte},System.Runtime.Intrinsics.Vector256{System.Byte})">
+            <inheritdoc/>
+        </member>
+        <member name="M:Garnet.common.Numerics.BitwiseAndNotOperator.Invoke(System.Runtime.Intrinsics.Vector512{System.Byte},System.Runtime.Intrinsics.Vector512{System.Byte})">
+            <inheritdoc/>
+        </member>
+        <member name="T:Garnet.common.NumUtils">
+            <summary>
+            Utilities for numeric parsing and formatting
+            </summary>
+        </member>
+        <member name="M:Garnet.common.NumUtils.WriteInt64(System.Int64,System.Span{System.Byte})">
+            <summary>
+            Writes 64-bit signed integer as ASCII.
+            </summary>
+            <param name="value">The value to write</param>
+            <param name="destination">Span Byte </param>
+            <returns>The length of written text in bytes.</returns>
+        </member>
+        <member name="M:Garnet.common.NumUtils.WriteInt64(System.Int64,System.Int32,System.Byte*@)">
+            <summary>
+            Writes 64-bit signed integer as ASCII.
+            </summary>
+            <param name="value">The value to write</param>
+            <param name="length"></param>
+            <param name="result">Byte pointer, will be updated to point after the written number</param>
+        </member>
+        <member name="M:Garnet.common.NumUtils.WriteDouble(System.Double,System.Span{System.Byte})">
+            <summary>
+            Writes <see langword="double"/> as ASCII.
+            </summary>
+            <param name="value">The value to write</param>
+            <param name="destination">Buffer to write the ASCII formatted value to</param>
+            <returns>The length of written text in bytes.</returns>
+        </member>
+        <member name="M:Garnet.common.NumUtils.WriteDouble(System.Double,System.Int32,System.Int32,System.Byte*@)">
+            <summary>
+            Writes <see langword="double"/> as ASCII.
+            </summary>
+            <param name="value">The value to write</param>
+            <param name="integerDigits">Number of digits in the integer part of the double value</param>
+            <param name="fractionalDigits">Number of digits in the fractional part of the double value</param>
+            <param name="result">Byte pointer, will be updated to point after the written number</param>
+        </member>
+        <member name="M:Garnet.common.NumUtils.ReadInt64(System.ReadOnlySpan{System.Byte})">
+            <summary>
+            Parses 64-bit signed integer from ASCII.
+            </summary>
+            <param name="source">Source buffer</param>
+            <returns>The double value parsed from the <paramref name="source"/> buffer.</returns>
+        </member>
+        <member name="M:Garnet.common.NumUtils.ReadInt64(System.Int32,System.Byte*)">
+            <summary>
+            Parses 64-bit signed integer from ASCII.
+            </summary>
+            <param name="length">Length of number</param>
+            <param name="source">Source bytes</param>
+            <returns>The double value parsed from the buffer which <paramref name="source"/> points to.</returns>
+        </member>
+        <member name="M:Garnet.common.NumUtils.TryReadInt64(System.ReadOnlySpan{System.Byte},System.Int64@)">
+            <summary>
+            Parses 64-bit signed integer from ASCII.
+            </summary>
+            <param name="source">Pointer to source buffer</param>
+            <param name="result">Long value extracted from sequence</param>
+            <returns>True if buffer <paramref name="source"/> consisted only of a valid signed 64-bit integer, otherwise false</returns>
+        </member>
+        <member name="M:Garnet.common.NumUtils.TryReadInt64(System.Int32,System.Byte*,System.Int64@)">
+            <summary>
+            Parses 64-bit signed integer from ASCII.
+            </summary>
+            <param name="length">The expected length of the integer in the buffer which <paramref name="source"/> points to</param>
+            <param name="source">Pointer to the source buffer</param>
+            <param name="result">64-bit signed integer parsed from the buffer which <paramref name="source"/> points to</param>
+            <returns>True if the buffer which <paramref name="source"/> points to consisted only of a valid signed 64-bit integer, otherwise false</returns>
+        </member>
+        <member name="M:Garnet.common.NumUtils.TryReadDouble(System.ReadOnlySpan{System.Byte},System.Double@)">
+            <summary>
+            Parses <see langword="double"/> from ASCII.
+            </summary>
+            <param name="source">Source buffer</param>
+            <param name="result"><see langword="double"/> parsed from the <paramref name="source"/> buffer</param>
+            <returns>True if the <paramref name="source"/> buffer consisted only of a valid <see langword="double"/>, otherwise false</returns>
+        </member>
+        <member name="M:Garnet.common.NumUtils.TryReadDouble(System.Int32,System.Byte*,System.Double@)">
+            <summary>
+            Writes <see langword="double"/> as ASCII.
+            </summary>
+            <param name="length">The expected length of the number in the buffer <paramref name="source"/> points to</param>
+            <param name="source">Pointer to the source buffer</param>
+            <param name="result">Double value extracted from sequence</param>
+            <returns>True if the buffer which <paramref name="source"/> points to consisted only of a valid <see langword="double"/>, otherwise false</returns>
+        </member>
+        <member name="M:Garnet.common.NumUtils.WriteInt32(System.Int32,System.Int32,System.Byte*@)">
+            <summary>
+            Convert integer into sequence of ASCII bytes
+            </summary>
+            <param name="value">The value to write</param>
+            <param name="length">Number of digits in the integer value</param>
+            <param name="result">Byte pointer, will updated to point after the written number</param>
+        </member>
+        <member name="M:Garnet.common.NumUtils.CountDigits(System.Int32)">
+            <summary>
+            Counts the number of digits in a given integer.
+            </summary>
+            <param name="value">Integer value</param>
+            <remarks>Doesn't count the sign as a digit.</remarks>
+            <returns>The number of digits in <paramref name="value"/>.</returns>
+        </member>
+        <member name="M:Garnet.common.NumUtils.CountDigits(System.Int64)">
+            <inheritdoc cref="M:Garnet.common.NumUtils.CountDigits(System.Int32)"/>
+        </member>
+        <member name="M:Garnet.common.NumUtils.CountDigits(System.Int64,System.Boolean@)">
+            <summary>
+            Counts the number of digits in a given integer.
+            </summary>
+            <param name="value">Integer value</param>
+            <param name="isNegative">Whether the <paramref name="value"/> is negative or not</param>
+            <remarks>Doesn't count the sign as a digit.</remarks>
+            <returns>The number of digits in <paramref name="value"/>.</returns>
+        </member>
+        <member name="M:Garnet.common.NumUtils.CountCharsInDouble(System.Double,System.Int32@,System.Byte@,System.Int32@)">
+            <summary>
+            Return number of digits in given double number incluing the decimal part and `.` character
+            </summary>
+            <param name="value">Double value</param>
+            <returns>Number of digits in the integer part of the double value</returns>
+        </member>
+        <member name="M:Garnet.common.NumUtils.TryParse(System.ReadOnlySpan{System.Byte},System.Int32@)">
+            <inheritdoc cref="M:System.Buffers.Text.Utf8Parser.TryParse(System.ReadOnlySpan{System.Byte},System.Int32@,System.Int32@,System.Char)"/>
+        </member>
+        <member name="M:Garnet.common.NumUtils.TryParse(System.ReadOnlySpan{System.Byte},System.Int64@)">
+            <inheritdoc cref="M:System.Buffers.Text.Utf8Parser.TryParse(System.ReadOnlySpan{System.Byte},System.Int64@,System.Int32@,System.Char)"/>
+        </member>
+        <member name="M:Garnet.common.NumUtils.TryParse(System.ReadOnlySpan{System.Byte},System.Single@)">
+            <inheritdoc cref="M:System.Buffers.Text.Utf8Parser.TryParse(System.ReadOnlySpan{System.Byte},System.Single@,System.Int32@,System.Char)"/>
+        </member>
+        <member name="M:Garnet.common.NumUtils.TryParse(System.ReadOnlySpan{System.Byte},System.Double@)">
+            <inheritdoc cref="M:System.Buffers.Text.Utf8Parser.TryParse(System.ReadOnlySpan{System.Byte},System.Double@,System.Int32@,System.Char)"/>
+        </member>
+        <member name="M:Garnet.common.NumUtils.TryParseWithInfinity(System.ReadOnlySpan{System.Byte},System.Double@)">
+            <inheritdoc cref="M:System.Buffers.Text.Utf8Parser.TryParse(System.ReadOnlySpan{System.Byte},System.Double@,System.Int32@,System.Char)" path="//*[not(self::summary)]"/>
+            <summary>
+            Parses a Double at the start of a Utf8 string, including RESP's infinity format
+            </summary>
+            <remarks>
+            Formats supported:
+                G/g  (default)
+                F/f             12.45       Fixed point
+                E/e             1.245000e1  Exponential
+                [+-]inf         plus/minus infinity
+            </remarks>
+        </member>
+        <member name="T:Garnet.common.Parsing.RespParsingException">
+            <summary>
+            Exception wrapper for RESP parsing errors.
+            </summary>
+        </member>
+        <member name="M:Garnet.common.Parsing.RespParsingException.#ctor(System.String,Microsoft.Extensions.Logging.LogLevel)">
+            <summary>
+            Construct a new RESP parsing exception with the given message.
+            </summary>
+            <param name="message">Message that described the exception that has occurred.</param>
+            <param name="logLevel">Logging level for the exception that occurred</param>
+        </member>
+        <member name="M:Garnet.common.Parsing.RespParsingException.ThrowUnexpectedToken(System.Byte)">
+            <summary>
+            Throw an "Unexcepted Token" exception.
+            </summary>
+            <param name="token">The character that was unexpected.</param>
+        </member>
+        <member name="M:Garnet.common.Parsing.RespParsingException.ThrowInvalidStringLength(System.Int64)">
+            <summary>
+            Throw an invalid string length exception.
+            </summary>
+            <param name="len">The invalid string length.</param>
+        </member>
+        <member name="M:Garnet.common.Parsing.RespParsingException.ThrowInvalidLength(System.Int64)">
+            <summary>
+            Throw an invalid length exception.
+            </summary>
+            <param name="len">The invalid length.</param>
+        </member>
+        <member name="M:Garnet.common.Parsing.RespParsingException.ThrowNotANumber(System.Byte*,System.Int32)">
+            <summary>
+            Throw NaN (not a number) exception.
+            </summary>
+            <param name="buffer">Pointer to an ASCII-encoded byte buffer containing the string that could not be converted.</param>
+            <param name="length">Length of the buffer.</param>
+        </member>
+        <member name="M:Garnet.common.Parsing.RespParsingException.ThrowIntegerOverflow(System.Byte*,System.Int32)">
+            <summary>
+            Throw a exception indicating that an integer overflow has occurred.
+            </summary>
+            <param name="buffer">Pointer to an ASCII-encoded byte buffer containing the string that caused the overflow.</param>
+            <param name="length">Length of the buffer.</param>
+        </member>
+        <member name="M:Garnet.common.Parsing.RespParsingException.Throw(System.String,Microsoft.Extensions.Logging.LogLevel)">
+            <summary>
+            Throw helper that throws a RespParsingException.
+            </summary>
+            <param name="message">Exception message.</param>
+            <param name="logLevel">LogLevel for exception.</param>
+        </member>
+        <member name="T:Garnet.common.RandomUtils">
+            <summary>
+            Utility class for Random-related operations
+            </summary>
+        </member>
+        <member name="F:Garnet.common.RandomUtils.IndexStackallocThreshold">
+            <summary>
+            Stack allocation size threshold for integer arrays.
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RandomUtils.PickKRandomIndexes(System.Int32,System.Span{System.Int32},System.Int32,System.Boolean)">
+            <summary>
+            Pick k indexes from a collection of n items into a given span of length k
+            </summary>
+            <param name="n">Number of items in the collection</param>
+            <param name="indexes">Span of indexes to pick.</param>
+            <param name="seed">Random seed</param>
+            <param name="distinct">Whether items returned should be distinct (default: true)</param>
+            <returns>K indexes picked</returns>
+        </member>
+        <member name="M:Garnet.common.RandomUtils.PickRandomIndex(System.Int32,System.Int32)">
+            <summary>
+            Pick random index from a collection of n items, using the given random integer
+            </summary>
+            <param name="n">Number of items in the collection</param>
+            <param name="rand">Random integer</param>
+            <returns>Index picked</returns>
+        </member>
+        <member name="T:Garnet.common.RespLengthEncodingUtils">
+            <summary>
+            Utils for working with RESP length encoding
+            </summary>
+        </member>
+        <member name="F:Garnet.common.RespLengthEncodingUtils.MaxLength">
+            <summary>
+            Maximum length that can be encoded
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespLengthEncodingUtils.TryReadLength(System.ReadOnlySpan{System.Byte},System.Int32@,System.Int32@)">
+            <summary>
+            Try read RESP-encoded length
+            </summary>
+            <param name="input"></param>
+            <param name="length"></param>
+            <param name="bytesRead"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.common.RespLengthEncodingUtils.TryWriteLength(System.Int32,System.Span{System.Byte},System.Int32@)">
+            <summary>
+            Try to write RESP-encoded length
+            </summary>
+            <param name="length"></param>
+            <param name="output"></param>
+            <param name="bytesWritten"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Garnet.common.RespMemoryWriter">
+            <summary>
+            RESP output to SpanByteAndMemory.
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespMemoryWriter.WriteAsciiBulkString(System.String)">
+            <summary>
+            Encodes the <paramref name="chars"/> as ASCII bulk string to memory.
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespMemoryWriter.WriteAsciiDirect(System.ReadOnlySpan{System.Char})">
+            <summary>
+            Encodes the <paramref name="span"/> as ASCII to memory.
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespMemoryWriter.WriteArrayItem(System.Int64)">
+            <summary>
+            Writes an array str to memory.
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespMemoryWriter.WriteArrayLength(System.Int32)">
+            <summary>
+            Writes an array length to memory.
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespMemoryWriter.WriteArrayLength(System.Int32,System.Int32@,System.Int32@)">
+            <summary>
+            Writes an array length to memory.
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespMemoryWriter.WriteBulkString(System.ReadOnlySpan{System.Byte})">
+            <summary>
+            Write bulk string to memory.
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespMemoryWriter.WriteBulkString(System.Collections.Generic.IEnumerable{System.Byte[]})">
+            <summary>
+            Write bulk string to memory.
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespMemoryWriter.WriteDirect(System.ReadOnlySpan{System.Byte})">
+            <summary>
+            Writes the contents of <paramref name="span"/> as byte array to memory.
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespMemoryWriter.WriteDirect``1(``0@)">
+            <summary>
+            Writes struct directly to memory.
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespMemoryWriter.WriteDoubleBulkString(System.Double)">
+            <summary>
+            Writes a double-precision floating-point <paramref name="value"/> as bulk string to memory.
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespMemoryWriter.WriteDoubleNumeric(System.Double)">
+            <summary>
+            Write a double-precision floating-point <paramref name="value"/> to memory.
+            If RESP2, write as BulkString. If RESP3 write as Double.
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespMemoryWriter.WriteEmptyArray">
+            <summary>
+            Write empty array to memory.
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespMemoryWriter.WriteEmptyMap">
+            <summary>
+            Write empty array to memory.
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespMemoryWriter.WriteError(System.ReadOnlySpan{System.Byte})">
+            <summary>
+            Write simple error to memory.
+            </summary>
+            <param name="errorString">An ASCII encoded error string. The string mustn't contain a CR (\r) or LF (\n) bytes.</param>
+        </member>
+        <member name="M:Garnet.common.RespMemoryWriter.WriteError(System.ReadOnlySpan{System.Char})">
+            <summary>
+            Write simple error
+            </summary>
+            <param name="errorString">An ASCII error string. The string mustn't contain a CR (\r) or LF (\n) characters.</param>
+        </member>
+        <member name="M:Garnet.common.RespMemoryWriter.TryWriteFalse">
+            <summary>
+            Write RESP3 false
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespMemoryWriter.WriteInt32(System.Int32)">
+            <summary>
+            Write integer to memory.
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespMemoryWriter.WriteInt64AsBulkString(System.Int64)">
+            <summary>
+            Write a signed 64-bit integer as bulk string
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespMemoryWriter.WriteInt64(System.Int64)">
+            <summary>
+            Write long to memory.
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespMemoryWriter.WriteIntegerFromBytes(System.ReadOnlySpan{System.Byte})">
+            <summary>
+            Write integer from bytes to memory.
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespMemoryWriter.WriteMapLength(System.Int32)">
+            <summary>
+            Writes a map length to memory.
+            If RESP2, write as (doubled) Array length. If RESP3, write as Map length.
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespMemoryWriter.WriteNewLine">
+            <summary>
+            Write new line
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespMemoryWriter.WriteNull">
+            <summary>
+            Writes a null to memory, using proper protocol representation.
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespMemoryWriter.WriteNullArray">
+            <summary>
+            Writes a null array to memory, using proper protocol representation.
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespMemoryWriter.WritePushLength(System.Int32)">
+            <summary>
+            Writes a push type length
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespMemoryWriter.WriteSetLength(System.Int32)">
+            <summary>
+            Writes a set length to memory.
+            If RESP2, write as Array length. If RESP3, write as Set length.
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespMemoryWriter.WriteSimpleString(System.ReadOnlySpan{System.Char})">
+            <summary>
+            Write simple string to memory.
+            </summary>
+            <param name="simpleString">An ASCII simple string. The string mustn't contain a CR (\r) or LF (\n) characters.</param>
+        </member>
+        <member name="M:Garnet.common.RespMemoryWriter.WriteTrue">
+            <summary>
+            Write RESP3 true
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespMemoryWriter.WriteUtf8BulkString(System.ReadOnlySpan{System.Char})">
+            <summary>
+            Wrties the <paramref name="chars"/> as UTF8 bulk string to memory.
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespMemoryWriter.WriteVerbatimString(System.ReadOnlySpan{System.Byte},System.ReadOnlySpan{System.Byte})">
+            <summary>
+            Write Verbatim string to memory.
+            If RESP2, write as Bulk String. If RESP3, write as Verbatim String with given type.
+            </summary>
+            <param name="str">String to write to memory</param>
+            <param name="ext">String 3-letter type. If not supplied default is "txt"</param>
+        </member>
+        <member name="M:Garnet.common.RespMemoryWriter.WriteZero">
+            <summary>
+            Write zero as integer to memory.
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespMemoryWriter.WriteOne">
+            <summary>
+            Write one as integer to memory.
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespMemoryWriter.Realloc(System.Int32)">
+            <summary>
+            Make sure at least totalLen bytes are allocated.
+            </summary>
+            <param name="totalLenHint"></param>
+        </member>
+        <member name="M:Garnet.common.RespMemoryWriter.DecreaseArrayLength(System.Int32,System.Int32)">
+            <summary>
+            Decrease array length.
+            </summary>
+            <param name="newCount">New count of array items</param>
+            <param name="oldTotalArrayHeaderLen">Array Header length</param>
+        </member>
+        <member name="M:Garnet.common.RespMemoryWriter.AsReadOnlySpan">
+            <summary>
+            As a span of the contained data.
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespMemoryWriter.GetPosition">
+            <summary>
+            Get position
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.common.RespMemoryWriter.ResetPosition">
+            <summary>
+            Reset position to starting position
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespMemoryWriter.Dispose">
+            <inheritdoc />
+        </member>
+        <member name="T:Garnet.common.RespReadUtils">
+            <summary>
+            Utilities for reading RESP protocol messages.
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TryReadSign(System.Byte*,System.Boolean@)">
+            <summary>
+            Tries to read the leading sign of the given ASCII-encoded number.
+            </summary>
+            <param name="ptr">String to try reading sign from.</param>
+            <param name="negative">Whether the sign is '-'.</param>
+            <returns>True if either '+' or '-' was found, false otherwise.</returns>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TryReadUInt64(System.Byte*@,System.Byte*,System.UInt64@,System.UInt64@)">
+            <summary>
+            Tries to read an unsigned 64-bit integer from a given ASCII-encoded input stream.
+            The input may include leading zeros.
+            </summary>
+            <param name="ptr">Pointer to the beginning of the ASCII encoded input string.</param>
+            <param name="end">The end of the string to parse.</param>
+            <param name="value">If parsing was successful, contains the parsed ulong value.</param>
+            <param name="bytesRead">If parsing was successful, contains the number of bytes that were parsed.</param>
+            <returns>
+            True if a ulong was successfully parsed, false if the input string did not start with
+            a valid integer or the end of the string was reached before finishing parsing.
+            </returns>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if integer overflow occurs.</exception>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TryReadInt64(System.Byte*@,System.Byte*,System.Int64@,System.UInt64@,System.Boolean)">
+            <summary>
+            Tries to read a signed 64-bit integer from a given ASCII-encoded input stream.
+            This method will throw if an overflow occurred.
+            </summary>
+            <param name="ptr">Pointer to the beginning of the ASCII encoded input string.</param>
+            <param name="end">The end of the string to parse.</param>
+            <param name="value">If parsing was successful, contains the parsed long value.</param>
+            <param name="bytesRead">If parsing was successful, contains the number of bytes that were parsed.</param>
+            <param name="allowLeadingZeros">True if leading zeros allowed</param>
+            <returns>
+            True if a long was successfully parsed, false if the input string did not start with
+            a valid integer or the end of the string was reached before finishing parsing.
+            </returns>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if integer overflow occurs.</exception>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TryReadInt64Safe(System.Byte*@,System.Byte*,System.Int64@,System.UInt64@,System.Boolean@,System.Boolean@,System.Boolean)">
+            <summary>
+            Tries to read a signed 64-bit integer from a given ASCII-encoded input stream.
+            </summary>
+            <param name="ptr">Pointer to the beginning of the ASCII encoded input string.</param>
+            <param name="end">The end of the string to parse.</param>
+            <param name="value">If parsing was successful, contains the parsed long value.</param>
+            <param name="bytesRead">If parsing was successful, contains the number of bytes that were parsed.</param>
+            <param name="signRead">True if +/- sign was read during parsing</param>
+            <param name="overflow">True if overflow occured during parsing</param>
+            <param name="allowLeadingZeros">True if leading zeros allowed</param>
+            <returns>
+            True if a long was successfully parsed, false if the input string did not start with
+            a valid integer or the end of the string was reached before finishing parsing.
+            </returns>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if integer overflow occurs.</exception>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TryReadInt32(System.Byte*@,System.Byte*,System.Int32@,System.UInt64@,System.Boolean)">
+            <summary>
+            Tries to read a signed 32-bit integer from a given ASCII-encoded input stream.
+            This method will throw if an overflow occurred.
+            </summary>
+            <param name="ptr">Pointer to the beginning of the ASCII encoded input string.</param>
+            <param name="end">The end of the string to parse.</param>
+            <param name="value">If parsing was successful, contains the parsed int value.</param>
+            <param name="bytesRead">If parsing was successful, contains the number of bytes that were parsed.</param>
+            <param name="allowLeadingZeros">True if leading zeros allowed</param>
+            <returns>
+            True if an int was successfully parsed, false if the input string did not start with
+            a valid integer or the end of the string was reached before finishing parsing.
+            </returns>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if integer overflow occurs.</exception>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TryReadInt32Safe(System.Byte*@,System.Byte*,System.Int32@,System.UInt64@,System.Boolean@,System.Boolean@,System.Boolean)">
+            <summary>
+            Tries to read a signed 32-bit integer from a given ASCII-encoded input stream.
+            </summary>
+            <param name="ptr">Pointer to the beginning of the ASCII encoded input string.</param>
+            <param name="end">The end of the string to parse.</param>
+            <param name="value">If parsing was successful, contains the parsed int value.</param>
+            <param name="bytesRead">If parsing was successful, contains the number of bytes that were parsed.</param>
+            <param name="signRead">True if +/- sign was read during parsing</param>
+            <param name="overflow">True if overflow occured during parsing</param>
+            <param name="allowLeadingZeros">True if leading zeros allowed</param>
+            <returns>
+            True if an int was successfully parsed, false if the input string did not start with
+            a valid integer or the end of the string was reached before finishing parsing.
+            </returns>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if integer overflow occurs.</exception>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TryReadUnsignedLengthHeader(System.Int32@,System.Byte*@,System.Byte*,System.Char)">
+            <summary>
+            Tries to read a RESP length header from the given ASCII-encoded RESP string
+            and, if successful, moves the given ptr to the end of the length header.
+            <para />
+            NOTE:
+                It will throw an <see cref="T:Garnet.common.Parsing.RespParsingException"/> if length header is negative.
+                It is primarily used for parsing header length from packets received from server side.
+            </summary>
+            <param name="length">If parsing was successful, contains the extracted length from the header.</param>
+            <param name="ptr">The starting position in the RESP string. Will be advanced if parsing is successful.</param>
+            <param name="end">The current end of the RESP string.</param>
+            <param name="expectedSigil">Expected type of RESP header, defaults to string ('$').</param>
+            <returns>True if a length header was successfully read.</returns>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if the length header is negative.</exception>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if unexpected token is read.</exception>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if integer overflow occurs.</exception>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TryReadSignedLengthHeader(System.Int32@,System.Byte*@,System.Byte*,System.Char)">
+            <summary>
+            Tries to read a RESP a signed length header from the given ASCII-encoded RESP string
+            and, if successful, moves the given ptr to the end of the length header.
+            <para />
+            NOTE:
+                It will not throw an exception if length header is negative.
+                It is primarily used by client side code.
+                Should not be called by any server code since server side does not accept null values
+            </summary>
+            <param name="length">If parsing was successful, contains the extracted length from the header.</param>
+            <param name="ptr">The starting position in the RESP string. Will be advanced if parsing is successful.</param>
+            <param name="end">The current end of the RESP string.</param>
+            <param name="expectedSigil">Expected type of RESP header, defaults to string ('$').</param>
+            <returns>True if a length header was successfully read.</returns>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if unexpected token is read.</exception>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if integer overflow occurs.</exception>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TryReadInt64(System.Int64@,System.Byte*@,System.Byte*)">
+            <summary>
+            Read signed 64 bit integer
+            </summary>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if unexpected token is read.</exception>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TryReadInt64(System.Int64@,System.Byte*@,System.Byte*,System.Nullable{System.Byte}@)">
+            <summary>
+            Try read signed 64 bit integer
+            </summary>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if integer overflow occurs.</exception>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TryReadUnsignedArrayLength(System.Int32@,System.Byte*@,System.Byte*)">
+            <summary>
+            Tries to read a RESP array length header from the given ASCII-encoded RESP string
+            and, if successful, moves the given ptr to the end of the length header.
+            <para />
+            NOTE: We use ReadUnsignedLengthHeader because server does not accept $-1\r\n headers
+            </summary>
+            <param name="length">If parsing was successful, contains the extracted length from the header.</param>
+            <param name="ptr">The starting position in the RESP string. Will be advanced if parsing is successful.</param>
+            <param name="end">The current end of the RESP string.</param>
+            <returns>True if a length header was successfully read.</returns>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if the length header is negative.</exception>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if unexpected token is read.</exception>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if integer overflow occurs.</exception>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TryReadSignedArrayLength(System.Int32@,System.Byte*@,System.Byte*)">
+            <summary>
+            Tries to read a RESP array length header from the given ASCII-encoded RESP string
+            and, if successful, moves the given ptr to the end of the length header.
+            <para />
+            NOTE: It will not throw an exception if length header is negative.
+            </summary>
+            <param name="length">If parsing was successful, contains the extracted length from the header.</param>
+            <param name="ptr">The starting position in the RESP string. Will be advanced if parsing is successful.</param>
+            <param name="end">The current end of the RESP string.</param>
+            <returns>True if a length header was successfully read.</returns>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if unexpected token is read.</exception>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if integer overflow occurs.</exception>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TryReadSignedMapLength(System.Int32@,System.Byte*@,System.Byte*)">
+            <summary>
+            Tries to read a RESP3 map length header from the given ASCII-encoded RESP string
+            and, if successful, moves the given ptr to the end of the length header.
+            <para />
+            NOTE: It will not throw an exception if length header is negative.
+            </summary>
+            <param name="length">If parsing was successful, contains the extracted length from the header.</param>
+            <param name="ptr">The starting position in the RESP string. Will be advanced if parsing is successful.</param>
+            <param name="end">The current end of the RESP string.</param>
+            <returns>True if a length header was successfully read.</returns>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if unexpected token is read.</exception>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if integer overflow occurs.</exception>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TryReadSignedSetLength(System.Int32@,System.Byte*@,System.Byte*)">
+            <summary>
+            Tries to read a RESP3 set length header from the given ASCII-encoded RESP string
+            and, if successful, moves the given ptr to the end of the length header.
+            <para />
+            NOTE: It will not throw an exception if length header is negative.
+            </summary>
+            <param name="length">If parsing was successful, contains the extracted length from the header.</param>
+            <param name="ptr">The starting position in the RESP string. Will be advanced if parsing is successful.</param>
+            <param name="end">The current end of the RESP string.</param>
+            <returns>True if a length header was successfully read.</returns>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if unexpected token is read.</exception>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if integer overflow occurs.</exception>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TryReadVerbatimStringLength(System.Int32@,System.Byte*@,System.Byte*)">
+            <summary>
+            Tries to read a RESP3 verbatim string length header from the given ASCII-encoded RESP string
+            and, if successful, moves the given ptr to the end of the length header.
+            <para />
+            NOTE: It will not throw an exception if length header is negative.
+            </summary>
+            <param name="length">If parsing was successful, contains the extracted length from the header.</param>
+            <param name="ptr">The starting position in the RESP string. Will be advanced if parsing is successful.</param>
+            <param name="end">The current end of the RESP string.</param>
+            <returns>True if a length header was successfully read.</returns>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if unexpected token is read.</exception>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if integer overflow occurs.</exception>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TryReadInt32WithLengthHeader(System.Int32@,System.Byte*@,System.Byte*)">
+            <summary>
+            Reads a signed 32-bit integer with length header
+            </summary>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if the length header is negative.</exception>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if unexpected token is read.</exception>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if integer overflow occurs.</exception>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if not a number is read.</exception>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TryReadInt64WithLengthHeader(System.Int64@,System.Byte*@,System.Byte*)">
+            <summary>
+            Read a signed 64-bit integer with length header
+            </summary>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if the length header is negative.</exception>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if unexpected token is read.</exception>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if integer overflow occurs.</exception>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if not a number is read.</exception>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TryReadUInt64WithLengthHeader(System.UInt64@,System.Byte*@,System.Byte*)">
+            <summary>
+            Read long with length header
+            </summary>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if the length header is negative.</exception>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if unexpected token is read.</exception>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if integer overflow occurs.</exception>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if not a number is read.</exception>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TrySkipByteArrayWithLengthHeader(System.Byte*@,System.Byte*)">
+            <summary>
+            Skip byte array with length header
+            </summary>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if the length header is negative.</exception>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if unexpected token is read.</exception>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if integer overflow occurs.</exception>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TryReadByteArrayWithLengthHeader(System.Byte[]@,System.Byte*@,System.Byte*)">
+            <summary>
+            Read byte array with length header
+            </summary>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if the length header is negative.</exception>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if unexpected token is read.</exception>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if integer overflow occurs.</exception>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TrySliceWithLengthHeader(System.ReadOnlySpan{System.Byte}@,System.Byte*@,System.Byte*)">
+             <summary>
+             Try slice a byte array with length header.
+             </summary>
+             <remarks>
+             SAFETY: Because this hands out a span over the underlying buffer to the caller,
+             it must be aware that any changes in the memory where <paramref name="ptr"/> pointed to
+             will be reflected in the <paramref name="result"/> span. i.e.
+             <code>
+             byte[] buffer = "$2\r\nAB\r\n"u8.ToArray();
+             fixed (byte* ptr = buffer)
+             {
+                 TrySliceWithLengthHeader(out var result, ref ptr, ptr + buffer.Length);
+                 Debug.Assert(result.SequenceEquals("AB"u8)); // True
+            
+                 *(ptr - 4) = (byte)'C';
+                 *(ptr - 3) = (byte)'D';
+                 Debug.Assert(result.SequenceEquals("CD"u8)); // True
+             }
+             </code>
+             </remarks>
+             <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if the length header is negative.</exception>
+             <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if unexpected token is read.</exception>
+             <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if integer overflow occurs.</exception>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TryReadBoolWithLengthHeader(System.Boolean@,System.Byte*@,System.Byte*)">
+            <summary>
+            Read boolean value with length header
+            </summary>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if the length header is negative.</exception>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if unexpected token is read.</exception>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if integer overflow occurs.</exception>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TryReadStringWithLengthHeader(System.String@,System.Byte*@,System.Byte*)">
+            <summary>
+            Tries to read a RESP-formatted string including its length header from the given ASCII-encoded
+            RESP message and, if successful, moves the given ptr to the end of the string value.
+            <para />
+            NOTE: We use ReadUnsignedLengthHeader because server does not accept $-1\r\n headers
+            </summary>
+            <param name="result">If parsing was successful, contains the extracted string value.</param>
+            <param name="ptr">The starting position in the RESP message. Will be advanced if parsing is successful.</param>
+            <param name="end">The current end of the RESP message.</param>
+            <returns>True if a RESP string was successfully read.</returns>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if the length header is negative.</exception>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if unexpected token is read.</exception>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if integer overflow occurs.</exception>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TryReadSpanWithLengthHeader(System.ReadOnlySpan{System.Byte}@,System.Byte*@,System.Byte*)">
+            <summary>
+            Tries to read a RESP-formatted string as span including its length header from the given ASCII-encoded
+            RESP message and, if successful, moves the given ptr to the end of the string value.
+            <para />
+            NOTE: We use ReadUnsignedLengthHeader because server does not accept $-1\r\n headers
+            </summary>
+            <param name="result">If parsing was successful, contains the extracted string value.</param>
+            <param name="ptr">The starting position in the RESP message. Will be advanced if parsing is successful.</param>
+            <param name="end">The current end of the RESP message.</param>
+            <returns>True if a RESP string was successfully read.</returns>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if the length header is negative.</exception>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if unexpected token is read.</exception>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if integer overflow occurs.</exception>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TryReadStringResponseWithLengthHeader(System.String@,System.Byte*@,System.Byte*)">
+            <summary>
+            Try to read a RESP formatted bulk string
+            <para />
+            NOTE: This is used with client implementation to parse responses that may include a null value (i.e. $-1\r\n)
+            </summary>
+            <param name="result">If parsing was successful, contains the extracted string value.</param>
+            <param name="ptr">The starting position in the RESP message. Will be advanced if parsing is successful.</param>
+            <param name="end">The current end of the RESP message.</param>
+            <returns>True if a RESP string was successfully read.</returns>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TryReadPtrWithSignedLengthHeader(System.Byte*@,System.Int32@,System.Byte*@,System.Byte*)">
+            <summary>
+            Try to read a RESP string and return pointer to the start of the string
+            <para />
+            NOTE: This is used with client implementation to parse responses that may include a null value (i.e. $-1\r\n)
+            </summary>
+            <param name="stringPtr">If parsing was successful, contains the pointer to start of the parsed string value.</param>
+            <param name="length">If parsing was successful, contains the length of the string value.</param>
+            <param name="ptr">The starting position in the RESP message. Will be advanced if parsing is successful.</param>
+            <param name="end">The current end of the RESP message.</param>
+            <returns>True if a RESP string was successfully read.</returns>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if the length header is negative.</exception>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if unexpected token is read.</exception>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if integer overflow occurs.</exception>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TryReadSimpleString(System.String@,System.Byte*@,System.Byte*)">
+            <summary>
+            Read simple string
+            </summary>
+            <param name="result">If parsing was successful, contains the extracted string value.</param>
+            <param name="ptr">The starting position in the RESP message. Will be advanced if parsing is successful.</param>
+            <param name="end">The current end of the RESP message.</param>
+            <returns>True if a RESP simple string was successfully read.</returns>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if unexpected token is read.</exception>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TryReadErrorAsString(System.String@,System.Byte*@,System.Byte*)">
+            <summary>
+            Read error as string
+            </summary>
+            <param name="result">If parsing was successful, contains the extracted string value.</param>
+            <param name="ptr">The starting position in the RESP message. Will be advanced if parsing is successful.</param>
+            <param name="end">The current end of the RESP message.</param>
+            <returns>True if a RESP error string was successfully read.</returns>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if unexpected token is read.</exception>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TryReadErrorAsSpan(System.ReadOnlySpan{System.Byte}@,System.Byte*@,System.Byte*)">
+            <summary>
+            Read error as span
+            </summary>
+            <param name="result">If parsing was successful, contains the span pointing to parsed error string value.</param>
+            <param name="ptr">The starting position in the RESP message. Will be advanced if parsing is successful.</param>
+            <param name="end">The current end of the RESP message.</param>
+            <returns>True if a RESP error was successfully read.</returns>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TryReadIntegerAsString(System.String@,System.Byte*@,System.Byte*)">
+            <summary>
+            Read integer as string
+            </summary>
+            <param name="result">If parsing was successful, contains the parsed integer as a string.</param>
+            <param name="ptr">The starting position in the RESP message. Will be advanced if parsing is successful.</param>
+            <param name="end">The current end of the RESP message.</param>
+            <returns>True if a RESP integer was successfully read.</returns>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if unexpected token is read.</exception>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TryReadIntegerAsSpan(System.ReadOnlySpan{System.Byte}@,System.Byte*@,System.Byte*)">
+            <summary>
+            Read integer as string
+            </summary>
+            <param name="result">If parsing was successful, contains a span pointing to the integer in the buffer.</param>
+            <param name="ptr">The starting position in the RESP message. Will be advanced if parsing is successful.</param>
+            <param name="end">The current end of the RESP message.</param>
+            <returns>True if a RESP integer was successfully read.</returns>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if unexpected token is read.</exception>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TryReadStringArrayWithLengthHeader(System.String[]@,System.Byte*@,System.Byte*)">
+            <summary>
+            Read string array with length header
+            <para />
+            NOTE: We use ReadUnsignedLengthHeader because server does not accept *-1\r\n headers.
+            </summary>
+            <param name="result">If parsing was successful, contains a array of parsed string values.</param>
+            <param name="ptr">The starting position in the RESP message. Will be advanced if parsing is successful.</param>
+            <param name="end">The current end of the RESP message.</param>
+            <returns>True if a RESP string array was successfully read.</returns>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if the array length header is negative.</exception>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if unexpected token is read.</exception>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if integer overflow occurs.</exception>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TryReadDoubleWithLengthHeader(System.Double@,System.Boolean@,System.Byte*@,System.Byte*)">
+            <summary>
+            Read double with length header
+            </summary>
+            <param name="result">If parsing was successful, contains the parsed <see langword="double"/> value.</param>
+            <param name="ptr">The starting position in the RESP message. Will be advanced if parsing is successful.</param>
+            <param name="end">The current end of the RESP message.</param>
+            <returns>True if a RESP double was successfully read.</returns>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if unexpected token is read.</exception>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TryReadPtrWithLengthHeader(System.Byte*@,System.Int32@,System.Byte*@,System.Byte*)">
+            <summary>
+            Read pointer to byte array, with length header.
+            </summary>
+            <param name="result">Pointer to the beginning of the read byte array (including empty).</param>
+            <param name="len">Length of byte array.</param>
+            <param name="ptr">Current read head of the input RESP stream.</param>
+            <param name="end">Current end of the input RESP stream.</param>
+            <returns>True if input was complete, otherwise false.</returns>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if the length header is negative.</exception>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if unexpected token is read.</exception>
+            <exception cref="T:Garnet.common.Parsing.RespParsingException">Thrown if integer overflow occurs.</exception>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TryReadString(System.String@,System.Byte*@,System.Byte*)">
+            <summary>
+            Read ASCII string without header until string terminator ('\r\n').
+            </summary>
+            <param name="result">If parsing was successful, contains the parsed string value.</param>
+            <param name="ptr">The starting position in the RESP message. Will be advanced if parsing is successful.</param>
+            <param name="end">The current end of the RESP message.</param>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TryReadAsSpan(System.ReadOnlySpan{System.Byte}@,System.Byte*@,System.Byte*)">
+            <summary>
+            Read ASCII string as span without header until string terminator ('\r\n').
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TryReadSerializedSpanByte(System.Byte*@,System.Byte@,System.Byte*@,System.Byte@,System.Byte*@,System.Byte*)">
+            <summary>
+            Read serialized data for migration
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TryReadSerializedData(System.Byte[]@,System.Byte[]@,System.Int64@,System.Byte*@,System.Byte*)">
+            <summary>
+            Read serialized data for migration
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespReadUtils.TryReadInfinity(System.ReadOnlySpan{System.Byte},System.Double@)">
+            <summary>
+            Parses "[+/-]inf" string and returns double.PositiveInfinity/double.NegativeInfinity respectively.
+            If string is not an infinity, parsing fails.
+            </summary>
+            <param name="value">input data</param>
+            <param name="number">If parsing was successful,contains positive or negative infinity</param>
+            <returns>True is infinity was read, false otherwise</returns>
+        </member>
+        <member name="T:Garnet.common.RespWriteUtils">
+            <summary>
+            Utilities for writing RESP protocol
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWriteMapLength(System.Int32,System.Byte*@,System.Byte*)">
+            <summary>
+            Writes a map length
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWritePushLength(System.Int32,System.Byte*@,System.Byte*)">
+            <summary>
+            Writes a push type length
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWritePaddedBulkStringLength(System.Int32,System.Int32,System.Byte*@,System.Byte*)">
+            <summary>
+            Writes a bulk string length header, padded to specified total length (including protocol bytes)
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWriteArrayLength(System.Int32,System.Byte*@,System.Byte*)">
+            <summary>
+            Writes an array length
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWriteSetLength(System.Int32,System.Byte*@,System.Byte*)">
+            <summary>
+            Writes an set length
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWriteArrayItem(System.Int64,System.Byte*@,System.Byte*)">
+            <summary>
+            Writes an array item
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWriteNull(System.Byte*@,System.Byte*)">
+            <summary>
+            Writes a RESP2 null ($-1\r\n)
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWriteResp3Null(System.Byte*@,System.Byte*)">
+            <summary>
+            Writes a RESP3 null (_\r\n)
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWriteNullArray(System.Byte*@,System.Byte*)">
+            <summary>
+            Writes a null array
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWriteSimpleString(System.ReadOnlySpan{System.Byte},System.Byte*@,System.Byte*)">
+            <summary>
+            Writes a simple string
+            </summary>
+            <param name="simpleString">An ASCII encoded simple string. The string mustn't contain a CR (\r) or LF (\n) bytes.</param>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWriteSimpleString(System.ReadOnlySpan{System.Char},System.Byte*@,System.Byte*)">
+            <summary>
+            Write simple string
+            </summary>
+            <param name="simpleString">An ASCII simple string. The string mustn't contain a CR (\r) or LF (\n) characters.</param>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWriteInt64AsSimpleString(System.Int64,System.Byte*@,System.Byte*)">
+            <summary>
+            Write a signed 64-bit integer as a simple string
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWriteError(System.ReadOnlySpan{System.Byte},System.Byte*@,System.Byte*)">
+            <summary>
+            Write simple error
+            </summary>
+            <param name="errorString">An ASCII encoded error string. The string mustn't contain a CR (\r) or LF (\n) bytes.</param>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWriteError(System.ReadOnlySpan{System.Byte},Garnet.common.MemoryResult{System.Byte}@)">
+            <summary>
+            Write simple error
+            </summary>
+            <param name="errorString">An ASCII encoded error string. The string mustn't contain a CR (\r) or LF (\n) bytes.</param>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWriteError(System.ReadOnlySpan{System.Char},System.Byte*@,System.Byte*)">
+            <summary>
+            Write simple error
+            </summary>
+            <param name="errorString">An ASCII error string. The string mustn't contain a CR (\r) or LF (\n) characters.</param>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWriteDirect(System.ReadOnlySpan{System.Byte},System.Byte*@,System.Byte*)">
+            <summary>
+            Writes the contents of <paramref name="span"/> as byte array to <paramref name="curr"/>
+            </summary>
+            <returns><see langword="true"/> if the <paramref name="span"/> could be written to <paramref name="curr"/>; <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWriteAsciiDirect(System.ReadOnlySpan{System.Char},System.Byte*@,System.Byte*)">
+            <summary>
+            Encodes the <paramref name="span"/> as ASCII to <paramref name="curr"/>
+            </summary>
+            <returns><see langword="true"/> if the <paramref name="span"/> could be written to <paramref name="curr"/>; <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWriteDirect``1(``0@,System.Byte*@,System.Byte*)">
+            <summary>
+            Write struct directly
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWriteBulkStringLength(System.ReadOnlySpan{System.Byte},System.Byte*@,System.Byte*)">
+            <summary>
+            Write length header of bulk string
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWriteBulkString(System.ReadOnlySpan{System.Byte},System.Byte*@,System.Byte*)">
+            <summary>
+            Write bulk string
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWriteBulkString(System.Collections.Generic.IEnumerable{System.Byte[]},System.Int32,System.Byte*@,System.Byte*)">
+            <summary>
+            Write bulk string
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWriteAsciiBulkString(System.ReadOnlySpan{System.Char},System.Byte*@,System.Byte*)">
+            <summary>
+            Encodes the <paramref name="chars"/> as ASCII bulk string to <paramref name="curr"/>
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWriteUtf8BulkString(System.ReadOnlySpan{System.Char},System.Byte*@,System.Byte*)">
+            <summary>
+            Encodes the <paramref name="chars"/> as UTF8 bulk string to <paramref name="curr"/>
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWriteNewLine(System.Byte*@,System.Byte*)">
+            <summary>
+            Write new line
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.GetBulkStringLength(System.Int32)">
+            <summary>
+            Get length of bulk string
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWriteInt32(System.Int32,System.Byte*@,System.Byte*)">
+            <summary>
+            Write integer
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWriteInt64(System.Int64,System.Byte*@,System.Byte*)">
+            <summary>
+            Write integer
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWriteInt64(System.Int64,System.Byte*@,System.Byte*,System.Int32@,System.Int32@)">
+            <summary>
+            Write integer
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWriteIntegerFromBytes(System.ReadOnlySpan{System.Byte},System.Byte*@,System.Byte*)">
+            <summary>
+            Write integer from bytes
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWriteInt32AsBulkString(System.Int32,System.Byte*@,System.Byte*)">
+            <summary>
+            Write a signed 32-bit integer as bulk string
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWriteInt64AsBulkString(System.Int64,System.Byte*@,System.Byte*,System.Int32@)">
+            <summary>
+            Write a signed 64-bit integer as bulk string
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.GetIntegerAsBulkStringLength(System.Int32)">
+            <summary>
+            Get length of integer as bulk string
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWriteDoubleBulkString(System.Double,System.Byte*@,System.Byte*)">
+            <summary>
+            Try to write a double-precision floating-point <paramref name="value"/> as bulk string.
+            </summary>
+            <returns><see langword="true"/> if the <paramref name="value"/> could be written to <paramref name="curr"/>; <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWriteDoubleNumeric(System.Double,System.Byte*@,System.Byte*)">
+            <summary>
+            Try to write a double-precision floating-point <paramref name="value"/> as bulk string.
+            </summary>
+            <returns><see langword="true"/> if the <paramref name="value"/> could be written to <paramref name="curr"/>; <see langword="false"/> otherwise.</returns>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWriteEmptyArray(System.Byte*@,System.Byte*)">
+            <summary>
+            Write empty array
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWriteEmptyMap(System.Byte*@,System.Byte*)">
+            <summary>
+            Write empty map
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWriteEmptySet(System.Byte*@,System.Byte*)">
+            <summary>
+            Write empty set
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWriteVerbatimString(System.ReadOnlySpan{System.Byte},System.ReadOnlySpan{System.Byte},System.Byte*@,System.Byte*)">
+            <summary>
+            Write verbatim string
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWriteTrue(System.Byte*@,System.Byte*)">
+            <summary>
+            Write RESP3 true
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWriteFalse(System.Byte*@,System.Byte*)">
+            <summary>
+            Write RESP3 false
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWriteZero(System.Byte*@,System.Byte*)">
+            <summary>
+            Write integer zero
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.TryWriteOne(System.Byte*@,System.Byte*)">
+            <summary>
+            Write integer one
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.WriteEtagValArray(System.Int64,System.ReadOnlySpan{System.Byte}@,System.Byte*@,System.Byte*,System.Boolean)">
+            <summary>
+            Writes an array consisting of an ETag followed by a Bulk string value into the buffer.
+            NOTE: Caller should make sure there is enough space in the buffer for sending the etag, and value array. Otherwise, this will quietly fail.
+            </summary>
+            <param name="etag">etag value to write in the array</param>
+            <param name="value">value to write in the array</param>
+            <param name="curr">start of destination buffer</param>
+            <param name="end">end of destincation buffer</param>
+            <param name="writeDirect">Whether to write the value directly to buffer or transform it to a resp bulk string</param>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.WriteNewline(System.Byte*@)">
+            <summary>
+            Writes newline (\r\n) to <paramref name="curr"/>
+            </summary>
+        </member>
+        <member name="M:Garnet.common.RespWriteUtils.WriteBytes``1(System.Byte*@,System.ReadOnlySpan{System.Byte})">
+            <summary>
+            Writes <paramref name="bytes"/> to <paramref name="curr"/> as type <typeparamref name="T"/> sized value.
+            </summary>
+        </member>
+        <member name="T:Garnet.common.SimpleObjectPool`1">
+            <summary>
+            Object pool
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="M:Garnet.common.SimpleObjectPool`1.#ctor(System.Func{`0},System.Int32)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="factory"></param>
+            <param name="maxObjects"></param>
+        </member>
+        <member name="M:Garnet.common.SimpleObjectPool`1.Dispose">
+            <summary>
+            Dispose
+            </summary>
+        </member>
+        <member name="M:Garnet.common.SimpleObjectPool`1.Checkout">
+            <summary>
+            Checkout item
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.common.SimpleObjectPool`1.Return(`0)">
+            <summary>
+            Return item
+            </summary>
+            <param name="obj"></param>
+        </member>
+        <member name="T:Garnet.common.SimpleStack`1">
+            <summary>
+            Simple stack implementation supporting data peek by reference
+            Note: this implementation is not thread-safe
+            </summary>
+        </member>
+        <member name="M:Garnet.common.SimpleStack`1.#ctor(System.Int32)">
+            <summary>
+            Creates an empty stack with initial capacity
+            </summary>
+            <param name="initialCapacity">Initial capacity of the underlying stack buffer</param>
+        </member>
+        <member name="M:Garnet.common.SimpleStack`1.Push(`0@)">
+            <summary>
+            Push item to stack
+            </summary>
+            <param name="item">Reference to item</param>
+        </member>
+        <member name="M:Garnet.common.SimpleStack`1.Peek">
+            <summary>
+            Peek top item in stack
+            </summary>
+            <returns>Reference to top item in stack</returns>
+        </member>
+        <member name="M:Garnet.common.SimpleStack`1.Pop">
+            <summary>
+            Pop top item in stack
+            </summary>
+            <returns>Top item in stack</returns>
+        </member>
+        <member name="P:Garnet.common.SimpleStack`1.Count">
+            <summary>
+            Size of stack
+            </summary>
+        </member>
+        <member name="T:Garnet.common.SingleWriterMultiReaderLock">
+            <summary>
+            Single writer multiple readers lock
+            </summary>
+        </member>
+        <member name="M:Garnet.common.SingleWriterMultiReaderLock.#ctor">
+            <summary>
+            Basic Constructor
+            </summary>
+        </member>
+        <member name="P:Garnet.common.SingleWriterMultiReaderLock.IsWriteLocked">
+            <summary>
+            Check if write locked
+            </summary>
+        </member>
+        <member name="M:Garnet.common.SingleWriterMultiReaderLock.TryWriteLock">
+            <summary>
+            Attempt to acquire write lock but do not wait on failure
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.common.SingleWriterMultiReaderLock.WriteLock">
+            <summary>
+            Acquire writer lock or spin wait until it can be acquired
+            </summary>
+        </member>
+        <member name="M:Garnet.common.SingleWriterMultiReaderLock.WriteUnlock">
+            <summary>
+            Release write lock (spin wait until it can be released)
+            </summary>
+        </member>
+        <member name="M:Garnet.common.SingleWriterMultiReaderLock.TryReadLock">
+            <summary>
+            Try acquire read lock but do not wait on failure
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.common.SingleWriterMultiReaderLock.ReadLock">
+            <summary>
+            Attempt to acquire read lock or spin wait until it can be acquired
+            </summary>
+        </member>
+        <member name="M:Garnet.common.SingleWriterMultiReaderLock.ReadUnlock">
+            <summary>
+            Release read lock
+            </summary>
+        </member>
+        <member name="M:Garnet.common.SingleWriterMultiReaderLock.TryUpgradeReadLock">
+            <summary>
+            Attempt to update a held read lock to a write lock.
+            </summary>
+        </member>
+        <member name="M:Garnet.common.SingleWriterMultiReaderLock.DowngradeWriteLock">
+            <summary>
+            Downgrade a held write lock to a read lock.
+            </summary>
+        </member>
+        <member name="M:Garnet.common.SingleWriterMultiReaderLock.CloseLock">
+            <summary>
+            Try acquire write lock and spin wait until isWriteLocked
+            NOTE: once closed this lock should never be unlocked because is considered disposed
+            </summary>
+            <returns>Return true if current thread is the one that acquired write lock</returns>
+        </member>
+        <member name="M:Garnet.common.SingleWriterMultiReaderLock.ToString">
+            <inheritdoc />
+        </member>
+        <member name="T:Garnet.common.IStreamProvider">
+            <summary>
+            Interface for reading / writing into local / remote files
+            </summary>
+        </member>
+        <member name="M:Garnet.common.IStreamProvider.Read(System.String)">
+            <summary>
+            Read data from file specified in path
+            </summary>
+            <param name="path">Path to file</param>
+            <returns>Stream object</returns>
+        </member>
+        <member name="M:Garnet.common.IStreamProvider.Write(System.String,System.Byte[])">
+            <summary>
+            Write data into file specified in path
+            </summary>
+            <param name="path">Path to file</param>
+            <param name="data">Data to write</param>
+        </member>
+        <member name="T:Garnet.common.StreamProviderBase">
+            <summary>
+            Base StreamProvider class containing common logic between stream providers 
+            </summary>
+        </member>
+        <member name="T:Garnet.common.StreamProviderFactory">
+            <summary>
+            Provides a StreamProvider instance
+            </summary>
+        </member>
+        <member name="M:Garnet.common.StreamProviderFactory.GetStreamProvider(Garnet.common.FileLocationType,System.String,System.Reflection.Assembly,System.Boolean)">
+            <summary>
+            Get a StreamProvider instance
+            </summary>
+            <param name="locationType">Type of location of files the stream provider reads from / writes to</param>
+            <param name="connectionString">Connection string to Azure Storage, if applicable</param>
+            <param name="resourceAssembly">Assembly from which to load the embedded resource, if applicable.</param>
+            <param name="readOnly">Open file in read only mode</param>
+            <returns>StreamProvider instance</returns>
+        </member>
+        <member name="T:Garnet.common.AzureStreamProvider">
+            <summary>
+            StreamProvider for reading / writing files in Azure Storage
+            </summary>
+        </member>
+        <member name="T:Garnet.common.LocalFileStreamProvider">
+            <summary>
+            StreamProvider for reading / writing files locally
+            </summary>
+        </member>
+        <member name="T:Garnet.common.EmbeddedResourceStreamProvider">
+            <summary>
+            StreamProvider for reading / writing files as embedded resources in executing assembly
+            </summary>
+        </member>
+        <member name="T:Garnet.networking.BatchHeader">
+            <summary>
+            Header for message batch (Little Endian server)
+            [4 byte seqNo][1 byte protocol][3 byte numMessages]
+            </summary>
+        </member>
+        <member name="F:Garnet.networking.BatchHeader.Size">
+            <summary>
+            Size
+            </summary>
+        </member>
+        <member name="F:Garnet.networking.BatchHeader.SeqNo">
+            <summary>
+            Sequence number.
+            </summary>
+        </member>
+        <member name="F:Garnet.networking.BatchHeader.numMessagesAndProtocol">
+            <summary>
+            Lower-order 8 bits are wire protocol, higher-order 24 bits are num messages.
+            </summary>
+        </member>
+        <member name="P:Garnet.networking.BatchHeader.NumMessages">
+            <summary>
+            Number of messages packed in batch
+            </summary>
+        </member>
+        <member name="P:Garnet.networking.BatchHeader.Protocol">
+            <summary>
+            Wire protocol this batch is written in
+            </summary>
+        </member>
+        <member name="M:Garnet.networking.BatchHeader.SetNumMessagesProtocol(System.Int32,Garnet.networking.WireFormat)">
+            <summary>
+            Set num messages and wire protocol
+            </summary>
+            <param name="numMessages"></param>
+            <param name="protocol"></param>
+        </member>
+        <member name="T:Garnet.networking.BufferSizeUtils">
+            <summary>
+            Utility for computing buffer size given settings
+            </summary>
+        </member>
+        <member name="M:Garnet.networking.BufferSizeUtils.ClientBufferSize(Garnet.networking.MaxSizeSettings)">
+            <summary>
+            Compute required client buffer size
+            </summary>
+            <param name="maxSizeSettings">Settings</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.networking.BufferSizeUtils.ServerBufferSize(Garnet.networking.MaxSizeSettings)">
+            <summary>
+            Compute required server buffer size
+            </summary>
+            <param name="maxSizeSettings">Settings</param>
+            <returns></returns>
+        </member>
+        <member name="T:Garnet.networking.IMessageConsumer">
+            <summary>
+            Interface for consumers of messages (from networks), such as sessions
+            </summary>
+        </member>
+        <member name="M:Garnet.networking.IMessageConsumer.TryConsumeMessages(System.Byte*,System.Int32)">
+            <summary>
+            Consume the message incoming on the wire
+            </summary>
+            <param name="reqBuffer"></param>
+            <param name="bytesRead"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Garnet.networking.INetworkHandler">
+            <summary>
+            Network handler interface
+            </summary>
+        </member>
+        <member name="P:Garnet.networking.INetworkHandler.Session">
+            <summary>
+            Get session
+            </summary>
+        </member>
+        <member name="T:Garnet.networking.INetworkSender">
+            <summary>
+            Interface for Network Sender
+            </summary>
+        </member>
+        <member name="P:Garnet.networking.INetworkSender.GetMaxSizeSettings">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:Garnet.networking.INetworkSender.RemoteEndpointName">
+            <summary>
+            Remote endpoint name
+            </summary>
+        </member>
+        <member name="P:Garnet.networking.INetworkSender.LocalEndpointName">
+            <summary>
+            Local endpoint name
+            </summary>
+        </member>
+        <member name="M:Garnet.networking.INetworkSender.IsLocalConnection">
+            <summary>
+            Is the remote endpoint local?
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.networking.INetworkSender.Enter">
+            <summary>
+            Enter exclusive use of network sender.
+            </summary>
+        </member>
+        <member name="M:Garnet.networking.INetworkSender.EnterAndGetResponseObject(System.Byte*@,System.Byte*@)">
+            <summary>
+            Enter exclusive use of network sender. Allocate and get response object pointers.
+            </summary>
+            <param name="head"></param>
+            <param name="tail"></param>
+        </member>
+        <member name="M:Garnet.networking.INetworkSender.Exit">
+            <summary>
+            Exit exclusive use of network sender.
+            </summary>
+        </member>
+        <member name="M:Garnet.networking.INetworkSender.ExitAndReturnResponseObject">
+            <summary>
+            Exit exclusive use of network sender. Free response object.
+            </summary>
+        </member>
+        <member name="M:Garnet.networking.INetworkSender.GetResponseObject">
+            <summary>
+            Allocate a new response object
+            </summary>
+        </member>
+        <member name="M:Garnet.networking.INetworkSender.ReturnResponseObject">
+            <summary>
+            Free response object
+            </summary>
+        </member>
+        <member name="M:Garnet.networking.INetworkSender.GetResponseObjectHead">
+            <summary>
+            Get current response object head ptr;
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.networking.INetworkSender.GetResponseObjectTail">
+            <summary>
+            Get current response object tail ptr;
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.networking.INetworkSender.SendResponse(System.Int32,System.Int32)">
+            <summary>
+            Send payload stored at response object, from offset to offset + size
+            </summary>
+            <param name="offset">Offset of response from which to start sending</param>
+            <param name="size">Number of bytes to send, starting from offset</param>
+            <returns>Whether the send succeeded</returns>
+        </member>
+        <member name="M:Garnet.networking.INetworkSender.SendResponse(System.Byte[],System.Int32,System.Int32,System.Object)">
+            <summary>
+            Send response (caller owns buffer space)
+            </summary>
+        </member>
+        <member name="M:Garnet.networking.INetworkSender.SendCallback(System.Object)">
+            <summary>
+            Send response (caller owns buffer space)
+            </summary>
+        </member>
+        <member name="M:Garnet.networking.INetworkSender.DisposeNetworkSender(System.Boolean)">
+            <summary>
+            Dispose, optionally waiting for ongoing outgoing calls to complete
+            </summary>
+        </member>
+        <member name="M:Garnet.networking.INetworkSender.Throttle">
+            <summary>
+            Throttle mechanism for preventing too many sends outstanding (blocking)
+            </summary>
+        </member>
+        <member name="M:Garnet.networking.INetworkSender.TryClose">
+            <summary>
+            Forcibly close the underlying network connection.
+            
+            Returns true if the caller is the first to successfully call this method.
+            </summary>
+        </member>
+        <member name="T:Garnet.networking.IServerHook">
+            <summary>
+            Hook for server
+            </summary>
+        </member>
+        <member name="M:Garnet.networking.IServerHook.TryCreateMessageConsumer(System.Span{System.Byte},Garnet.networking.INetworkSender,Garnet.networking.IMessageConsumer@)">
+            <summary>
+            Try creating a message consumer
+            </summary>
+            <param name="bytesReceived"></param>
+            <param name="networkSender"></param>
+            <param name="session"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.networking.IServerHook.DisposeMessageConsumer(Garnet.networking.INetworkHandler)">
+            <summary>
+            Dispose message consumer
+            </summary>
+            <param name="session"></param>
+        </member>
+        <member name="P:Garnet.networking.IServerHook.Disposed">
+            <summary>
+            Check whether server is disposed
+            </summary>
+        </member>
+        <member name="T:Garnet.networking.MaxSizeSettings">
+            <summary>
+            Settings for max sizes of types
+            </summary>
+        </member>
+        <member name="F:Garnet.networking.MaxSizeSettings.MaxKeySize">
+            <summary>
+            Max key size
+            </summary>
+        </member>
+        <member name="F:Garnet.networking.MaxSizeSettings.MaxValueSize">
+            <summary>
+            Max value size
+            </summary>
+        </member>
+        <member name="F:Garnet.networking.MaxSizeSettings.MaxInputSize">
+            <summary>
+            Max input size
+            </summary>
+        </member>
+        <member name="F:Garnet.networking.MaxSizeSettings.MaxOutputSize">
+            <summary>
+            Max output size
+            </summary>
+        </member>
+        <member name="T:Garnet.networking.NetworkHandler`2">
+            <summary>
+            Network handler
+            </summary>
+        </member>
+        <member name="F:Garnet.networking.NetworkHandler`2.serverHook">
+            <summary>
+            Server hook
+            </summary>
+        </member>
+        <member name="F:Garnet.networking.NetworkHandler`2.networkBufferSettings">
+            <summary>
+            Network buffer settings used to allocate send and receive buffers
+            </summary>
+        </member>
+        <member name="F:Garnet.networking.NetworkHandler`2.networkPool">
+            <summary>
+            Network pool used to allocated send and receive buffers
+            </summary>
+        </member>
+        <member name="F:Garnet.networking.NetworkHandler`2.networkReceiveBufferEntry">
+            <summary>
+            Pool entry
+            </summary>
+        </member>
+        <member name="F:Garnet.networking.NetworkHandler`2.networkReceiveBuffer">
+            <summary>
+            Buffer that receives data directly from network
+            This is allocated and populated by derived classes
+            </summary>
+        </member>
+        <member name="F:Garnet.networking.NetworkHandler`2.networkReceiveBufferPtr">
+            <summary>
+            Pointer to buffer that receives data directly from network
+            This is allocated and populated by derived classes
+            </summary>
+        </member>
+        <member name="F:Garnet.networking.NetworkHandler`2.networkBytesRead">
+            <summary>
+            Bytes read and read head for network buffer
+            </summary>
+        </member>
+        <member name="F:Garnet.networking.NetworkHandler`2.networkReadHead">
+            <summary>
+            Bytes read and read head for network buffer
+            </summary>
+        </member>
+        <member name="F:Garnet.networking.NetworkHandler`2.transportReceiveBufferEntry">
+            <summary>
+            Buffer that application reads data from
+            </summary>
+        </member>
+        <member name="F:Garnet.networking.NetworkHandler`2.transportReceiveBuffer">
+            <summary>
+            Transport receive buffer
+            </summary>
+        </member>
+        <member name="F:Garnet.networking.NetworkHandler`2.transportBytesRead">
+            <summary>
+            Bytes read by application from transport buffer
+            </summary>
+        </member>
+        <member name="F:Garnet.networking.NetworkHandler`2.transportReadHead">
+            <summary>
+            Bytes read by application from transport buffer
+            </summary>
+        </member>
+        <member name="P:Garnet.networking.NetworkHandler`2.Session">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.networking.NetworkHandler`2.#ctor(`0,`1,Garnet.common.NetworkBufferSettings,Garnet.common.LimitedFixedBufferPool,System.Boolean,Garnet.networking.IMessageConsumer,Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:Garnet.networking.NetworkHandler`2.Start(System.Net.Security.SslServerAuthenticationOptions,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Begin (background) network handler (including auth). Make sure you do not send data
+            until authentication completes.
+            </summary>
+        </member>
+        <member name="M:Garnet.networking.NetworkHandler`2.StartAsync(System.Net.Security.SslServerAuthenticationOptions,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Begin async network handler (including auth)
+            </summary>
+        </member>
+        <member name="M:Garnet.networking.NetworkHandler`2.AuthenticateAsServerAsync(System.Net.Security.SslServerAuthenticationOptions,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Async (background) authentication of TLS as server
+            </summary>
+            <param name="tlsOptions"></param>
+            <param name="remoteEndpointName"></param>
+            <param name="token"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.networking.NetworkHandler`2.Start(System.Net.Security.SslClientAuthenticationOptions,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Begin (background) network handler (including auth). Make sure you do not send data
+            until authentication completes.
+            </summary>
+        </member>
+        <member name="M:Garnet.networking.NetworkHandler`2.StartAsync(System.Net.Security.SslClientAuthenticationOptions,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Begin async network handler (including auth)
+            </summary>
+        </member>
+        <member name="M:Garnet.networking.NetworkHandler`2.AuthenticateAsClientAsync(System.Net.Security.SslClientAuthenticationOptions,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Authenticate TLS as client, update authState when done
+            </summary>
+        </member>
+        <member name="M:Garnet.networking.NetworkHandler`2.OnNetworkReceiveWithTLSAsync(System.Int32)">
+            <summary>
+            On network receive
+            </summary>
+            <param name="bytesTransferred">Number of bytes transferred</param>
+        </member>
+        <member name="M:Garnet.networking.NetworkHandler`2.GetNetworkSender">
+            <summary>
+            Get network sender for this handler
+            </summary>
+        </member>
+        <member name="M:Garnet.networking.NetworkHandler`2.Enter">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.networking.NetworkHandler`2.EnterAndGetResponseObject(System.Byte*@,System.Byte*@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.networking.NetworkHandler`2.Exit">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.networking.NetworkHandler`2.ExitAndReturnResponseObject">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.networking.NetworkHandler`2.GetResponseObject">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.networking.NetworkHandler`2.ReturnResponseObject">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.networking.NetworkHandler`2.SendResponse(System.Int32,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.networking.NetworkHandler`2.SendResponse(System.Byte[],System.Int32,System.Int32,System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.networking.NetworkHandler`2.SendCallback(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.networking.NetworkHandler`2.GetResponseObjectHead">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.networking.NetworkHandler`2.GetResponseObjectTail">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.networking.NetworkHandler`2.DisposeImpl">
+            <summary>
+            Implementation of dispose for network handler.
+            Expected to be called exactly once, by the same thread that listens to network
+            and calls the mono-threaded ProcessMessage.
+            </summary>
+            <exception cref="T:System.Exception"></exception>
+        </member>
+        <member name="M:Garnet.networking.NetworkHandler`2.DisposeNetworkSender(System.Boolean)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.networking.NetworkHandler`2.Throttle">
+            <inheritdoc />
+        </member>
+        <member name="T:Garnet.networking.NetworkSenderBase">
+            <summary>
+            NetworkSenderBase class 
+            </summary>
+        </member>
+        <member name="F:Garnet.networking.NetworkSenderBase.maxSizeSettings">
+            <summary>
+            Max size settings
+            </summary>
+        </member>
+        <member name="F:Garnet.networking.NetworkSenderBase.serverBufferSize">
+            <summary>
+            serverBufferSize
+            </summary>
+        </member>
+        <member name="M:Garnet.networking.NetworkSenderBase.#ctor(Garnet.networking.MaxSizeSettings)">
+            <summary>
+            NetworkSenderBase constructor
+            </summary>
+            <param name="maxSizeSettings"></param>        
+        </member>
+        <member name="M:Garnet.networking.NetworkSenderBase.#ctor(System.Int32)">
+            <summary>
+            NetworkSenderBase constructor
+            </summary>
+            <param name="serverBufferSize"></param>        
+        </member>
+        <member name="P:Garnet.networking.NetworkSenderBase.GetMaxSizeSettings">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:Garnet.networking.NetworkSenderBase.RemoteEndpointName">
+            <inheritdoc />
+        </member>
+        <member name="P:Garnet.networking.NetworkSenderBase.LocalEndpointName">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.networking.NetworkSenderBase.IsLocalConnection">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.networking.NetworkSenderBase.Enter">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.networking.NetworkSenderBase.EnterAndGetResponseObject(System.Byte*@,System.Byte*@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.networking.NetworkSenderBase.Exit">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.networking.NetworkSenderBase.ExitAndReturnResponseObject">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.networking.NetworkSenderBase.GetResponseObject">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.networking.NetworkSenderBase.ReturnResponseObject">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.networking.NetworkSenderBase.GetResponseObjectHead">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.networking.NetworkSenderBase.GetResponseObjectTail">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.networking.NetworkSenderBase.SendResponse(System.Int32,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.networking.NetworkSenderBase.SendResponse(System.Byte[],System.Int32,System.Int32,System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.networking.NetworkSenderBase.SendCallback(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.networking.NetworkSenderBase.Dispose">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.networking.NetworkSenderBase.DisposeNetworkSender(System.Boolean)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.networking.NetworkSenderBase.Throttle">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.networking.NetworkSenderBase.TryClose">
+            <inheritdoc />
+        </member>
+        <member name="T:Garnet.networking.TlsReaderStatus">
+            <summary>
+            TLS reader status
+            </summary>
+        </member>
+        <member name="F:Garnet.networking.TlsReaderStatus.Rest">
+            <summary>
+            Rest phase, no reader task or work running
+            </summary>
+        </member>
+        <member name="F:Garnet.networking.TlsReaderStatus.Active">
+            <summary>
+            Reader is active, processing TLS data on some thread
+            </summary>
+        </member>
+        <member name="F:Garnet.networking.TlsReaderStatus.Waiting">
+            <summary>
+            Reader is waiting on a semaphore for data to be available
+            </summary>
+        </member>
+        <member name="T:Garnet.networking.WireFormat">
+            <summary>
+            Wire format for a session, you can add custom session types on the server and client side
+            (e.g., one per distinct store and/or function types).
+            </summary>
+        </member>
+        <member name="F:Garnet.networking.WireFormat.ASCII">
+            <summary>
+            ASCII wire format, e.g. for RESP
+            </summary>
+        </member>
+        <member name="T:System.Threading.Tasks.TaskToApm">
+            <summary>
+            Provides support for efficiently using Tasks to implement the APM (Begin/End) pattern.
+            </summary>
+        </member>
+        <member name="M:System.Threading.Tasks.TaskToApm.Begin(System.Threading.Tasks.Task,System.AsyncCallback,System.Object)">
+            <summary>
+            Marshals the Task as an IAsyncResult, using the supplied callback and state
+            to implement the APM pattern.
+            </summary>
+            <param name="task">The Task to be marshaled.</param>
+            <param name="callback">The callback to be invoked upon completion.</param>
+            <param name="state">The state to be stored in the IAsyncResult.</param>
+            <returns>An IAsyncResult to represent the task's asynchronous operation.</returns>
+        </member>
+        <member name="M:System.Threading.Tasks.TaskToApm.End(System.IAsyncResult)">
+            <summary>Processes an IAsyncResult returned by Begin.</summary>
+            <param name="asyncResult">The IAsyncResult to unwrap.</param>
+        </member>
+        <member name="M:System.Threading.Tasks.TaskToApm.End``1(System.IAsyncResult)">
+            <summary>Processes an IAsyncResult returned by Begin.</summary>
+            <param name="asyncResult">The IAsyncResult to unwrap.</param>
+        </member>
+        <member name="T:System.Threading.Tasks.TaskToApm.TaskAsyncResult">
+            <summary>Provides a simple IAsyncResult that wraps a Task.</summary>
+            <remarks>
+            We could use the Task as the IAsyncResult if the Task's AsyncState is the same as the object state,
+            but that's very rare, in particular in a situation where someone cares about allocation, and always
+            using TaskAsyncResult simplifies things and enables additional optimizations.
+            </remarks>
+        </member>
+        <member name="F:System.Threading.Tasks.TaskToApm.TaskAsyncResult._task">
+            <summary>The wrapped Task.</summary>
+        </member>
+        <member name="F:System.Threading.Tasks.TaskToApm.TaskAsyncResult._callback">
+            <summary>Callback to invoke when the wrapped task completes.</summary>
+        </member>
+        <member name="M:System.Threading.Tasks.TaskToApm.TaskAsyncResult.#ctor(System.Threading.Tasks.Task,System.Object,System.AsyncCallback)">
+            <summary>Initializes the IAsyncResult with the Task to wrap and the associated object state.</summary>
+            <param name="task">The Task to wrap.</param>
+            <param name="state">The new AsyncState value.</param>
+            <param name="callback">Callback to invoke when the wrapped task completes.</param>
+        </member>
+        <member name="M:System.Threading.Tasks.TaskToApm.TaskAsyncResult.InvokeCallback">
+            <summary>Invokes the callback.</summary>
+        </member>
+        <member name="P:System.Threading.Tasks.TaskToApm.TaskAsyncResult.AsyncState">
+            <summary>Gets a user-defined object that qualifies or contains information about an asynchronous operation.</summary>
+        </member>
+        <member name="P:System.Threading.Tasks.TaskToApm.TaskAsyncResult.CompletedSynchronously">
+            <summary>Gets a value that indicates whether the asynchronous operation completed synchronously.</summary>
+            <remarks>This is set lazily based on whether the <see cref="F:System.Threading.Tasks.TaskToApm.TaskAsyncResult._task"/> has completed by the time this object is created.</remarks>
+        </member>
+        <member name="P:System.Threading.Tasks.TaskToApm.TaskAsyncResult.IsCompleted">
+            <summary>Gets a value that indicates whether the asynchronous operation has completed.</summary>
+        </member>
+        <member name="P:System.Threading.Tasks.TaskToApm.TaskAsyncResult.AsyncWaitHandle">
+            <summary>Gets a <see cref="T:System.Threading.WaitHandle"/> that is used to wait for an asynchronous operation to complete.</summary>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,2330 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Garnet.client</name>
+    </assembly>
+    <members>
+        <member name="T:Garnet.client.GarnetClientSession">
+            <summary>
+            RESP client session for remote Garnet (a session makes a single remote connection, and expects mono-threaded client access)
+            </summary>
+            <summary>
+            Mono-threaded remote client session for Garnet (a session makes a single network connection, and 
+            expects mono-threaded client access, i.e., no concurrent invocations of API by client)
+            </summary>
+            <summary>
+            Mono-threaded remote client session for Garnet (a session makes a single network connection, and 
+            expects mono-threaded client access, i.e., no concurrent invocations of API by client)
+            </summary>
+            <summary>
+            Mono-threaded remote client session for Garnet (a session makes a single network connection, and 
+            expects mono-threaded client access, i.e., no concurrent invocations of API by client)
+            </summary>
+            <summary>
+            Mono-threaded remote client session for Garnet (a session makes a single network connection, and 
+            expects mono-threaded client access, i.e., no concurrent invocations of API by client)
+            </summary>
+        </member>
+        <member name="M:Garnet.client.GarnetClientSession.ExecuteAsync(System.String[])">
+            <summary>
+            Execute command (async)
+            </summary>
+            <param name="command"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClientSession.ExecuteAsyncBatch(System.String[])">
+            <summary>
+            Execute command (async)
+            </summary>
+            <param name="command"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClientSession.ExecuteForArrayAsync(System.String[])">
+            <summary>
+            Execute command (async) for array return type
+            </summary>
+            <param name="command"></param>
+            <returns>Array of results</returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClientSession.ExecuteForArrayAsyncBatch(System.String[])">
+            <summary>
+            Execute command (async) for array return type
+            </summary>
+            <param name="command"></param>
+            <returns>Array of results</returns>
+        </member>
+        <member name="F:Garnet.client.GarnetClientSession.networkSendThrottleMax">
+            <summary>
+            Max outstanding network sends allowed
+            </summary>
+        </member>
+        <member name="F:Garnet.client.GarnetClientSession.disposeException">
+            <summary>
+            Exception to throw to ongoing tasks when disposed
+            </summary>
+        </member>
+        <member name="P:Garnet.client.GarnetClientSession.EndPoint">
+            <summary>
+            The host endpoint
+            </summary>
+        </member>
+        <member name="P:Garnet.client.GarnetClientSession.Disposed">
+            <inheritdoc />
+        </member>
+        <member name="P:Garnet.client.GarnetClientSession.IsConnected">
+            <summary>
+            Whether we are connected to the server
+            </summary>
+        </member>
+        <member name="F:Garnet.client.GarnetClientSession.RawResult">
+            <summary>
+            Get raw results from tcs completion
+            </summary>
+        </member>
+        <member name="F:Garnet.client.GarnetClientSession.authUsername">
+            <summary>
+            Username to authenticate the session on the server.
+            </summary>
+        </member>
+        <member name="F:Garnet.client.GarnetClientSession.authPassword">
+            <summary>
+            Password to authenticate the session on the server.
+            </summary>
+        </member>
+        <member name="F:Garnet.client.GarnetClientSession.usingManagedNetworkPool">
+            <summary>
+            Indicating whether this instance is using its own network pool or one that was provided
+            </summary>
+        </member>
+        <member name="F:Garnet.client.GarnetClientSession.networkBufferSettings">
+            <summary>
+            Instance of network buffer settings describing the send and receive buffer sizes
+            </summary>
+        </member>
+        <member name="F:Garnet.client.GarnetClientSession.networkPool">
+            <summary>
+            NetworkPool used to allocate send and receive buffers
+            </summary>
+        </member>
+        <member name="M:Garnet.client.GarnetClientSession.#ctor(System.Net.EndPoint,Garnet.common.NetworkBufferSettings,Garnet.common.LimitedFixedBufferPool,System.Net.Security.SslClientAuthenticationOptions,System.String,System.String,System.Int32,System.Boolean,Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            Create client instance
+            </summary>
+            <param name="endpoint">Endpoint of the server</param>
+            <param name="tlsOptions">TLS options</param>
+            <param name="authUsername">Username to authenticate with</param>
+            <param name="authPassword">Password to authenticate with</param>
+            <param name="networkBufferSettings">Settings for send and receive network buffers</param>
+            <param name="networkPool">Buffer pool to use for allocating send and receive buffers</param>
+            <param name="networkSendThrottleMax">Max outstanding network sends allowed</param>
+            <param name="logger">Logger</param>
+        </member>
+        <member name="M:Garnet.client.GarnetClientSession.Connect(System.Int32,System.Threading.CancellationToken)">
+            <summary>
+            Connect to server
+            </summary>
+            <param name="timeoutMs">Timeout in milliseconds (default 0 for immediate timeout)</param>
+            <param name="token"></param>
+        </member>
+        <member name="M:Garnet.client.GarnetClientSession.ConnectSendSocketAsync(System.Int32,System.Threading.CancellationToken)">
+            <summary>
+            Connect client send socket
+            </summary>
+            <param name="millisecondsTimeout"></param>
+            <returns></returns>
+            <exception cref="T:System.Exception"></exception>
+        </member>
+        <member name="M:Garnet.client.GarnetClientSession.TryConnectSocketAsync(System.Net.Sockets.Socket,System.Net.EndPoint,System.Int32,System.Threading.CancellationToken)">
+            <summary>
+            Try to establish connection for <paramref name="socket"/> using <paramref name="endpoint"/>
+            </summary>
+            <param name="socket"></param>
+            <param name="endpoint"></param>
+            <param name="millisecondsTimeout"></param>
+            <param name="cancellationToken">The cancellation token</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClientSession.Reconnect(System.Int32,System.Threading.CancellationToken)">
+            <summary>
+            Reconnect to server
+            </summary>
+        </member>
+        <member name="M:Garnet.client.GarnetClientSession.Dispose">
+            <summary>
+            Dispose instance
+            </summary>
+        </member>
+        <member name="M:Garnet.client.GarnetClientSession.Execute(System.String[])">
+            <summary>
+            Execute remote command
+            </summary>
+            <param name="command"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClientSession.ExecuteBatch(System.String[])">
+            <summary>
+            Execute remote command
+            </summary>
+            <param name="command"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClientSession.ExecuteForArray(System.String[])">
+            <summary>
+            Execute remote command (for array return type)
+            </summary>
+            <param name="command"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClientSession.ExecuteClusterAppendLog(System.String,System.Int64,System.Int64,System.Int64,System.Int64,System.Int32)">
+            <summary>
+            ClusterAppendLog
+            </summary>
+        </member>
+        <member name="M:Garnet.client.GarnetClientSession.Throttle">
+            <summary>
+            Throttle the network sender, potentially blocking
+            </summary>
+        </member>
+        <member name="M:Garnet.client.GarnetClientSession.CompletePending(System.Boolean)">
+            <summary>
+            Flush current buffer of outgoing messages. Optionally spin-wait for all responses to be received and processed.
+            </summary>
+        </member>
+        <member name="M:Garnet.client.GarnetClientSession.Wait">
+            <summary>
+            Wait for responses to arrive
+            </summary>
+        </member>
+        <member name="M:Garnet.client.GarnetClientSession.InternalExecute(System.String[])">
+            <summary>
+            Issue command for execution
+            </summary>
+            <param name="command"></param>
+        </member>
+        <member name="M:Garnet.client.GarnetClientSession.Flush">
+            <summary>
+            Flush current buffer of outgoing messages. Does not wait for responses.
+            </summary>
+        </member>
+        <member name="M:Garnet.client.GarnetClientSession.TryCreateMessageConsumer(System.Span{System.Byte},Garnet.networking.INetworkSender,Garnet.networking.IMessageConsumer@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.client.GarnetClientSession.DisposeMessageConsumer(Garnet.networking.INetworkHandler)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.client.GarnetClientSession.TryConsumeMessages(System.Byte*,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.client.GarnetClientSession.ExecuteGossip(System.Memory{System.Byte})">
+            <summary>
+            Send gossip message to corresponding node
+            </summary>
+            <param name="byteArray"></param>
+            <returns></returns>
+        </member>
+        <member name="P:Garnet.client.GarnetClientSession.ExtraSpace">
+            <summary>
+            Getter to compute how much space to leave at the front of the buffer
+            in order to write the maximum possible RESP length header (of length bufferSize)
+            </summary>
+        </member>
+        <member name="P:Garnet.client.GarnetClientSession.NeedsInitialization">
+            <summary>
+            Check if header for batch is initialized
+            </summary>
+        </member>
+        <member name="M:Garnet.client.GarnetClientSession.InitializeIterationBuffer(System.TimeSpan)">
+            <summary>
+            Flush and initialize buffers/parameters used for migrate command
+            </summary>
+            <param name="iterationProgressFreq"></param>
+        </member>
+        <member name="M:Garnet.client.GarnetClientSession.SendAndResetIterationBuffer">
+            <summary>
+            Send key value pair and reset migrate buffers
+            </summary>
+        </member>
+        <member name="M:Garnet.client.GarnetClientSession.TryWriteKeyValueSpanByte(Tsavorite.core.SpanByte@,Tsavorite.core.SpanByte@,System.Threading.Tasks.Task{System.String}@)">
+            <summary>
+            Try write key value pair for main store directly to the client buffer
+            </summary>
+            <param name="key"></param>
+            <param name="value"></param>
+            <param name="task"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClientSession.TryWriteKeyValueByteArray(System.Byte[],System.Byte[],System.Int64,System.Threading.Tasks.Task{System.String}@)">
+            <summary>
+            Try write key value pair for object store directly to the client buffer
+            </summary>
+            <param name="key"></param>
+            <param name="value"></param>
+            <param name="expiration"></param>
+            <param name="task"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClientSession.TrackIterationProgress(System.Int32,System.Int32,System.Boolean)">
+            <summary>
+            Logging of migrate session status
+            </summary>
+            <param name="keyCount"></param>
+            <param name="size"></param>
+            <param name="completed"></param>
+        </member>
+        <member name="M:Garnet.client.GarnetClientSession.Authenticate(System.String,System.String)">
+            <summary>
+            Send AUTH command to target node to authenticate connection.
+            </summary>
+            <param name="username"></param>
+            <param name="password"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClientSession.SetSlotRange(System.Memory{System.Byte},System.String,System.Collections.Generic.List{System.ValueTuple{System.Int32,System.Int32}})">
+            <summary>
+            SETSLOTSRANGE command
+            </summary>
+            <param name="state"></param>
+            <param name="nodeid"></param>
+            <param name="slotRanges"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClientSession.SetClusterMigrateHeader(System.String,System.Boolean,System.Boolean)">
+            <summary>
+            Write parameters of CLUSTER MIGRATE directly to the client buffer
+            </summary>
+            <param name="sourceNodeId"></param>
+            <param name="replace"></param>
+            <param name="isMainStore"></param>
+        </member>
+        <member name="M:Garnet.client.GarnetClientSession.CompleteMigrate(System.String,System.Boolean,System.Boolean)">
+            <summary>
+            Signal completion of migration by sending an empty payload
+            </summary>
+            <param name="sourceNodeId"></param>
+            <param name="replace"></param>
+            <param name="isMainStore"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClientSession.ExecuteReplicaSync(System.String,System.String,System.Byte[],System.Int64,System.Int64)">
+            <summary>
+            Initiate checkpoint retrieval from replica by sending replica checkpoint information and AOF address range
+            </summary>
+            <param name="nodeId"></param>
+            <param name="primary_replid"></param>
+            <param name="checkpointEntryData"></param>
+            <param name="aofBeginAddress"></param>
+            <param name="aofTailAddress"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClientSession.ExecuteSendCkptMetadata(System.Memory{System.Byte},System.Int32,System.Memory{System.Byte})">
+            <summary>
+            Send checkpoint metadata to replica
+            </summary>
+            <param name="fileTokenBytes"></param>
+            <param name="fileType"></param>
+            <param name="data"></param>
+        </member>
+        <member name="M:Garnet.client.GarnetClientSession.ExecuteSendFileSegments(System.Memory{System.Byte},System.Int32,System.Int64,System.Span{System.Byte},System.Int32)">
+            <summary>
+            Send checkpoint file segments
+            </summary>
+            <param name="fileTokenBytes"></param>
+            <param name="fileType"></param>
+            <param name="startAddress"></param>
+            <param name="data"></param>
+            <param name="segmentId"></param>
+        </member>
+        <member name="M:Garnet.client.GarnetClientSession.ExecuteBeginReplicaRecover(System.Boolean,System.Boolean,System.Boolean,System.String,System.Byte[],System.Int64,System.Int64)">
+            <summary>
+            Signal replica to recover
+            </summary>
+            <param name="sendStoreCheckpoint"></param>
+            <param name="sendObjectStoreCheckpoint"></param>
+            <param name="replayAOF"></param>
+            <param name="primary_replid"></param>
+            <param name="checkpointEntryData"></param>
+            <param name="beginAddress"></param>
+            <param name="tailAddress"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClientSession.ExecuteAttachSync(System.Byte[])">
+            <summary>
+            Initiate attach from replica
+            </summary>
+            <param name="syncMetadata"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClientSession.SetClusterSyncHeader(System.String,System.Boolean)">
+            <summary>
+            Set CLUSTER SYNC header info
+            </summary>
+            <param name="sourceNodeId"></param>
+            <param name="isMainStore"></param>
+        </member>
+        <member name="T:Garnet.client.ClientTcpNetworkSender">
+            <summary>
+            TCP network sender
+            </summary>
+        </member>
+        <member name="M:Garnet.client.ClientTcpNetworkSender.#ctor(System.Net.Sockets.Socket,System.Action{System.Object},Garnet.common.NetworkBufferSettings,Garnet.common.LimitedFixedBufferPool,System.Int32)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="socket"></param>
+            <param name="callback"></param>
+            <param name="networkBufferSettings"></param>
+            <param name="networkPool"></param>
+            <param name="networkSendThrottleMax"></param>
+        </member>
+        <member name="M:Garnet.client.ClientTcpNetworkSender.SendResponse(System.Byte[],System.Int32,System.Int32,System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.client.ClientTcpNetworkSender.SendCallback(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.client.ClientTcpNetworkSender.DisposeNetworkSender(System.Boolean)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.client.CompletionEvent.Dispose">
+            <inheritdoc/>
+        </member>
+        <member name="T:Garnet.client.GarnetClientDisposedException">
+            <summary>
+            GarnetClient disposed exception
+            </summary>
+        </member>
+        <member name="T:Garnet.client.GarnetClientTimeoutException">
+            <summary>
+            GarnetClient timeout exception
+            </summary>
+        </member>
+        <member name="T:Garnet.client.GarnetClientSocketDisposedException">
+            <summary>
+            GarnetClient socket disposed exception
+            </summary>
+        </member>
+        <member name="T:Garnet.client.GarnetClient">
+            <summary>
+            Garnet client (makes a single network connection to server)
+            </summary>
+        </member>
+        <member name="P:Garnet.client.GarnetClient.Disposed">
+            <inheritdoc />
+        </member>
+        <member name="F:Garnet.client.GarnetClient.timeoutCheckerCts">
+            <summary>
+            CTS to allow cancellation of the timeout checker background task, called during Dispose
+            </summary>
+        </member>
+        <member name="F:Garnet.client.GarnetClient.timeoutMilliseconds">
+            <summary>
+            Timeout in milliseconds (0 for no timeout)
+            </summary>
+        </member>
+        <member name="F:Garnet.client.GarnetClient.networkSendThrottleMax">
+            <summary>
+            Max outstanding network sends allowed
+            </summary>
+        </member>
+        <member name="F:Garnet.client.GarnetClient.authUsername">
+            <summary>
+            Username to authenticate client on server.
+            </summary>
+        </member>
+        <member name="F:Garnet.client.GarnetClient.authPassword">
+            <summary>
+            Password to authenticate client on server.
+            </summary>
+        </member>
+        <member name="F:Garnet.client.GarnetClient.disposeException">
+            <summary>
+            Exception to throw to ongoing tasks when disposed
+            </summary>
+        </member>
+        <member name="P:Garnet.client.GarnetClient.EndPoint">
+            <summary>
+            The host endpoint
+            </summary>
+        </member>
+        <member name="P:Garnet.client.GarnetClient.IsConnected">
+            <summary>
+            Whether we are connected to the server
+            </summary>
+        </member>
+        <member name="P:Garnet.client.GarnetClient.GetOutstandingTasksLimit">
+            <summary>
+            Get the max number of allowed outstanding tasks.
+            </summary>
+        </member>
+        <member name="P:Garnet.client.GarnetClient.SendPageSize">
+            <summary>
+            Get the send page size.
+            </summary>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.#ctor(System.Net.EndPoint,System.Net.Security.SslClientAuthenticationOptions,System.String,System.String,System.Int32,System.Int32,System.Int32,System.Int32,System.Buffers.MemoryPool{System.Byte},System.Boolean,System.Boolean,System.Int32,Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            Create client instance
+            </summary>
+            <param name="endpoint">Endpoint of the server</param>
+            <param name="tlsOptions">TLS options</param>
+            <param name="authUsername">Username to authenticate with</param>
+            <param name="authPassword">Password to authenticate with</param>
+            <param name="sendPageSize">Size of pages where requests are written to be sent, determines max request size (rounds down to previous power of 2)</param>
+            <param name="maxOutstandingTasks">Maximum outstanding tasks before client throttles new requests (rounds down to previous power of 2), default 32K</param>
+            <param name="timeoutMilliseconds">Timeout (in milliseconds) after which client disposes itself and throws exception on all active tasks</param>
+            <param name="memoryPool">Pool for Memory based response buffers</param>
+            <param name="recordLatency">Record latency using client internal histogram</param>
+            <param name="useTimeoutChecker"></param>
+            <param name="networkSendThrottleMax">Max outstanding network sends allowed</param>
+            <param name="logger">Logger instance</param>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.Finalize">
+            <summary>
+            Finalizer
+            </summary>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.Connect(System.Threading.CancellationToken)">
+            <summary>
+            Connect to server
+            </summary>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ConnectAsync(System.Threading.CancellationToken)">
+            <summary>
+            Connect to server
+            </summary>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ConnectSendSocketAsync(System.Int32,System.Threading.CancellationToken)">
+            <summary>
+            Connect client send socket
+            </summary>
+            <param name="millisecondsTimeout"></param>
+            <returns></returns>
+            <exception cref="T:System.Exception"></exception>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.TryConnectSocketAsync(System.Net.Sockets.Socket,System.Net.EndPoint,System.Int32,System.Threading.CancellationToken)">
+            <summary>
+            Try to establish connection for <paramref name="socket"/> using <paramref name="endpoint"/>
+            </summary>
+            <param name="socket"></param>
+            <param name="endpoint"></param>
+            <param name="millisecondsTimeout"></param>
+            <param name="cancellationToken">The cancellation token</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.Reconnect(System.Threading.CancellationToken)">
+            <summary>
+            Reconnect to server
+            </summary>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ReconnectAsync(System.Threading.CancellationToken)">
+            <summary>
+            Reconnect to server
+            </summary>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.Dispose">
+            <summary>
+            Dispose instance
+            </summary>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.PipelineLength">
+            <summary>
+            Get estimated number of outstanding tasks.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.InternalExecuteAsync(Garnet.client.TcsWrapper,System.String,System.Collections.Generic.ICollection{System.String},System.Threading.CancellationToken)">
+            <summary>
+            Issue command for execution
+            </summary>
+            <param name="op"></param>
+            <param name="args"></param>
+            <param name="token"></param>
+            <param name="tcs"></param>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.InternalExecuteAsync(Garnet.client.TcsWrapper,System.Memory{System.Byte},System.Collections.Generic.ICollection{System.Memory{System.Byte}},System.Threading.CancellationToken)">
+            <summary>
+            Issue command for execution with parameter array
+            </summary>
+            <param name="tcs"></param>
+            <param name="respOp">Operation in resp format</param>
+            <param name="args"></param>
+            <param name="token"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.TryCreateMessageConsumer(System.Span{System.Byte},Garnet.networking.INetworkSender,Garnet.networking.IMessageConsumer@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.client.GarnetClient.DisposeMessageConsumer(Garnet.networking.INetworkHandler)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.client.GarnetClient.Save(System.Threading.CancellationToken)">
+            <summary>
+            Take a checkpoint of the Garnet instance.
+            </summary>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.Save(System.Action{System.Int64,System.String},System.Int64)">
+            <summary>
+            Take a checkpoint of the Garnet instance.
+            </summary>
+            <param name="callback"></param>
+            <param name="context"></param>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.Info(Garnet.common.InfoMetricsType,System.Threading.CancellationToken)">
+            <summary>
+            Return information and statistics of the server from the corresponding section
+            </summary>
+            <param name="infoSection"></param>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ReplicaOf(System.String,System.Int32,System.Threading.CancellationToken)">
+            <summary>
+            Make the receiving node a replica of the node at the given endpoint
+            </summary>
+            <param name="address"></param>
+            <param name="port"></param>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.QuitAsync">
+            <summary>
+            Send ping
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.QuitAsync(System.Threading.CancellationToken)">
+            <summary>
+            Send ping
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.Quit(System.Action{System.Int64,System.String},System.Int64)">
+            <summary>
+            Send ping
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.PingAsync">
+            <summary>
+            Send ping
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.PingAsync(System.Threading.CancellationToken)">
+            <summary>
+            Send ping
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.Ping(System.Action{System.Int64,System.String},System.Int64)">
+            <summary>
+            Send ping
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringGetAsync(System.String)">
+            <summary>
+            Get value for given key
+            </summary>
+            <param name="key">Key</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringGetAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Get value for given key
+            </summary>
+            <param name="key"></param>
+            <param name="token"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringGetAsMemoryAsync(System.String)">
+            <summary>
+            Get value for given key
+            </summary>
+            <param name="key">Key</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringGetAsMemoryAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Get value for given key
+            </summary>
+            <param name="key">Key</param>
+            <param name="token"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringGetAsMemoryAsync(System.Memory{System.Byte})">
+            <summary>
+            Get value for given key
+            </summary>
+            <param name="key">Key</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringGetAsMemoryAsync(System.Memory{System.Byte},System.Threading.CancellationToken)">
+            <summary>
+            Get value for given key
+            </summary>
+            <param name="key">Key</param>
+            <param name="token"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringGet(System.String,System.Action{System.Int64,System.String},System.Int64)">
+            <summary>
+            Get value for given key
+            </summary>
+            <param name="key">Key</param>
+            <param name="callback">Callback function when operation completes</param>
+            <param name="context">Optional context to correlate request to callback</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringGetAsMemory(System.Memory{System.Byte},System.Action{System.Int64,Garnet.common.MemoryResult{System.Byte}},System.Int64)">
+            <summary>
+            Get value for given key
+            </summary>
+            <param name="key">Key</param>
+            <param name="callback">Callback function when operation completes</param>
+            <param name="context">Optional context to correlate request to callback</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringGet(System.String[],System.Action{System.Int64,System.String[],System.String},System.Int64)">
+            <summary>
+            Get for multiple keys  with string array
+            </summary>
+            <param name="keys"></param>
+            <param name="callback"></param>
+            <param name="context"></param>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringGetAsMemory(System.Memory{System.Byte}[],System.Action{System.Int64,Garnet.common.MemoryResult{System.Byte}[],Garnet.common.MemoryResult{System.Byte}},System.Int64)">
+            <summary>
+            Get for multiple keys with Memory array type
+            </summary>
+            <param name="keys"></param>
+            <param name="callback"></param>
+            <param name="context"></param>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringGetAsMemoryAsync(System.Memory{System.Byte}[])">
+            <summary>
+            Async get for multiple keys with Memory array type
+            </summary>
+            <param name="keys"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringGetAsync(System.String[])">
+            <summary>
+            Async get for multiple keys with string array type
+            </summary>
+            <param name="keys"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringGetAsync(System.String[],System.Threading.CancellationToken)">
+            <summary>
+            Async get for multiple keys with string array type 
+            using cancellation token
+            </summary>  
+            <param name="keys"></param>
+            <param name="token"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringGetAsMemoryAsync(System.String[])">
+            <summary>
+            Async Get for multiple keys as memory result
+            </summary>
+            <param name="keys"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringGetAsMemoryAsync(System.String[],System.Threading.CancellationToken)">
+            <summary>
+            
+            </summary>
+            <param name="keys"></param>
+            <param name="token"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringSetAsync(System.String,System.String)">
+            <summary>
+            Set given value, for given key
+            </summary>
+            <param name="key">Key</param>
+            <param name="value">Value</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringSetAsync(System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Set given value, for given key
+            </summary>
+            <param name="key"></param>
+            <param name="value"></param>
+            <param name="token"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringSetAsync(System.Memory{System.Byte},System.Memory{System.Byte})">
+            <summary>
+            Set given value, for given key
+            </summary>
+            <param name="key">Key</param>
+            <param name="value">Value</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringSetAsync(System.Memory{System.Byte},System.Memory{System.Byte},System.Threading.CancellationToken)">
+            <summary>
+            Set given value, for given key
+            </summary>
+            <param name="key">Key</param>
+            <param name="value">Value</param>
+            <param name="token">Value</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringSet(System.String,System.String,System.Action{System.Int64,System.String},System.Int64)">
+            <summary>
+            Set given value, for given key
+            </summary>
+            <param name="key">Key</param>
+            <param name="value">Value</param>
+            <param name="callback">Callback function when operation completes</param>
+            <param name="context">Optional context to correlate request to callback</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringSet(System.Memory{System.Byte},System.Memory{System.Byte},System.Action{System.Int64,System.String},System.Int64)">
+            <summary>
+            Set given value, for given key
+            </summary>
+            <param name="key">Key</param>
+            <param name="value">Value</param>
+            <param name="callback">Callback function when operation completes</param>
+            <param name="context">Optional context to correlate request to callback</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.KeyDeleteAsync(System.String)">
+            <summary>
+            Delete given key
+            </summary>
+            <param name="key">Key</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.KeyDeleteAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Delete given key
+            </summary>
+            <param name="key">Key</param>
+            <param name="token">Key</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.KeyDeleteAsync(System.Memory{System.Byte})">
+            <summary>
+            Delete given key
+            </summary>
+            <param name="key">Key</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.KeyDeleteAsync(System.Memory{System.Byte},System.Threading.CancellationToken)">
+            <summary>
+            Delete given key
+            </summary>
+            <param name="key">Key</param>
+            <param name="token">Cancellation token</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.KeyDelete(System.String,System.Action{System.Int64,System.String},System.Int64)">
+            <summary>
+            Delete given key
+            </summary>
+            <param name="key">Key</param>
+            <param name="callback">Callback function when operation completes</param>
+            <param name="context">Optional context to correlate request to callback</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.KeyDelete(System.Memory{System.Byte},System.Action{System.Int64,System.String},System.Int64)">
+            <summary>
+            Delete given key
+            </summary>
+            <param name="key">Key</param>
+            <param name="callback">Callback function when operation completes</param>
+            <param name="context">Optional context to correlate request to callback</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.KeyDeleteAsync(System.String[])">
+            <summary>
+            Delete given keys
+            </summary>
+            <param name="keys">Keys for delete</param>
+            <returns>The number of keys deleted, or -1 if there was an error</returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.KeyDeleteAsync(System.Memory{System.Byte}[],System.Threading.CancellationToken)">
+            <summary>
+            Delete given key with cancellation token
+            </summary>
+            <param name="keys">Keys for delete</param>
+            <param name="token">Cancellation token</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.KeyDeleteAsync(System.String[],System.Threading.CancellationToken)">
+            <summary>
+            Delete given keys with a cancellation token
+            </summary>
+            <param name="keys">Keys to delete</param>
+            <param name="token">Cancellation token</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.KeyDeleteAsync(System.Memory{System.Byte}[])">
+            <summary>
+            Delete the given keys
+            </summary>
+            <param name="keys">Keys</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.KeyDelete(System.String[],System.Action{System.Int64,System.Int64,System.String},System.Int64)">
+            <summary>
+            Delete the given keys with a callback fuction
+            </summary>
+            <param name="keys">Keys to delete</param>
+            <param name="callback">Callback function when operation completes</param>
+            <param name="context">Optional context to correlate request to callback</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.KeyDelete(System.Memory{System.Byte}[],System.Action{System.Int64,System.Int64,System.String},System.Int64)">
+            <summary>
+            Delete given key
+            </summary>
+            <param name="keys">Key</param>
+            <param name="callback">Callback function when operation completes</param>
+            <param name="context">Optional context to correlate request to callback</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringIncrement(System.String)">
+            <summary>
+            Increment number stored at key by 1.
+            </summary>
+            <param name="key">Key</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringIncrement(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Increment number stored at key by 1.
+            </summary>
+            <param name="key">Key</param>
+            <param name="token">Value</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringIncrement(System.Memory{System.Byte})">
+            <summary>
+            Increment number stored at key by 1.
+            </summary>
+            <param name="key">Key</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringIncrement(System.Memory{System.Byte},System.Threading.CancellationToken)">
+            <summary>
+            Increment number stored at key by 1.
+            </summary>
+            <param name="key">Key</param>
+            <param name="token">Key</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringIncrement(System.String,System.Action{System.Int64,System.String},System.Int64)">
+            <summary>
+            Increment number stored at key by 1.
+            </summary>
+            <param name="key">Key</param>
+            <param name="callback">Callback function when operation completes</param>
+            <param name="context">Optional context to correlate request to callback</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringIncrement(System.Memory{System.Byte},System.Action{System.Int64,System.String},System.Int64)">
+            <summary>
+            Increment number stored at key by 1.
+            </summary>
+            <param name="key">Key</param>
+            <param name="callback">Callback function when operation completes</param>
+            <param name="context">Optional context to correlate request to callback</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringIncrement(System.String,System.Int64)">
+            <summary>
+            Increment number stored at key by value.
+            </summary>
+            <param name="key">Key</param>
+            <param name="value">Value</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringIncrement(System.String,System.Int64,System.Threading.CancellationToken)">
+            <summary>
+            Increment number stored at key by value.
+            </summary>
+            <param name="key">Key</param>
+            <param name="value">Value</param>
+            <param name="token">Value</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringIncrement(System.Memory{System.Byte},System.Int64)">
+            <summary>
+            Increment number stored at key by value.
+            </summary>
+            <param name="key">Key</param>
+            <param name="value">Value</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringIncrement(System.Memory{System.Byte},System.Int64,System.Threading.CancellationToken)">
+            <summary>
+            Increment number stored at key by value.
+            </summary>
+            <param name="key">Key</param>
+            <param name="value">Value</param>
+            <param name="token">Value</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringIncrement(System.String,System.Int64,System.Action{System.Int64,System.String},System.Int64)">
+            <summary>
+            Increment number stored at key by value.
+            </summary>
+            <param name="key">Key</param>
+            <param name="value">Value</param>
+            <param name="callback">Callback function when operation completes</param>
+            <param name="context">Optional context to correlate request to callback</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringIncrement(System.Memory{System.Byte},System.Int64,System.Action{System.Int64,System.String},System.Int64)">
+            <summary>
+            Increment number stored at key by value.
+            </summary>
+            <param name="key">Key</param>
+            <param name="value">Value</param>
+            <param name="callback">Callback function when operation completes</param>
+            <param name="context">Optional context to correlate request to callback</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringDecrement(System.String)">
+            <summary>
+            Decrement number stored at key by 1.
+            </summary>
+            <param name="key">Key</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringDecrement(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Decrement number stored at key by 1.
+            </summary>
+            <param name="key">Key</param>
+            <param name="token">Value</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringDecrement(System.Memory{System.Byte})">
+            <summary>
+            Decrement number stored at key by 1.
+            </summary>
+            <param name="key">Key</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringDecrement(System.Memory{System.Byte},System.Threading.CancellationToken)">
+            <summary>
+            Decrement number stored at key by 1.
+            </summary>
+            <param name="key">Key</param>
+            <param name="token">Key</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringDecrement(System.String,System.Action{System.Int64,System.String},System.Int64)">
+            <summary>
+            Decrement number stored at key by 1.
+            </summary>
+            <param name="key">Key</param>
+            <param name="callback">Callback function when operation completes</param>
+            <param name="context">Optional context to correlate request to callback</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringDecrement(System.Memory{System.Byte},System.Action{System.Int64,System.String},System.Int64)">
+            <summary>
+            Decrement number stored at key by 1.
+            </summary>
+            <param name="key">Key</param>
+            <param name="callback">Callback function when operation completes</param>
+            <param name="context">Optional context to correlate request to callback</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringDecrement(System.String,System.Int64)">
+            <summary>
+            Decrement number stored at key by value.
+            </summary>
+            <param name="key">Key</param>
+            <param name="value">Value</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringDecrement(System.String,System.Int64,System.Threading.CancellationToken)">
+            <summary>
+            Decrement number stored at key by value.
+            </summary>
+            <param name="key">Key</param>
+            <param name="value">Value</param>
+            <param name="token">Value</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringDecrement(System.Memory{System.Byte},System.Int64)">
+            <summary>
+            Increment number stored at key by value.
+            </summary>
+            <param name="key">Key</param>
+            <param name="value">Value</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringDecrement(System.Memory{System.Byte},System.Int64,System.Threading.CancellationToken)">
+            <summary>
+            Decrement number stored at key by value.
+            </summary>
+            <param name="key">Key</param>
+            <param name="value">Value</param>
+            <param name="token">Value</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringDecrement(System.String,System.Int64,System.Action{System.Int64,System.String},System.Int64)">
+            <summary>
+            Decrement number stored at key by value.
+            </summary>
+            <param name="key">Key</param>
+            <param name="value">Value</param>
+            <param name="callback">Callback function when operation completes</param>
+            <param name="context">Optional context to correlate request to callback</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.StringDecrement(System.Memory{System.Byte},System.Int64,System.Action{System.Int64,System.String},System.Int64)">
+            <summary>
+            Decrement number stored at key by value.
+            </summary>
+            <param name="key">Key</param>
+            <param name="value">Value</param>
+            <param name="callback">Callback function when operation completes</param>
+            <param name="context">Optional context to correlate request to callback</param>
+            <returns></returns>
+        </member>
+        <member name="F:Garnet.client.GarnetClient.CLUSTER">
+            <summary>
+            CLUSTER resp formatted
+            </summary>
+        </member>
+        <member name="P:Garnet.client.GarnetClient.PUBLISH">
+            <summary>
+            PUBLISH resp formatted
+            </summary>
+        </member>
+        <member name="P:Garnet.client.GarnetClient.SPUBLISH">
+            <summary>
+            PUBLISH resp formatted
+            </summary>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.Failover(Garnet.common.FailoverOption,System.Threading.CancellationToken)">
+            <summary>
+            Issue cluster failover command to replica node
+            </summary>
+            <param name="failoverOption"></param>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForStringResultAsync(System.Memory{System.Byte},System.String,System.String)">
+            <summary>
+            Execute command (async)
+            </summary>
+            <param name="respOp">Operation in resp format</param>
+            <param name="param1">Parameter</param>
+            <param name="param2">Parameter</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForStringResultAsync(System.Memory{System.Byte},System.Memory{System.Byte},System.Memory{System.Byte})">
+            <summary>
+            Execute command (async)
+            </summary>
+            <param name="respOp">Operation in resp format</param>
+            <param name="param1">Parameter</param>
+            <param name="param2">Parameter</param>
+            
+            
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForStringResultAsync(System.String,System.Collections.Generic.ICollection{System.String})">
+            <summary>
+            Execute command (async)
+            </summary>
+            <param name="op">Operation</param>
+            <param name="args">Operation arguments</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForStringResultAsync(System.Memory{System.Byte},System.Collections.Generic.ICollection{System.Memory{System.Byte}})">
+            <summary>
+            Execute command (async)
+            </summary>
+            <param name="respOp">Operation in resp format</param>
+            <param name="args">Command arguments</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForStringResult(System.Action{System.Int64,System.String},System.Int64,System.Memory{System.Byte},System.String,System.String)">
+            <summary>
+            Execute command (sync)
+            </summary>
+            <param name="callback">Callback function when operation completes</param>
+            <param name="context">Optional context to correlate request to callback</param>
+            <param name="respOp">Operation in resp format</param>
+            <param name="param1">Parameter</param>
+            <param name="param2">Parameter</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForStringResult(System.Action{System.Int64,System.String},System.Int64,System.Memory{System.Byte},System.Memory{System.Byte},System.Memory{System.Byte})">
+            <summary>
+            Execute command (sync)
+            </summary>
+            <param name="callback">Callback function when operation completes</param>
+            <param name="context">Optional context to correlate request to callback</param>
+            <param name="respOp">Operation in resp format</param>
+            <param name="param1">Parameter</param>
+            <param name="param2">Parameter</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForStringResult(System.Action{System.Int64,System.String},System.Int64,System.String,System.Collections.Generic.ICollection{System.String})">
+            <summary>
+            Execute command (sync)
+            </summary>
+            <param name="callback">Callback function when operation completes</param>
+            <param name="context">Optional context to correlate request to callback</param>
+            <param name="op">Commands</param>
+            <param name="args">Command arguments</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForStringResult(System.Action{System.Int64,System.String},System.Int64,System.Memory{System.Byte},System.Collections.Generic.ICollection{System.Memory{System.Byte}})">
+            <summary>
+            Execute command (sync)
+            </summary>
+            <param name="callback">Callback function when operation completes</param>
+            <param name="context">Optional context to correlate request to callback</param>
+            <param name="respOp">Operation in resp format</param>
+            <param name="args">Operation arguments</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForStringResultWithCancellationAsync(System.Memory{System.Byte},System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Execute command (async)
+            </summary>
+            <param name="respOp">Operation in resp format</param>
+            <param name="param1"></param>
+            <param name="param2"></param>
+            <param name="token"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForStringResultWithCancellationAsync(System.Memory{System.Byte},System.Memory{System.Byte},System.Memory{System.Byte},System.Threading.CancellationToken)">
+            <summary>
+            Execute command (async)
+            </summary>
+            <param name="respOp">Operation in resp format</param>
+            <param name="param1"></param>
+            <param name="param2"></param>
+            <param name="token"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForStringResultWithCancellationAsync(System.String,System.Collections.Generic.ICollection{System.String},System.Threading.CancellationToken)">
+            <summary>
+            Execute command (async)
+            </summary>
+            <param name="op">Operation</param>
+            <param name="args">Operation arguments</param>
+            <param name="token">Cancellation token</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForStringResultWithCancellationAsync(System.Memory{System.Byte},System.Collections.Generic.ICollection{System.Memory{System.Byte}},System.Threading.CancellationToken)">
+            <summary>
+            Execute command (async)
+            </summary>
+            <param name="respOp">Operation in resp format</param>
+            <param name="args">Operation arguments</param>
+            <param name="token">Cancellation token</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForMemoryResultAsync(System.Memory{System.Byte},System.String,System.String)">
+            <summary>
+            Execute command (async)
+            </summary>
+            <param name="respOp">Operation in resp format</param>
+            <param name="param1">Parameter</param>
+            <param name="param2">Parameter</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForMemoryResultAsync(System.Memory{System.Byte},System.Memory{System.Byte},System.Memory{System.Byte})">
+            <summary>
+            Execute command (async)
+            </summary>
+            <param name="respOp">Operation in resp format</param>
+            <param name="param1">Parameter</param>
+            <param name="param2">Parameter</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForMemoryResultAsync(System.String,System.Collections.Generic.ICollection{System.String})">
+            <summary>
+            Execute command (async)
+            </summary>
+            <param name="op">Operation</param>
+            <param name="args">Operation arguments</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForMemoryResultAsync(System.Memory{System.Byte},System.Collections.Generic.ICollection{System.Memory{System.Byte}})">
+            <summary>
+            Execute command (async)
+            </summary>
+            <param name="respOp">Operation in resp format</param>
+            <param name="args">Operation arguments</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForMemoryResult(System.Action{System.Int64,Garnet.common.MemoryResult{System.Byte}},System.Int64,System.Memory{System.Byte},System.String,System.String)">
+            <summary>
+            Execute command (sync)
+            </summary>
+            <param name="respOp">Operation in resp format</param>
+            <param name="param1">Parameter</param>
+            <param name="param2">Parameter</param>
+            <param name="callback">Callback function when operation completes</param>
+            <param name="context">Optional context to correlate request to callback</param>
+            <returns></returns>ok 1
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForMemoryResult(System.Action{System.Int64,Garnet.common.MemoryResult{System.Byte}},System.Int64,System.Memory{System.Byte},System.Memory{System.Byte},System.Memory{System.Byte})">
+            <summary>
+            Execute command (sync)
+            </summary>
+            <param name="respOp">Operation in resp format</param>
+            <param name="param1">Parameter</param>
+            <param name="param2">Parameter</param>
+            <param name="callback">Callback function when operation completes</param>
+            <param name="context">Optional context to correlate request to callback</param>
+            <returns></returns>ok 2
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForMemoryResult(System.Action{System.Int64,Garnet.common.MemoryResult{System.Byte}},System.Int64,System.String,System.Collections.Generic.ICollection{System.String})">
+            <summary>
+            Execute command (sync)
+            </summary>
+            <param name="callback">Callback function when operation completes</param>
+            <param name="context">Optional context to correlate request to callback</param>
+            <param name="op">Commands</param>
+            <param name="args">Operation arguments</param>
+            <returns></returns> ok 3
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForMemoryResult(System.Action{System.Int64,Garnet.common.MemoryResult{System.Byte}},System.Int64,System.Memory{System.Byte},System.Collections.Generic.ICollection{System.Memory{System.Byte}})">
+            <summary>
+            Execute command with callback function
+            </summary>
+            <param name="callback"></param>
+            <param name="context"></param>
+            <param name="respOp">Operation in resp format</param>
+            <param name="args">Operation arguments</param>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForMemoryResultWithCancellationAsync(System.Memory{System.Byte},System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Execute command (async)
+            </summary>
+            <param name="respOp">Operation in resp format</param>
+            <param name="param1"></param>
+            <param name="param2"></param>
+            <param name="token"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForMemoryResultWithCancellationAsync(System.Memory{System.Byte},System.Memory{System.Byte},System.Memory{System.Byte},System.Threading.CancellationToken)">
+            <summary>
+            Execute command (async) with cancellation token
+            </summary>
+            <param name="respOp">Operation in resp format</param>
+            <param name="param1"></param>
+            <param name="param2"></param>
+            <param name="token"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForMemoryResultWithCancellationAsync(System.String,System.Collections.Generic.ICollection{System.String},System.Threading.CancellationToken)">
+            <summary>
+            Execute command (async)
+            </summary>
+            <param name="op">Commands</param>
+            <param name="args">Operation arguments</param>
+            <param name="token">Commands</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForMemoryResultWithCancellationAsync(System.Memory{System.Byte},System.Collections.Generic.ICollection{System.Memory{System.Byte}},System.Threading.CancellationToken)">
+            <summary>
+            Execute command (async)
+            </summary>
+            <param name="respOp">Operation in resp format</param>
+            <param name="args">Operation arguments</param>
+            <param name="token">Commands</param>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForStringArrayResultAsync(System.Memory{System.Byte},System.String,System.String)">
+            <summary>
+            Execute command (async) for array return type
+            </summary>
+            <param name="respOp">Operation in resp format</param>
+            <param name="param1"></param>
+            <param name="param2"></param>
+            <returns>Array of results</returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForStringArrayResultAsync(System.Memory{System.Byte},System.Memory{System.Byte},System.Memory{System.Byte})">
+            <summary>
+            Execute command (async) for array return type
+            </summary>
+            <param name="respOp">Operation in resp format</param>
+            <param name="param1"></param>
+            <param name="param2"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForStringArrayResultAsync(System.String,System.Collections.Generic.ICollection{System.String})">
+            <summary>
+            Execute command (async) for array return type
+            </summary>
+            <param name="op"></param>
+            <param name="args">Operation arguments</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForStringArrayResultAsync(System.Memory{System.Byte},System.Collections.Generic.ICollection{System.Memory{System.Byte}})">
+            <summary>
+            Execute command (async) for array return type
+            </summary>
+            <param name="respOp">Operation in resp format</param>
+            <param name="args">Operation arguments</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForStringArrayResult(System.Action{System.Int64,System.String[],System.String},System.Int64,System.Memory{System.Byte},System.String,System.String)">
+            <summary>
+            Execute command (sync)
+            </summary>
+            <param name="callback">Callback function when operation completes</param>
+            <param name="context"></param>
+            <param name="respOp">Operation in resp format</param>
+            <param name="param1"></param>
+            <param name="param2"></param>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForStringArrayResult(System.Action{System.Int64,System.String[],System.String},System.Int64,System.Memory{System.Byte},System.Memory{System.Byte},System.Memory{System.Byte})">
+            <summary>
+            Execute command (sync)
+            </summary>
+            <param name="callback">Callback function when operation completes</param>
+            <param name="context"></param>
+            <param name="respOp">Operation in resp format</param>
+            <param name="param1"></param>
+            <param name="param2"></param>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForStringArrayResult(System.Action{System.Int64,System.String[],System.String},System.Int64,System.String,System.Collections.Generic.ICollection{System.String})">
+            <summary>
+            Execute command (sync)
+            </summary>
+            <param name="callback">Callback function when operation completes</param>
+            <param name="context"></param>
+            <param name="op"></param>
+            <param name="args">Operation arguments</param>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForStringArrayResult(System.Action{System.Int64,System.String[],System.String},System.Int64,System.Memory{System.Byte},System.Collections.Generic.ICollection{System.Memory{System.Byte}})">
+            <summary>
+            Execute command (sync)
+            </summary>
+            <param name="callback">Callback function when operation completes</param>
+            <param name="context"></param>
+            <param name="respOp">Operation in resp format</param>
+            <param name="args">Operation arguments</param>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForStringArrayResultWithCancellationAsync(System.Memory{System.Byte},System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Executes a command (async) with a cancellation token
+            </summary>
+            <param name="respOp">Operation in resp format</param>
+            <param name="param1"></param>
+            <param name="param2"></param>
+            <param name="token"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForStringArrayResultWithCancellationAsync(System.Memory{System.Byte},System.Memory{System.Byte},System.Memory{System.Byte},System.Threading.CancellationToken)">
+            <summary>
+             Executes a command (async) with a cancellation token
+            </summary>
+            <param name="respOp">Operation in resp format</param>
+            <param name="param1"></param>
+            <param name="param2"></param>
+            <param name="token"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForStringArrayResultWithCancellationAsync(System.String,System.Collections.Generic.ICollection{System.String},System.Threading.CancellationToken)">
+            <summary>
+            Execute command (async) for array return type with a cancellation token
+            </summary>
+            <param name="op"></param>
+            <param name="args">Operation arguments</param>
+            <param name="token"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForStringArrayResultWithCancellationAsync(System.Memory{System.Byte},System.Collections.Generic.ICollection{System.Memory{System.Byte}},System.Threading.CancellationToken)">
+            <summary>
+            Execute command (async) for array return type with a cancellation token
+            </summary>
+            <param name="respOp">Operation in resp format</param>
+            <param name="args">Operation arguments</param>
+            <param name="token"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForMemoryResultArrayAsync(System.Memory{System.Byte},System.String,System.String)">
+            <summary>
+            Executes a command
+            </summary>
+            <param name="respOp">Operation in resp format</param>
+            <param name="param1"></param>
+            <param name="param2"></param>
+            <returns>MemoryResult byte array</returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForMemoryResultArrayAsync(System.Memory{System.Byte},System.Memory{System.Byte},System.Memory{System.Byte})">
+            <summary>
+            Executes a command
+            </summary>
+            <param name="respOp">Operation in resp format</param>
+            <param name="param1"></param>
+            <param name="param2"></param>
+            <returns>MemoryResult byte array</returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForMemoryResultArrayAsync(System.String,System.Collections.Generic.ICollection{System.String})">
+            <summary>
+            Executes command with string param array
+            </summary>
+            <param name="op"></param>
+            <param name="args">Operation arguments</param>
+            <returns>MemoryResult byte array</returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForMemoryResultArrayAsync(System.Memory{System.Byte},System.Collections.Generic.ICollection{System.Memory{System.Byte}})">
+            <summary>
+            Executes command with memorybyte param array
+            </summary>
+            <param name="respOp">Operation in resp format</param>
+            <param name="args">Operation arguments</param>
+            <returns>MemoryResult byte array</returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForMemoryResultArray(System.Action{System.Int64,Garnet.common.MemoryResult{System.Byte}[],Garnet.common.MemoryResult{System.Byte}},System.Int64,System.Memory{System.Byte},System.String,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="callback"></param>
+            <param name="context"></param>
+            <param name="respOp">Operation in resp format</param>
+            <param name="param1"></param>
+            <param name="param2"></param>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForMemoryResultArray(System.Action{System.Int64,Garnet.common.MemoryResult{System.Byte}[],Garnet.common.MemoryResult{System.Byte}},System.Int64,System.Memory{System.Byte},System.Memory{System.Byte},System.Memory{System.Byte})">
+            <summary>
+            
+            </summary>
+            <param name="callback"></param>
+            <param name="context"></param>
+            <param name="respOp">Operation in resp format</param>
+            <param name="param1"></param>
+            <param name="param2"></param>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForMemoryResultArray(System.Action{System.Int64,Garnet.common.MemoryResult{System.Byte}[],Garnet.common.MemoryResult{System.Byte}},System.Int64,System.String,System.Collections.Generic.ICollection{System.String})">
+            <summary>
+            
+            </summary>
+            <param name="callback"></param>
+            <param name="context"></param>
+            <param name="op"></param>
+            <param name="args">Operation arguments</param>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForMemoryResultArray(System.Action{System.Int64,Garnet.common.MemoryResult{System.Byte}[],Garnet.common.MemoryResult{System.Byte}},System.Int64,System.Memory{System.Byte},System.Collections.Generic.ICollection{System.Memory{System.Byte}})">
+            <summary>
+            
+            </summary>
+            <param name="callback"></param>
+            <param name="context"></param>
+            <param name="respOp">Operation in resp format</param>
+            <param name="args">Operation arguments</param>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForMemoryResultArrayWithCancellationAsync(System.Memory{System.Byte},System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Executes command with memorybyte param array
+            </summary>
+            <param name="respOp">Operation in resp format</param>
+            <param name="param1"></param>
+            <param name="param2"></param>
+            <param name="token"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForMemoryResultArrayWithCancellationAsync(System.Memory{System.Byte},System.Memory{System.Byte},System.Memory{System.Byte},System.Threading.CancellationToken)">
+            <summary>
+            Executes command with memorybyte param array 
+            </summary>
+            <param name="respOp">Operation in resp format</param>
+            <param name="param1"></param>
+            <param name="param2"></param>
+            <param name="token"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForMemoryResultArrayWithCancellationAsync(System.String,System.Collections.Generic.ICollection{System.String},System.Threading.CancellationToken)">
+            <summary>
+            Executes command with memorybyte param array
+            </summary>
+            <param name="op"></param>
+            <param name="args">Operation arguments</param>
+            <param name="token"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForMemoryResultArrayWithCancellationAsync(System.Memory{System.Byte},System.Collections.Generic.ICollection{System.Memory{System.Byte}},System.Threading.CancellationToken)">
+            <summary>
+            Executes command with memorybyte param array
+            </summary>
+            <param name="respOp">Operation in resp format</param>
+            <param name="args">Operation arguments</param>
+            <param name="token"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForLongResultAsync(System.String,System.Collections.Generic.ICollection{System.String})">
+            <summary>
+            Execute command (async)
+            </summary>
+            <param name="op">Commands</param>
+            <param name="args">Operation arguments</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForLongResultAsync(System.Memory{System.Byte},System.Collections.Generic.ICollection{System.Memory{System.Byte}})">
+            <summary>
+            Execute command (async)
+            </summary>
+            <param name="respOp">Operation in resp format</param>
+            <param name="args">Command arguments</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForLongResultAsync(System.Memory{System.Byte},System.String,System.String)">
+            <summary>
+            Execute command (async)
+            </summary>
+            <param name="respOp"></param>
+            <param name="param1"></param>
+            <param name="param2"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForLongResult(System.Action{System.Int64,System.Int64,System.String},System.Int64,System.String,System.Collections.Generic.ICollection{System.String})">
+            <summary>
+            Execute command (sync)
+            </summary>
+            <param name="callback">Callback function when operation completes</param>
+            <param name="context">Optional context to correlate request to callback</param>
+            <param name="op">Commands</param>
+            <param name="args">Command arguments</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForLongResult(System.Action{System.Int64,System.Int64,System.String},System.Int64,System.Memory{System.Byte},System.Collections.Generic.ICollection{System.Memory{System.Byte}})">
+            <summary>
+            Execute command (sync)
+            </summary>
+            <param name="callback">Callback function when operation completes</param>
+            <param name="context">Optional context to correlate request to callback</param>
+            <param name="respOp">Command in resp format</param>
+            <param name="args">Commands arguments</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForLongResult(System.Action{System.Int64,System.Int64,System.String},System.Int64,System.Memory{System.Byte},System.String,System.String)">
+            <summary>
+            Execute command (sync)
+            </summary>
+            <param name="callback"></param>
+            <param name="context"></param>
+            <param name="respOp"></param>
+            <param name="param1"></param>
+            <param name="param2"></param>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForLongResultWithCancellationAsync(System.String,System.Collections.Generic.ICollection{System.String},System.Threading.CancellationToken)">
+            <summary>
+            Execute command (async) with cancellation token
+            </summary>
+            <param name="op">Commands</param>
+            <param name="args">Operation arguments</param>
+            <param name="token">Commands</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteForLongResultWithCancellationAsync(System.Memory{System.Byte},System.Memory{System.Byte}[],System.Threading.CancellationToken)">
+            <summary>
+            Execute command (async) with cancellation token
+            </summary>
+            <param name="respOp">Operation in resp format</param>
+            <param name="args">Operation arguments</param>
+            <param name="token">Cancellation token</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ExecuteNoResponse(System.Memory{System.Byte},System.ReadOnlySpan{System.Byte},System.Span{System.Byte}@,System.Span{System.Byte}@,System.Threading.CancellationToken)">
+            <summary>
+            Execute command expecting no response
+            </summary>
+            <param name="op"></param>
+            <param name="param1"></param>
+            <param name="param2"></param>
+            <param name="param3"></param>
+            <param name="token"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ListLeftPush(System.String,System.String,System.Action{System.Int64,System.Int64,System.String},System.Int64)">
+            <summary>
+            Add the specified element to the head of the list stored at key.
+            </summary>
+            <param name="key">The key of the list.</param>
+            <param name="element">The element to be added.</param>
+            <param name="callback">The callback function when operation completes.</param>
+            <param name="context">An optional context to correlate request to callback.</param>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ListLeftPush(System.String,System.Collections.Generic.IEnumerable{System.String},System.Action{System.Int64,System.Int64,System.String},System.Int64)">
+            <summary>
+            Add the specified elements to the head of the list stored at key.
+            </summary>
+            <param name="key">The key of the list.</param>
+            <param name="elements">The elements to be added.</param>
+            <param name="callback">The callback function when operation completes.</param>
+            <param name="context">An optional context to correlate request to callback.</param>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ListLeftPushAsync(System.String,System.String[])">
+            <summary>
+            Asynchronously add the specified elements to the head of the list stored at key.
+            </summary>
+            <param name="key">The key of the list.</param>
+            <param name="elements">The elements to be added.</param>
+            <returns>The number of list elements after the addition.</returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ListRightPush(System.String,System.String,System.Action{System.Int64,System.Int64,System.String},System.Int64)">
+            <summary>
+            Add the specified element to the tail of the list stored at key.
+            </summary>
+            <param name="key">The key of the list.</param>
+            <param name="element">The element to be added.</param>
+            <param name="callback">The callback function when operation completes.</param>
+            <param name="context">An optional context to correlate request to callback.</param>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ListRightPush(System.String,System.Collections.Generic.IEnumerable{System.String},System.Action{System.Int64,System.Int64,System.String},System.Int64)">
+            <summary>
+            Add the specified elements to the tail of the list stored at key.
+            </summary>
+            <param name="key">The key of the list.</param>
+            <param name="elements">The elements to be added.</param>
+            <param name="callback">The callback function when operation completes.</param>
+            <param name="context">An optional context to correlate request to callback.</param>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ListRightPushAsync(System.String,System.String[])">
+            <summary>
+            Asynchronously add the specified elements to the tail of the list stored at key.
+            </summary>
+            <param name="key">The key of the list.</param>
+            <param name="elements">The elements to be added.</param>
+            <returns>The number of list elements after the addition.</returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ListRangeAsync(System.String,System.Int32,System.Int32)">
+            <summary>
+            Gets the values of the specified list key.
+            </summary>
+            <param name="key">The key of the list.</param>
+            <param name="start">The offset start.</param>
+            <param name="stop">The offset stop.</param>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ListLengthAsync(System.String)">
+            <summary>
+            Gets the length of the list.
+            </summary>
+            <param name="key">The key of the list.</param>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.SortedSetAdd(System.String,System.String,System.Double,System.Action{System.Int64,System.Int64,System.String},System.Int64)">
+            <summary>
+            Adds/Updates a member, score in a SortedSet
+            </summary>
+            <param name="key"></param>
+            <param name="member"></param>
+            <param name="score"></param>
+            <param name="callback"></param>
+            <param name="context"></param>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.SortedSetAdd(System.String,Garnet.client.GarnetClientAPI.SortedSetPairCollection,System.Action{System.Int64,System.Int64,System.String},System.Int64)">
+            <summary>
+            Creates/Update a SortedSet 
+            new members are added, existing members are updated.
+            </summary>
+            <param name="key"></param>
+            <param name="sortedSetEntries"></param>
+            <param name="callback"></param>
+            <param name="context"></param>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.SortedSetAddAsync(System.String,System.String,System.Double)">
+            <summary>
+            Adds/Updates a member, score in a SortedSet
+            </summary>
+            <param name="key"></param>
+            <param name="member"></param>
+            <param name="score"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.SortedSetAddAsync(System.String,Garnet.client.GarnetClientAPI.SortedSetPairCollection)">
+            <summary>
+            Creates/Update a SortedSet 
+            new members are added, existing members are updated.
+            </summary>
+            <param name="key"></param>
+            <param name="sortedSetEntries"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.SortedSetRemove(System.String,System.String,System.Action{System.Int64,System.Int64,System.String},System.Int64)">
+            <summary>
+            Removes a [member, score] pair from a SortedSet
+            </summary>
+            <param name="key"></param>
+            <param name="member"></param>
+            <param name="callback"></param>
+            <param name="context"></param>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.SortedSetRemove(System.String,System.Collections.Generic.List{System.String},System.Action{System.Int64,System.Int64,System.String},System.Int64)">
+            <summary>
+            Removes elements from a SortedSet 
+            </summary>
+            <param name="key"></param>
+            <param name="members"></param>
+            <param name="callback"></param>
+            <param name="context"></param>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.SortedSetRemoveAsync(System.String,System.String,System.Double)">
+            <summary>
+            Removes a [member, score] pair from a SortedSet
+            </summary>
+            <param name="key"></param>
+            <param name="member"></param>
+            <param name="score"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.SortedSetRemoveAsync(System.String,Garnet.client.GarnetClientAPI.SortedSetPairCollection)">
+            <summary>
+            Removes a [member, score] pair from a SortedSet
+            </summary>
+            <param name="key"></param>
+            <param name="sortedSetEntries"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.SortedSetLengthAsync(System.String)">
+            <summary>
+            Gets the current Length of a SortedSet (async)
+            </summary>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.SortedSetLength(System.String,System.Action{System.Int64,System.Int64,System.String},System.Int64)">
+            <summary>
+            Gets the current Length of a SortedSet(sync)
+            </summary>
+            <param name="key"></param>
+            <param name="callback"></param>
+            <param name="context"></param>
+        </member>
+        <member name="P:Garnet.client.GarnetClient.CopyLatencyHistogram">
+            <summary>
+            Get client latency histogram
+            </summary>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.ResetLatencyHistogram">
+            <summary>
+            Reset internal latency histogram if enabled
+            </summary>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.GetLatencyMetrics">
+            <summary>
+            Return request latency histogram.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.DumpLatencyHistToConsole(System.Boolean)">
+            <summary>
+            Dump histogram values to console
+            </summary>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.GetOutstandingRequestsMetrics">
+            <summary>
+            Return histogram of outstanding requests.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.GarnetClient.TryConsumeMessages(System.Byte*,System.Int32)">
+            <inheritdoc />
+        </member>
+        <member name="T:Garnet.client.GarnetClientAPI.SortedSetPairCollection">
+            <summary>
+            Describes a SortedSet [member, score] entry
+            </summary>
+        </member>
+        <member name="M:Garnet.client.GarnetClientAPI.SortedSetPairCollection.#ctor">
+            <summary>
+            Create a new collection for a sorted set
+            </summary>
+        </member>
+        <member name="M:Garnet.client.GarnetClientAPI.SortedSetPairCollection.AddSortedSetEntry(System.Byte[],System.Double)">
+            <summary>
+            Adds a new entry to the collection
+            </summary>
+            <param name="member"></param>
+            <param name="score"></param>
+        </member>
+        <member name="P:Garnet.client.GarnetClientAPI.SortedSetPairCollection.Elements">
+            <summary>
+            Gets all the entries
+            </summary>
+        </member>
+        <member name="T:Garnet.client.LightEpoch">
+            <summary>
+            Epoch protection
+            </summary>
+        </member>
+        <member name="F:Garnet.client.LightEpoch.kCacheLineBytes">
+            Size of cache line in bytes
+        </member>
+        <member name="F:Garnet.client.LightEpoch.kInvalidIndex">
+            <summary>
+            Default invalid index entry.
+            </summary>
+        </member>
+        <member name="F:Garnet.client.LightEpoch.kTableSize">
+            <summary>
+            Default number of entries in the entries table
+            </summary>
+        </member>
+        <member name="F:Garnet.client.LightEpoch.kDrainListSize">
+            <summary>
+            Default drainlist size
+            </summary>
+        </member>
+        <member name="F:Garnet.client.LightEpoch.tableRaw">
+            <summary>
+            Thread protection status entries.
+            </summary>
+        </member>
+        <member name="F:Garnet.client.LightEpoch.drainCount">
+            <summary>
+            List of action, epoch pairs containing actions to performed 
+            when an epoch becomes safe to reclaim. Marked volatile to
+            ensure latest value is seen by the last suspended thread.
+            </summary>
+        </member>
+        <member name="F:Garnet.client.LightEpoch.threadEntryIndex">
+            <summary>
+            A thread's entry in the epoch table.
+            </summary>
+        </member>
+        <member name="F:Garnet.client.LightEpoch.threadEntryIndexCount">
+            <summary>
+            Number of instances using this entry
+            </summary>
+        </member>
+        <member name="F:Garnet.client.LightEpoch.CurrentEpoch">
+            <summary>
+            Global current epoch value
+            </summary>
+        </member>
+        <member name="F:Garnet.client.LightEpoch.SafeToReclaimEpoch">
+            <summary>
+            Cached value of latest epoch that is safe to reclaim
+            </summary>
+        </member>
+        <member name="P:Garnet.client.LightEpoch.LocalCurrentEpoch">
+            <summary>
+            Local view of current epoch, for an epoch-protected thread
+            </summary>
+        </member>
+        <member name="M:Garnet.client.LightEpoch.#cctor">
+            <summary>
+            Static constructor to setup shared cache-aligned space
+            to store per-entry count of instances using that entry
+            </summary>
+        </member>
+        <member name="M:Garnet.client.LightEpoch.#ctor">
+            <summary>
+            Instantiate the epoch table
+            </summary>
+        </member>
+        <member name="M:Garnet.client.LightEpoch.Dispose">
+            <summary>
+            Clean up epoch table
+            </summary>
+        </member>
+        <member name="M:Garnet.client.LightEpoch.ThisInstanceProtected">
+            <summary>
+            Check whether current epoch instance is protected on this thread
+            </summary>
+            <returns>Result of the check</returns>
+        </member>
+        <member name="M:Garnet.client.LightEpoch.AnyInstanceProtected">
+            <summary>
+            Check whether any epoch instance is protected on this thread
+            </summary>
+            <returns>Result of the check</returns>
+        </member>
+        <member name="M:Garnet.client.LightEpoch.ProtectAndDrain">
+            <summary>
+            Enter the thread into the protected code region
+            </summary>
+            <returns>Current epoch</returns>
+        </member>
+        <member name="M:Garnet.client.LightEpoch.Suspend">
+            <summary>
+            Thread suspends its epoch entry
+            </summary>
+        </member>
+        <member name="M:Garnet.client.LightEpoch.Resume">
+            <summary>
+            Thread resumes its epoch entry
+            </summary>
+        </member>
+        <member name="M:Garnet.client.LightEpoch.Resume(System.Int32@)">
+            <summary>
+            Thread resumes its epoch entry
+            </summary>
+        </member>
+        <member name="M:Garnet.client.LightEpoch.BumpCurrentEpoch(System.Action)">
+            <summary>
+            Increment current epoch and associate trigger action
+            with the prior epoch
+            </summary>
+            <param name="onDrain">Trigger action</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.LightEpoch.Mark(System.Int32,System.Int64)">
+            <summary>
+            Mechanism for threads to mark some activity as completed until
+            some version by this thread
+            </summary>
+            <param name="markerIdx">ID of activity</param>
+            <param name="version">Version</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.LightEpoch.CheckIsComplete(System.Int32,System.Int64)">
+            <summary>
+            Check if all active threads have completed the some
+            activity until given version.
+            </summary>
+            <param name="markerIdx">ID of activity</param>
+            <param name="version">Version</param>
+            <returns>Whether complete</returns>
+        </member>
+        <member name="M:Garnet.client.LightEpoch.BumpCurrentEpoch">
+            <summary>
+            Increment global current epoch
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.LightEpoch.ComputeNewSafeToReclaimEpoch(System.Int32)">
+            <summary>
+            Looks at all threads and return the latest safe epoch
+            </summary>
+            <param name="currentEpoch">Current epoch</param>
+            <returns>Safe epoch</returns>
+        </member>
+        <member name="M:Garnet.client.LightEpoch.SuspendDrain">
+            <summary>
+            Take care of pending drains after epoch suspend
+            </summary>
+        </member>
+        <member name="M:Garnet.client.LightEpoch.Drain(System.Int32)">
+            <summary>
+            Check and invoke trigger actions that are ready
+            </summary>
+            <param name="nextEpoch">Next epoch</param>
+        </member>
+        <member name="M:Garnet.client.LightEpoch.Acquire">
+            <summary>
+            Thread acquires its epoch entry
+            </summary>
+        </member>
+        <member name="M:Garnet.client.LightEpoch.Release">
+            <summary>
+            Thread releases its epoch entry
+            </summary>
+        </member>
+        <member name="M:Garnet.client.LightEpoch.ReserveEntry">
+            <summary>
+            Reserve entry for thread. This method relies on the fact that no
+            thread will ever have ID 0.
+            </summary>
+            <returns>Reserved entry</returns>
+        </member>
+        <member name="M:Garnet.client.LightEpoch.ReserveEntryForThread">
+            <summary>
+            Allocate a new entry in epoch table. This is called 
+            once for a thread.
+            </summary>
+            <returns>Reserved entry</returns>
+        </member>
+        <member name="T:Garnet.client.LightEpoch.Entry">
+            <summary>
+            Epoch table entry (cache line size).
+            </summary>
+        </member>
+        <member name="F:Garnet.client.LightEpoch.Entry.localCurrentEpoch">
+            <summary>
+            Thread-local value of epoch
+            </summary>
+        </member>
+        <member name="F:Garnet.client.LightEpoch.Entry.threadId">
+            <summary>
+            ID of thread associated with this entry.
+            </summary>
+        </member>
+        <member name="T:Garnet.client.NetworkWriter">
+            <summary>
+            Concurrent network writer
+            </summary>
+        </member>
+        <member name="F:Garnet.client.NetworkWriter.disposed">
+            <summary>
+            Whether log is disposed
+            </summary>
+        </member>
+        <member name="F:Garnet.client.NetworkWriter.FlushEvent">
+            <summary>
+            The "event" to be waited on for flush completion by the initiator of an operation
+            </summary>
+        </member>
+        <member name="M:Garnet.client.NetworkWriter.#ctor(Garnet.client.GarnetClient,System.Net.Sockets.Socket,System.Int32,System.Net.Security.SslClientAuthenticationOptions,Garnet.client.GarnetClientTcpNetworkHandler@,System.Int32,System.Int32,Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:Garnet.client.NetworkWriter.Dispose">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.client.NetworkWriter.GetTailAddress">
+            <summary>
+            Get tail address
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.NetworkWriter.GetNextTaskId">
+            <summary>
+            Get next unassigned task ID
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.NetworkWriter.TryAllocate(System.Int32,System.Int32@,System.Boolean)">
+            <summary>
+            Try allocate, no thread spinning allowed
+            </summary>
+            <param name="size">Number of bytes to allocate</param>
+            <param name="taskId"></param>
+            <param name="skipTaskIdIncrement"></param>
+            <returns>The allocated logical address, or negative in case of inability to allocate</returns>
+        </member>
+        <member name="M:Garnet.client.NetworkWriter.TryAllocate(System.Int32,Garnet.client.CompletionEvent@,System.Boolean)">
+            <summary>
+            Async wrapper for TryAllocate
+            </summary>
+            <param name="size">Number of slots to allocate</param>
+            <param name="flushEvent"></param>
+            <param name="skipTaskIdIncrement"></param>
+            <returns>The allocated logical address</returns>
+        </member>
+        <member name="M:Garnet.client.NetworkWriter.GetPhysicalAddress(System.Int64)">
+            <summary>
+            Get physical address
+            </summary>
+            <param name="logicalAddress"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.NetworkWriter.AsyncFlushPages(System.Int64,System.Int64)">
+            <summary>
+            Flush page range to disk
+            Called when all threads have agreed that a page range is sealed.
+            </summary>
+            <param name="fromAddress"></param>
+            <param name="untilAddress"></param>
+        </member>
+        <member name="M:Garnet.client.NetworkWriter.AsyncFlushPageCallback(System.Object)">
+            <summary>
+            Completion callback for page flush
+            </summary>
+            <param name="context"></param>
+        </member>
+        <member name="T:Garnet.client.PageAsyncFlushResult">
+            <summary>
+            Page async flush result
+            </summary>
+        </member>
+        <member name="M:Garnet.client.RespReadResponseUtils.TryReadSimpleString(System.String@,System.Byte*@,System.Byte*)">
+            <inheritdoc cref="M:Garnet.common.RespReadUtils.TryReadSimpleString(System.String@,System.Byte*@,System.Byte*)"/>
+        </member>
+        <member name="M:Garnet.client.RespReadResponseUtils.TryReadSimpleString(System.Buffers.MemoryPool{System.Byte},Garnet.common.MemoryResult{System.Byte}@,System.Byte*@,System.Byte*)">
+            <summary>
+            Read simple string
+            </summary>
+        </member>
+        <member name="M:Garnet.client.RespReadResponseUtils.TryReadIntegerAsString(System.String@,System.Byte*@,System.Byte*)">
+            <inheritdoc cref="M:Garnet.common.RespReadUtils.TryReadIntegerAsString(System.String@,System.Byte*@,System.Byte*)"/>
+        </member>
+        <member name="M:Garnet.client.RespReadResponseUtils.TryReadIntegerAsString(System.Buffers.MemoryPool{System.Byte},Garnet.common.MemoryResult{System.Byte}@,System.Byte*@,System.Byte*)">
+            <summary>
+            Read integer as string
+            </summary>
+        </member>
+        <member name="M:Garnet.client.RespReadResponseUtils.TryReadStringWithLengthHeader(System.String@,System.Byte*@,System.Byte*)">
+            <summary>
+            Try to read a RESP formatted bulk string
+            NOTE: This is used with client implementation to parse responses that may include a null value (i.e. $-1\r\n)
+            </summary>
+            <param name="result"></param>
+            <param name="ptr"></param>
+            <param name="end"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.RespReadResponseUtils.TryReadStringWithLengthHeader(System.Buffers.MemoryPool{System.Byte},Garnet.common.MemoryResult{System.Byte}@,System.Byte*@,System.Byte*)">
+            <summary>
+            Read string with length header
+            </summary>
+            <param name="pool">Memory pool to rent space for storing the result.</param>
+            <param name="result">If parsing was successful, contains the extracted byte sequence.</param>
+            <param name="ptr">The starting position in the RESP message. Will be advanced if parsing is successful.</param>
+            <param name="end">The current end of the RESP message.</param>
+            <returns>True if a RESP string was successfully read.</returns>
+        </member>
+        <member name="M:Garnet.client.RespReadResponseUtils.TryReadErrorAsString(System.String@,System.Byte*@,System.Byte*)">
+            <inheritdoc cref="M:Garnet.common.RespReadUtils.TryReadErrorAsString(System.String@,System.Byte*@,System.Byte*)"/>
+        </member>
+        <member name="M:Garnet.client.RespReadResponseUtils.TryReadStringArrayWithLengthHeader(System.String[]@,System.Byte*@,System.Byte*)">
+            <summary>
+            Read string array with length header
+            </summary>
+        </member>
+        <member name="M:Garnet.client.RespReadResponseUtils.TryReadStringArrayWithLengthHeader(System.Buffers.MemoryPool{System.Byte},Garnet.common.MemoryResult{System.Byte}[]@,System.Byte*@,System.Byte*)">
+            <summary>
+            Read string array with length header
+            </summary>
+        </member>
+        <member name="M:Garnet.client.RespReadResponseUtils.TryReadIntWithLengthHeader(System.Int32@,System.Byte*@,System.Byte*)">
+            <inheritdoc cref="M:Garnet.common.RespReadUtils.TryReadInt32WithLengthHeader(System.Int32@,System.Byte*@,System.Byte*)"/>
+        </member>
+        <member name="M:Garnet.client.RespReadResponseUtils.TryReadString(System.Buffers.MemoryPool{System.Byte},Garnet.common.MemoryResult{System.Byte}@,System.Byte*@,System.Byte*)">
+            <summary>
+            Read ASCII string without header until string terminator ('\r\n').
+            </summary>
+        </member>
+        <member name="T:Garnet.client.TcsWrapper">
+            <summary>
+            Result type for Garnet
+            </summary>
+        </member>
+        <member name="M:Garnet.client.TcsWrapper.LoadFrom(Garnet.client.TcsWrapper)">
+            <summary>
+            Load TCS wrapper from given source
+            </summary>
+            <param name="source"></param>
+        </member>
+        <member name="T:Garnet.client.Utility">
+            <summary>
+            Utility functions
+            </summary>
+        </member>
+        <member name="M:Garnet.client.Utility.ParseSize(System.String)">
+            <summary>
+            Parse size in string notation into long.
+            Examples: 4k, 4K, 4KB, 4 KB, 8m, 8MB, 12g, 12 GB, 16t, 16 TB, 32p, 32 PB.
+            </summary>
+            <param name="value">String version of number</param>
+            <returns>The number</returns>
+        </member>
+        <member name="M:Garnet.client.Utility.NumBitsPreviousPowerOf2(System.Int64,Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            Num bits in the previous power of 2 for specified number
+            </summary>
+            <param name="v"></param>
+            <param name="logger"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.Utility.PreviousPowerOf2(System.Int64)">
+            <summary>
+            Previous power of 2
+            </summary>
+            <param name="v"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.Utility.PrettySize(System.Int64)">
+            <summary>
+            Pretty print value
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.Utility.IsBlittable``1">
+            <summary>
+            Is type blittable
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.Utility.Murmur3(System.Int32)">
+            <summary>
+            A 32-bit murmur3 implementation.
+            </summary>
+            <param name="h"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.client.Utility.MonotonicUpdate(System.Int64@,System.Int64,System.Int64,System.Int64@)">
+            <summary>
+            Updates the variable to newValue only if the current value is smaller than the new value.
+            </summary>
+            <param name="variable">The variable to possibly replace</param>
+            <param name="newValue">The value that replaces the variable if successful</param>
+            <param name="wrapDistance">Wrap distance</param>
+            <param name="oldValue">The orignal value in the variable</param>
+            <returns> if oldValue less than newValue </returns>
+        </member>
+        <member name="M:Garnet.client.Utility.MonotonicUpdate(System.Int32@,System.Int32,System.Int32@)">
+            <summary>
+            Updates the variable to newValue only if the current value is smaller than the new value.
+            </summary>
+            <param name="variable">The variable to possibly replace</param>
+            <param name="newValue">The value that replaces the variable if successful</param>
+            <param name="oldValue">The orignal value in the variable</param>
+            <returns>if oldValue less than or equal to newValue</returns>
+        </member>
+        <member name="M:Garnet.client.Utility.WithCancellationAsync``1(System.Threading.Tasks.Task{``0},System.Threading.CancellationToken,System.Boolean)">
+            <summary>
+            Throws OperationCanceledException if token cancels before the real task completes.
+            Doesn't abort the inner task, but allows the calling code to get "unblocked" and react to stuck tasks.
+            </summary>
+        </member>
+        <member name="T:Garnet.common.AsyncPool`1">
+            <summary>
+            Asynchronous pool of fixed pre-filled capacity
+            Supports sync get (TryGet) for fast path
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="M:Garnet.common.AsyncPool`1.#ctor(System.Int32,System.Func{`0})">
+            <summary>
+            Constructor
+            </summary>
+            <param name="size"></param>
+            <param name="creator"></param>
+        </member>
+        <member name="M:Garnet.common.AsyncPool`1.Get(System.Threading.CancellationToken)">
+            <summary>
+            Get item synchronously
+            </summary>
+            <param name="token"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.common.AsyncPool`1.GetAsync(System.Threading.CancellationToken)">
+            <summary>
+            Get item asynchronously
+            </summary>
+            <param name="token"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.common.AsyncPool`1.TryGet(`0@)">
+            <summary>
+            Try get item (fast path)
+            </summary>
+            <param name="item"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.common.AsyncPool`1.Return(`0)">
+            <summary>
+            Return item to pool
+            </summary>
+            <param name="item"></param>
+        </member>
+        <member name="M:Garnet.common.AsyncPool`1.Dispose">
+            <summary>
+            Dispose
+            </summary>
+        </member>
+        <member name="M:Garnet.common.AsyncPool`1.GetOrAdd(System.Collections.Concurrent.ConcurrentQueue{`0},`0@)">
+            <summary>
+            Get item from queue, adding up to pool-size items if necessary
+            </summary>
+        </member>
+    </members>
+</doc>

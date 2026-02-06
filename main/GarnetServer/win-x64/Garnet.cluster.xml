@@ -1,0 +1,3291 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Garnet.cluster</name>
+    </assembly>
+    <members>
+        <member name="T:ClusterAssemblyRef">
+            <summary>
+            Sets public key string for friend assemblies.
+            </summary>
+        </member>
+        <member name="T:Garnet.cluster.ClusterFactory">
+            <summary>
+            Cluster factory
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ClusterFactory.CreateCheckpointManager(Tsavorite.core.INamedDeviceFactoryCreator,Tsavorite.core.ICheckpointNamingScheme,System.Boolean,Microsoft.Extensions.Logging.ILogger)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.cluster.ClusterFactory.CreateClusterProvider(Garnet.server.StoreWrapper)">
+            <inheritdoc />
+        </member>
+        <member name="T:Garnet.cluster.CmdStrings">
+            <summary>
+            Command strings for RESP protocol
+            </summary>
+        </member>
+        <member name="P:Garnet.cluster.CmdStrings.WITHMEET">
+            <summary>
+            Request strings
+            </summary>
+        </member>
+        <member name="P:Garnet.cluster.CmdStrings.failstopwrites">
+            <summary>
+            Internode communication cluster commands
+            </summary>
+        </member>
+        <member name="P:Garnet.cluster.CmdStrings.RESP_OK">
+            <summary>
+            Response strings
+            </summary>
+        </member>
+        <member name="P:Garnet.cluster.CmdStrings.RESP_ERR_GENERIC_CLUSTER">
+            <summary>
+            Generic error respone strings, i.e. these are sent in the form "-ERR responseString\r\n"
+            </summary>
+        </member>
+        <member name="P:Garnet.cluster.CmdStrings.RESP_ERR_GENERIC_MIGRATE_TO_MYSELF">
+            <summary>
+            Generic error response strings for <c>MIGRATE</c> command
+            </summary>
+        </member>
+        <member name="P:Garnet.cluster.CmdStrings.RESP_ERR_CROSSSLOT">
+            <summary>
+            Simple error respone strings, i.e. these are of the form "-errorString\r\n"
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.CmdStrings.GenericErrWrongNumArgs">
+            <summary>
+            Response string templates
+            </summary>
+        </member>
+        <member name="T:Garnet.cluster.ClusterAuthContainer">
+            <summary>
+            Container to hold cluster username and password for backend cluster communications.
+            Having a container allows for atomic switching to a new username and password.
+            </summary>
+        </member>
+        <member name="T:Garnet.cluster.ClusterConfig">
+            <summary>
+            Cluster configuration
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.ClusterConfig.RESERVED_WORKER_ID">
+            <summary>
+            Reserved offset in workers array
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.ClusterConfig.LOCAL_WORKER_ID">
+            <summary>
+            Reserved Worker offset in workers array.
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.ClusterConfig.MIN_HASH_SLOT_VALUE">
+            <summary>
+            Minimum hash slot value.
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.ClusterConfig.MAX_HASH_SLOT_VALUE">
+            <summary>
+            Maximum hash slot value.
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.OutOfRange(System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="slot"></param>
+            <returns></returns>
+        </member>
+        <member name="P:Garnet.cluster.ClusterConfig.NumWorkers">
+            <summary>
+            Num of workers assigned
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.#ctor">
+            <summary>
+            Create default cluster config
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.#ctor(Garnet.cluster.HashSlot[],Garnet.cluster.Worker[])">
+            <summary>
+            Create cluster config
+            </summary>
+            <param name="slotMap"></param>
+            <param name="workers"></param>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.InitializeUnassignedWorker">
+            <summary>
+            Initialize the worker at index 0 as unassigned.
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.InitializeLocalWorker(System.String,System.String,System.Int32,System.Int64,Garnet.cluster.NodeRole,System.String,System.String)">
+            <summary>
+            Initialize local worker with provided information
+            </summary>
+            <param name="nodeId">Local worker node-id.</param>
+            <param name="address">Local worker IP address.</param>
+            <param name="port">Local worker port.</param>
+            <param name="configEpoch">Local worker config epoch.</param>
+            <param name="role">Local worker role.</param>
+            <param name="replicaOfNodeId">Local worker primary id.</param>
+            <param name="hostname">Local worker hostname.</param>
+            <returns>Instance of local config with update local worker info.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.HasAssignedSlots(System.UInt16)">
+            <summary>
+            Check if workerId has assigned slots
+            </summary>
+            <param name="workerId">Offset in worker list.</param>
+            <returns>True if worker has assigned slots, false otherwise.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.IsLocal(System.UInt16,System.Boolean)">
+            <summary>
+            Check if the provided  slot is local from the perspective of the local config.
+            1. Local slots are assigned to workerId = 1
+            2. Local slots which are in migrating state are pointing to the target node thus workerdId != 1. 
+                However, we still need to redirect traffic as if the workerId == 1 until migration completes
+            3. Local slots for a replica are those slots served by its primary only for read operations
+            </summary>
+            <param name="slot">Slot to check</param>
+            <param name="readWriteSession">Used to override write restrictions for non-local slots that are replicas of the slot owner</param>
+            <returns>True if slot is owned by this node, false otherwise</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.IsLocalExpensive(System.UInt16,System.Boolean)">
+            <summary>
+            If slot in MIGRATE state then it must have been set by original owner, so we keep treating it like a local slot and serve requests if the key has not yet migrated.
+            If it is a read command and this is a replica the associated slot should be assigned to this node's primary in order for the read request to be served.
+            </summary>
+            <param name="slot"></param>
+            <param name="readWriteSession"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.IsKnown(System.String)">
+            <summary>
+            Check if specified node-id belongs to a node in our local config.
+            </summary>
+            <param name="nodeid">Node id to search for.</param>
+            <returns>True if node-id in worker list, false otherwise.</returns>
+        </member>
+        <member name="P:Garnet.cluster.ClusterConfig.IsPrimary">
+            <summary>
+            Check if local node is a PRIMARY node
+            </summary>
+        </member>
+        <member name="P:Garnet.cluster.ClusterConfig.IsReplica">
+            <summary>
+            Check if local node is a REPLICA node
+            </summary>
+        </member>
+        <member name="P:Garnet.cluster.ClusterConfig.LocalNodeIp">
+            <summary>
+            Get local node ip
+            </summary>
+            <returns>IP of local worker</returns>
+        </member>
+        <member name="P:Garnet.cluster.ClusterConfig.LocalNodePort">
+            <summary>
+            Get local node port
+            </summary>
+            <returns>Port of local worker</returns>
+        </member>
+        <member name="P:Garnet.cluster.ClusterConfig.LocalNodeId">
+            <summary>
+            Get local node ID
+            </summary>
+            <returns>Node-id of local worker.</returns>
+        </member>
+        <member name="P:Garnet.cluster.ClusterConfig.LocalNodeIdShort">
+            <summary>
+            NOTE: Use this only for logging not comparison
+            Get short local node ID
+            </summary>
+            <returns>Short node-id of local worker.</returns>
+        </member>
+        <member name="P:Garnet.cluster.ClusterConfig.LocalNodeRole">
+            <summary>
+            Get local node role
+            </summary>
+            <returns>Role of local node.</returns>
+        </member>
+        <member name="P:Garnet.cluster.ClusterConfig.LocalNodePrimaryId">
+            <summary>
+            Get nodeid of primary.
+            </summary>
+            <returns>Primary-id of the node this node is replicating.</returns>
+        </member>
+        <member name="P:Garnet.cluster.ClusterConfig.LocalNodeConfigEpoch">
+            <summary>
+            Get config epoch for local worker.
+            </summary>
+            <returns>Config epoch of local node.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.GetLocalNodePrimaryAddress">
+            <summary>
+            Return endpoint of primary if this node is a replica.
+            </summary>
+            <returns>Returns primary endpoints if this node is a replica, otherwise (null,-1)</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.GetLocalNodeReplicaIds">
+            <summary>
+            Get local node replicas
+            </summary>
+            <returns>Returns a list of node-ids representing the replicas that replicate this node.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.GetLocalNodeReplicaEndpoints">
+            <summary>
+            Get list of endpoints for all replicas of this node.
+            </summary>
+            <returns>List of (address,port) pairs.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.GetLocalNodePrimaryEndpoints(System.Boolean)">
+            <summary>
+            Return all primary endpoints. Used from replica that is becoming a primary during a failover.
+            </summary>
+            <param name="includeMyPrimaryFirst"></param>
+            <returns>List of pairs (address,port) representing known primary endpoints</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.GetLocalPrimarySlots">
+            <summary>
+            Retrieve a list of slots served by this node's primary.
+            </summary>
+            <returns>List of slots.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.GetMaxConfigEpoch">
+            <summary>
+            Find maximum config epoch from local config
+            </summary>
+            <returns>Integer representing max config epoch value.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.GetRemoteNodeIds">
+            <summary>
+            Retrieve list of all known node ids.
+            </summary>
+            <returns>List of strings representing known node ids.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.GetWorkerIdFromNodeId(System.String)">
+            <summary>
+            Get worker id from node id.
+            </summary>
+            <param name="nodeId"></param>
+            <returns>Integer representing offset of worker in worker list.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.GetNodeRoleFromNodeId(System.String)">
+            <summary>
+            Get role from node-id.
+            </summary>
+            <param name="nodeId"></param>
+            <returns>Node role type</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.GetWorkerFromNodeId(System.String)">
+            <summary>
+            Get worker from node-id.
+            </summary>
+            <param name="nodeId"></param>
+            <returns>Worker struct</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.GetWorkerAddressFromNodeId(System.String)">
+            <summary>
+            Get worker (IP address and port) for node-id.
+            </summary>
+            <param name="nodeId"></param>
+            <returns>Pair of (string,int) representing worker endpoint.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.GetHostNameFromNodeId(System.String)">
+            <summary>
+            Get hostname from node-id.
+            </summary>
+            <param name="nodeId"></param>
+            <returns>String representing node's hostname.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.IsImportingSlot(System.UInt16)">
+            <summary>
+            Check if slot is set as IMPORTING
+            </summary>
+            <param name="slot">Slot number.</param>
+            <returns>True if slot is in IMPORTING state, false otherwise.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.IsMigratingSlot(System.UInt16)">
+            <summary>
+            Check if slot is set as MIGRATING
+            </summary>
+            <param name="slot">Slot number.</param>
+            <returns>True if slot is in MIGRATING state, false otherwise.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.GetState(System.UInt16)">
+            <summary>
+            Get slot state
+            </summary>
+            <param name="slot">Slot number.</param>
+            <returns>SlotState type</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.GetWorkerIdFromSlot(System.UInt16)">
+            <summary>
+            Get worker offset in worker list from slot.
+            </summary>
+            <param name="slot">Slot number.</param>
+            <returns>Integer offset in worker list.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.GetNodeIdFromSlot(System.UInt16)">
+            <summary>
+            Get node-id of slot owner.
+            </summary>
+            <param name="slot">Slot number.</param>
+            <returns>String node-id</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.GetOwnerIdFromSlot(System.UInt16)">
+            <summary>
+            Get node-id of slot owner.
+            </summary>
+            <param name="slot">Slot number.</param>
+            <returns>String node-id</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.GetEndpointFromSlot(System.UInt16,Garnet.server.ClusterPreferredEndpointType)">
+            <summary>
+            Get endpoint of slot owner.
+            </summary>
+            <param name="slot">Slot number.</param>
+            <returns>Pair of (string,integer) representing endpoint.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.AskEndpointFromSlot(System.UInt16,Garnet.server.ClusterPreferredEndpointType)">
+            <summary>
+            Get endpoint of node to which slot is migrating.
+            </summary>
+            <param name="slot">Slot number.</param>
+            <returns>Pair of (string,integer) representing endpoint.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.GetEndpointFromNodeId(System.String)">
+            <summary>
+            Get endpoint of node from node-id.
+            </summary>
+            <param name="nodeid">Node-id.</param>
+            <returns>Pair of (string,integer) representing endpoint.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.GetClusterInfo(Garnet.cluster.ClusterProvider)">
+            <summary>
+            Get formatted (using CLUSTER NODES format) cluster info.
+            </summary>
+            <returns>Formatted string.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.GetNodeInfo(System.UInt16,Garnet.cluster.ConnectionInfo)">
+            <summary>
+            Get formatted (using CLUSTER NODES format) worker info.
+            </summary>
+            <param name="workerId">Offset of worker in the worker list.</param>
+            <param name="info">Connection information for the corresponding worker.</param>
+            <returns>Formatted string.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.GetShardRanges(System.Int32)">
+            <summary>
+            Get shard slot ranges for worker.
+            </summary>
+            <param name="workerId">Offset of worker in worker list.</param>
+            <returns>List of pairs representing slot ranges.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.GetWorkerReplicas(System.Int32)">
+            <summary>
+            Get worker offset in worker list for replicas of the given worker offset.
+            </summary>
+            <param name="workerId">Offset of worker in worker list.</param>
+            <returns>List of worker offsets.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.GetShardsInfo(Garnet.cluster.GarnetClusterConnectionStore)">
+            <summary>
+            Get formatted (using CLUSTER SHARDS format) cluster config information.
+            </summary>
+            <param name="clusterConnection"></param>
+            <returns>RESP formatted string</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.GetSlotsInfo(Garnet.server.ClusterPreferredEndpointType)">
+            <summary>
+            Get formatted (using CLUSTER SLOTS format) cluster config info.
+            Ip, endpoint is ip address
+            hostname may be null and included in metadata
+            Hostname, endpoint is hostname
+            if hostname is not existing, endpoint is "?"
+            metadata includes ip address
+            UnknownEndpoint, endpoint is null
+            hostname and ip address are included in metadata
+            </summary>
+            <returns>Formatted string.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.GetSlotList(System.UInt16)">
+            <summary>
+            Retrieve a list of slots served by this node.
+            </summary>
+            <returns>List of slots.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.GetReplicas(System.String,Garnet.cluster.ClusterProvider)">
+            <summary>
+            Get Replicas for node-id.
+            </summary>
+            <param name="nodeid">Node-id string.</param>
+            <param name="clusterProvider">ClusterProvider instance.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.GetAllNodeIds(System.Collections.Generic.List{System.ValueTuple{System.String,System.Net.IPEndPoint}}@)">
+            <summary>
+            Get all know node ids
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.GetNodeIdsForShard(System.Collections.Generic.List{System.ValueTuple{System.String,System.Net.IPEndPoint}}@)">
+            <summary>
+            Get node-ids for nodes in the local shard
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.GetReplicaIds(System.String)">
+            <summary>
+            
+            </summary>
+            <param name="nodeid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.GetWorkerAddress(System.UInt16)">
+            <summary>
+            Get worker (IP address and port) for workerId
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.GetWorkerInfoForGossip">
+            <summary>
+            Return list of triples containing node-id,address,port.
+            </summary>
+            <returns>List of triplets.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.GetSlotCountForState(Garnet.cluster.SlotState)">
+            <summary>
+            Return count of slots in given state.
+            </summary>
+            <param name="slotState">SlotState type.</param>
+            <returns>Integer representing count of slots in given state.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.GetPrimaryCount">
+            <summary>
+            Return number of primary nodes.
+            </summary>
+            <returns>Integer representing number of primary nodes.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.GetWorkerNodeIdFromAddress(System.String,System.Int32)">
+            <summary>
+            Get worker (IP address and port) for node-id.
+            </summary>
+            <param name="address">IP address string.</param>
+            <param name="port">Port number.</param>
+            <returns>String representing node-id matching endpoint.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.LazyUpdateLocalReplicationOffset(System.Int64)">
+            <summary>
+            Update replication offset lazily.
+            </summary>
+            <param name="newReplicationOffset">Long of new replication offset.</param>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.Merge(Garnet.cluster.ClusterConfig,System.Collections.Concurrent.ConcurrentDictionary{System.String,System.Int64},Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            Merging incoming configuration from gossip with local configuration copy.
+            </summary>
+            <param name="senderConfig">Sender config object.</param>
+            <param name="workerBanList">Worker ban list used to prevent merging.</param>
+            <param name="logger">Logger instance</param>
+            <returns>Cluster config object.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.RemoveWorker(System.String)">
+            <summary>
+            Remove worker
+            </summary>
+            <param name="nodeid">Node-id string.</param>
+            <returns>ClusterConfig object with updates.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.MakeReplicaOf(System.String)">
+            <summary>
+            Make this worker replica of a node with specified node Id.
+            </summary>
+            <param name="nodeid">String node-id of primary.</param>
+            <returns>ClusterConfig object with updates.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.SetLocalWorkerRole(Garnet.cluster.NodeRole)">
+            <summary>
+            Set role of local worker.
+            </summary>
+            <param name="role"></param>
+            <returns>ClusterConfig object with updates.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.TakeOverFromPrimary">
+            <summary>
+            Take over for primary.
+            </summary>
+            <returns>ClusterConfig object with updates.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.TryAddSlots(System.Collections.Generic.HashSet{System.Int32},System.Int32@,Garnet.cluster.ClusterConfig@,Garnet.cluster.SlotState)">
+            <summary>
+            Try to make local node owner of list of slots given.
+            </summary>
+            <param name="slots">Slots to assign.</param>
+            <param name="slotAssigned">Slot already assigned if any during this bulk op.</param>
+            <param name="config">ClusterConfig object with updates</param>
+            <param name="state">SlotState type to be set.</param>
+            <returns><see langword="false"/> if slot already owned by someone else according to a message received from the gossip protocol; otherwise <see langword="true"/>.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.AssignSlots(System.Collections.Generic.List{System.Int32},System.UInt16,Garnet.cluster.SlotState)">
+            <summary>
+            Assign slots to workerId
+            </summary>
+            <param name="slots"></param>
+            <param name="workerId"></param>
+            <param name="state"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.TryRemoveSlots(System.Collections.Generic.HashSet{System.Int32},System.Int32@,Garnet.cluster.ClusterConfig@)">
+            <summary>
+            Try to remove slots from this local node.
+            </summary>
+            <param name="slots">Slots to be removed.</param>
+            <param name="notLocalSlot">The slot number that is not local.</param>
+            <param name="config">ClusterConfig object with updates</param>
+            <returns><see langword="false"/> if a slot provided is not local; otherwise <see langword="true"/>.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.UpdateSlotState(System.Int32,System.Int32,Garnet.cluster.SlotState)">
+            <summary>
+            Update local slot state.
+            </summary>
+            <param name="slot">Slot number to update state</param>
+            <param name="workerId">Worker offset information associated with slot.</param>
+            <param name="state">SlotState type</param>
+            <returns>ClusterConfig object with updates.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.UpdateMultiSlotState(System.Collections.Generic.HashSet{System.Int32},System.Int32,Garnet.cluster.SlotState)">
+            <summary>
+            Update slot states in bulk.
+            </summary>
+            <param name="slots">Slot numbers to update state.</param>
+            <param name="workerId">Worker offset information associated with slot.</param>
+            <param name="state">SlotState type</param>
+            <returns>ClusterConfig object with updates.</returns>        
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.SetLocalWorkerConfigEpoch(System.Int64)">
+            <summary>
+            Update config epoch for worker in new version of config.
+            </summary>
+            <param name="configEpoch">Config epoch value to set.</param>
+            <returns>ClusterConfig object with updates.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.BumpLocalNodeConfigEpoch">
+            <summary>
+            Increment local config epoch without consensus
+            </summary>
+            <returns>ClusterConfig object with updates.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.HandleConfigEpochCollision(Garnet.cluster.ClusterConfig,Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            Check if sender has same local worker epoch as the receiver node and resolve collision.
+            </summary>
+            <param name="senderConfig">Incoming configuration object.</param>
+            <param name="logger"></param>
+            <returns>ClusterConfig object with updates.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.ToByteArray">
+            <summary>
+            Serialize config to byte array
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ClusterConfig.FromByteArray(System.Byte[])">
+            <summary>
+            Deserialize config from byte array
+            </summary>
+        </member>
+        <member name="T:Garnet.cluster.ClusterManager">
+            <summary>
+            Cluster manager
+            </summary>
+            <summary>
+            Cluster manager
+            </summary>
+            <summary>
+            Cluster manager
+            </summary>
+        </member>
+        <member name="P:Garnet.cluster.ClusterManager.CurrentConfig">
+            <summary>
+            Get current config
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.ClusterManager.tlsOptions">
+            <summary>
+            Tls Client options
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.ClusterManager.serverOptions">
+            <summary>
+            Garnet server options
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.ClusterManager.clusterProvider">
+            <summary>
+            ClusterProvider
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.ClusterManager.flushCount">
+            <summary>
+            Flush count used to indicate a pending flush operation.
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.#ctor(Garnet.cluster.ClusterProvider,Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.Dispose">
+            <summary>
+            Dispose
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.DisposeBackgroundTasks">
+            <summary>
+            Dispose background running tasks before disposing cluster manager
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.Start">
+            <summary>
+            Startup cluster manager
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.FlushConfig">
+            <summary>
+            Flush current config to disk
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.InitLocal(System.String,System.Int32,System.Boolean)">
+            <summary>
+            Init local worker info
+            </summary>
+            <param name="address"></param>
+            <param name="port"></param>
+            <param name="recoverConfig"></param>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.GetInfo">
+            <summary>
+            Implements CLUSTER INFO command
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.GetRange(System.Int32[])">
+            <summary>
+            Return range of slots from provided array of slots
+            </summary>
+            <param name="slots"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.TrySetLocalConfigEpoch(System.Int64,System.ReadOnlySpan{System.Byte}@)">
+            <summary>
+            Attempts to update config epoch of local worker
+            </summary>
+            <param name="configEpoch"></param>
+            <param name="errorMessage">The ASCII encoded error message if the method returned <see langword="false"/>; otherwise <see langword="default"/></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.TryBumpClusterEpoch">
+            <summary>
+            Bump cluster epoch from client request.
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.TrySetLocalNodeRole(Garnet.cluster.NodeRole)">
+            <summary>
+            Set local node role
+            </summary>
+            <param name="role">Role type</param>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.TryResetReplica">
+            <summary>
+            Reset node to primary.
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.TryStopWrites(System.String)">
+            <summary>
+            Force this node to be a replica of given node-id
+            </summary>
+            <param name="replicaId">Node-id to replicate</param>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.TryTakeOverForPrimary">
+            <summary>
+            Takeover as new primary but forcefully claim ownership of old primary's slots.
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.TryAddSlots(System.Collections.Generic.HashSet{System.Int32},System.Int32@)">
+            <summary>
+            Try to add slots to local worker
+            </summary>
+            <param name="slots">Slot list</param>
+            <param name="slotAssigned">Slot number of already assigned slot</param>
+            <returns>True on success, false otherwise</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.TryRemoveSlots(System.Collections.Generic.HashSet{System.Int32},System.Int32@)">
+            <summary>
+            Try to remove ownership of slots. Slot state transition to OFFLINE.
+            </summary>
+            <param name="slots">Slot list</param>
+            <param name="notLocalSlot">The slot number that is not local.</param>
+            <returns><see langword="false"/> if a slot provided is not local; otherwise <see langword="true"/>.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.TryPrepareSlotForMigration(System.Int32,System.String,System.ReadOnlySpan{System.Byte}@)">
+            <summary>
+            Try to prepare node for migration of slot to node with specified node Id.
+            </summary>
+            <param name="slot">Slot to change state</param>
+            <param name="nodeid">Migration target node-id</param>
+            <param name="errorMessage">Error message</param>
+            <returns>True on success, false otherwise</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.TryPrepareSlotsForMigration(System.Collections.Generic.HashSet{System.Int32},System.String,System.ReadOnlySpan{System.Byte}@)">
+            <summary>
+            Try to change list of slots to migrating state
+            </summary>
+            <param name="slots">Slot list</param>
+            <param name="nodeid">Migration target node-id</param>
+            <param name="errorMessage">Error message</param>
+            <returns>True on success, false otherwise</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.TryPrepareSlotForImport(System.Int32,System.String,System.ReadOnlySpan{System.Byte}@)">
+            <summary>
+            Try to prepare node for import of slot from node with specified nodeid.
+            </summary>
+            <param name="slot">Slot list</param>
+            <param name="nodeid">Importing source node-id</param>
+            <param name="errorMessage">Error message</param>
+            <returns>True on success, false otherwise</returns>       
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.TryPrepareSlotsForImport(System.Collections.Generic.HashSet{System.Int32},System.String,System.ReadOnlySpan{System.Byte}@)">
+            <summary>
+            Try to prepare node for import of slots from node with specified nodeid.
+            </summary>
+            <param name="slots">Slot list</param>
+            <param name="nodeid">Migration target node-id</param>
+            <param name="errorMessage">Error message</param>
+            <returns>True on success, false otherwise</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.TryPrepareSlotForOwnershipChange(System.Int32,System.String,System.ReadOnlySpan{System.Byte}@)">
+            <summary>
+            Try to change ownership of slot to node.
+            </summary>
+            <param name="slot">Slot list</param>
+            <param name="nodeid">Importing source node-id</param>
+            <param name="errorMesage">Error message</param>
+            <returns>True on success, false otherwise</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.TryPrepareSlotsForOwnershipChange(System.Collections.Generic.HashSet{System.Int32},System.String,System.ReadOnlySpan{System.Byte}@)">
+            <summary>
+            Try to change ownership of slots to node.
+            </summary>
+            <param name="slots">SLot list</param>
+            <param name="nodeid">The id of the new owner node.</param>
+            <param name="errorMessage">Error message</param>
+            <returns>True on success, false otherwise</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.TryResetSlotState(System.Int32)">
+            <summary>
+            Reset slot state to <see cref="F:Garnet.cluster.SlotState.STABLE"/>
+            </summary>
+            <param name="slot">Slot id to reset state</param>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.TryResetSlotState(System.Collections.Generic.HashSet{System.Int32})">
+            <summary>
+            Reset local slot state to <see cref="F:Garnet.cluster.SlotState.STABLE"/>
+            </summary>
+            <param name="slots">Slot list</param>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.DeleteKeysInSlotsFromMainStore(Garnet.server.GarnetApi{Tsavorite.core.BasicContext{Tsavorite.core.SpanByte,Tsavorite.core.SpanByte,Garnet.server.RawStringInput,Tsavorite.core.SpanByteAndMemory,System.Int64,Garnet.server.MainSessionFunctions,Tsavorite.core.StoreFunctions{Tsavorite.core.SpanByte,Tsavorite.core.SpanByte,Tsavorite.core.SpanByteComparer,Tsavorite.core.SpanByteRecordDisposer},Tsavorite.core.SpanByteAllocator{Tsavorite.core.StoreFunctions{Tsavorite.core.SpanByte,Tsavorite.core.SpanByte,Tsavorite.core.SpanByteComparer,Tsavorite.core.SpanByteRecordDisposer}}},Tsavorite.core.BasicContext{System.Byte[],Garnet.server.IGarnetObject,Garnet.server.ObjectInput,Garnet.server.GarnetObjectStoreOutput,System.Int64,Garnet.server.ObjectSessionFunctions,Tsavorite.core.StoreFunctions{System.Byte[],Garnet.server.IGarnetObject,Tsavorite.core.ByteArrayKeyComparer,Tsavorite.core.DefaultRecordDisposer{System.Byte[],Garnet.server.IGarnetObject}},Tsavorite.core.GenericAllocator{System.Byte[],Garnet.server.IGarnetObject,Tsavorite.core.StoreFunctions{System.Byte[],Garnet.server.IGarnetObject,Tsavorite.core.ByteArrayKeyComparer,Tsavorite.core.DefaultRecordDisposer{System.Byte[],Garnet.server.IGarnetObject}}}}},System.Collections.Generic.HashSet{System.Int32})">
+            <summary>
+            Methods used to cleanup keys for given slot collection in main store
+            </summary>
+            <param name="BasicGarnetApi"></param>
+            <param name="slots">Slot list</param>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.DeleteKeysInSlotsFromObjectStore(Garnet.server.GarnetApi{Tsavorite.core.BasicContext{Tsavorite.core.SpanByte,Tsavorite.core.SpanByte,Garnet.server.RawStringInput,Tsavorite.core.SpanByteAndMemory,System.Int64,Garnet.server.MainSessionFunctions,Tsavorite.core.StoreFunctions{Tsavorite.core.SpanByte,Tsavorite.core.SpanByte,Tsavorite.core.SpanByteComparer,Tsavorite.core.SpanByteRecordDisposer},Tsavorite.core.SpanByteAllocator{Tsavorite.core.StoreFunctions{Tsavorite.core.SpanByte,Tsavorite.core.SpanByte,Tsavorite.core.SpanByteComparer,Tsavorite.core.SpanByteRecordDisposer}}},Tsavorite.core.BasicContext{System.Byte[],Garnet.server.IGarnetObject,Garnet.server.ObjectInput,Garnet.server.GarnetObjectStoreOutput,System.Int64,Garnet.server.ObjectSessionFunctions,Tsavorite.core.StoreFunctions{System.Byte[],Garnet.server.IGarnetObject,Tsavorite.core.ByteArrayKeyComparer,Tsavorite.core.DefaultRecordDisposer{System.Byte[],Garnet.server.IGarnetObject}},Tsavorite.core.GenericAllocator{System.Byte[],Garnet.server.IGarnetObject,Tsavorite.core.StoreFunctions{System.Byte[],Garnet.server.IGarnetObject,Tsavorite.core.ByteArrayKeyComparer,Tsavorite.core.DefaultRecordDisposer{System.Byte[],Garnet.server.IGarnetObject}}}}},System.Collections.Generic.HashSet{System.Int32})">
+            <summary>
+            Methods used to cleanup keys for given slot collection in object store
+            </summary>
+            <param name="BasicGarnetApi"></param>
+            <param name="slots">Slot list</param>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.TryInitializeLocalWorker(System.String,System.String,System.Int32,System.Int64,Garnet.cluster.NodeRole,System.String,System.String)">
+            <summary>
+            Add worker with specified slots
+            Update existing only if new config epoch is larger or current config epoch is zero
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.TryRemoveWorker(System.String,System.Int32,System.ReadOnlySpan{System.Byte}@)">
+            <summary>
+            Try remove worker through the forget command.
+            </summary>
+            <param name="nodeid"></param>
+            <param name="expirySeconds"></param>
+            <param name="errorMessage">The ASCII encoded error message if the method returned <see langword="false"/>; otherwise <see langword="default"/></param>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.TryReset(System.Boolean,System.Int32)">
+            <summary>
+            Reset cluster config and generated new node id if HARD reset specified
+            </summary>
+            <param name="soft"></param>
+            <param name="expirySeconds"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.TryAddReplica(System.String,System.Boolean,System.Boolean,System.ReadOnlySpan{System.Byte}@,Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            Try to make this node a replica of node with nodeid
+            </summary>
+            <param name="nodeid"></param>
+            <param name="force">If false, checks if node is clean (i.e. is PRIMARY without any assigned nodes) before making changes.</param>
+            <param name="upgradeLock">If true, allows for a <see cref="F:Garnet.cluster.RecoveryStatus.ReadRole"/> read lock to be upgraded to <see cref="F:Garnet.cluster.RecoveryStatus.ClusterReplicate"/>.</param>
+            <param name="errorMessage">The ASCII encoded error response if the method returned <see langword="false"/>; otherwise <see langword="default"/></param>
+            <param name="logger"></param>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.ListReplicas(System.String,Garnet.cluster.ClusterProvider)">
+            <summary>
+            List replicas of specified primary with given nodeid
+            </summary>
+            <param name="nodeid"> Node-id string</param>
+            <param name="clusterProvider">ClusterProvider instance</param>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.GetBanList">
+            <summary>
+            Return worker ban list
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.GetConnectionInfo(System.String,Garnet.cluster.ConnectionInfo@)">
+            <summary>
+            Get connection info to populate CLUSTER NODES
+            </summary>
+            <param name="nodeId"></param>
+            <param name="info"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.GetPrimaryLinkStatus(Garnet.cluster.ClusterConfig)">
+            <summary>
+            Get link status info for primary of this node.
+            </summary>
+            <param name="config">Snapshot of config to use for retrieving that information.</param>
+            <returns>MetricsItem array of all the associated info.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.SuspendConfigMerge">
+            <summary>
+            Pause merge config ops by setting numActiveMerge to MinValue.
+            Called when FORGET op executes and waits until ongoing merge operations complete before executing FORGET
+            Multiple FORGET ops can execute at the same time.
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.ResumeConfigMerge">
+            <summary>
+            Resume config merge
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.TryStartGossipTasks">
+            <summary>
+            Initiate meet and main gossip tasks
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.TryMerge(Garnet.cluster.ClusterConfig,System.Boolean)">
+            <summary>
+            Merge incoming config to evolve local version
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.RunMeetTask(System.String,System.Int32)">
+            <summary>
+            Run meet background task
+            </summary>
+            <param name="address"></param>
+            <param name="port"></param>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.TryMeetAsync(System.String,System.Int32,System.Boolean)">
+            <summary>
+            This task will immediately communicate with the new node and try to merge the retrieve configuration to its own.
+            If node to meet was previous in the ban list then it will not be added to the cluster.
+            </summary>
+            <param name="address">Address of node to issue meet to</param>
+            <param name="port"> Port of node to issue meet to</param>
+            <param name="acquireLock">Whether to acquire lock for merging. Default true</param>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.TryClusterPublish(Garnet.server.RespCommand,System.Span{System.Byte}@,System.Span{System.Byte}@)">
+            <summary>
+            Forward message by issuing CLUSTER PUBLISH|SPUBLISH
+            </summary>
+            <param name="cmd"></param>
+            <param name="channel"></param>
+            <param name="message"></param>
+        </member>
+        <member name="M:Garnet.cluster.ClusterManager.GossipMain">
+            <summary>
+            Main gossip async task
+            </summary>
+        </member>
+        <member name="T:Garnet.cluster.ClusterProvider">
+            <summary>
+            Cluster provider
+            </summary>
+        </member>
+        <member name="P:Garnet.cluster.ClusterProvider.ClusterUsername">
+            <summary>
+            Get cluster username
+            </summary>
+        </member>
+        <member name="P:Garnet.cluster.ClusterProvider.ClusterPassword">
+            <summary>
+            Get cluster password
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ClusterProvider.#ctor(Garnet.server.StoreWrapper)">
+            <summary>
+            Create new cluster provider
+            </summary>
+        </member>
+        <member name="P:Garnet.cluster.ClusterProvider.AllowDataLoss">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.cluster.ClusterProvider.Recover">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.cluster.ClusterProvider.PreventRoleChange">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.cluster.ClusterProvider.AllowRoleChange">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.cluster.ClusterProvider.Start">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.cluster.ClusterProvider.CreateClusterSession(Garnet.server.TransactionManager,Garnet.server.Auth.IGarnetAuthenticator,Garnet.server.ACL.UserHandle,Garnet.server.GarnetSessionMetrics,Garnet.server.GarnetApi{Tsavorite.core.BasicContext{Tsavorite.core.SpanByte,Tsavorite.core.SpanByte,Garnet.server.RawStringInput,Tsavorite.core.SpanByteAndMemory,System.Int64,Garnet.server.MainSessionFunctions,Tsavorite.core.StoreFunctions{Tsavorite.core.SpanByte,Tsavorite.core.SpanByte,Tsavorite.core.SpanByteComparer,Tsavorite.core.SpanByteRecordDisposer},Tsavorite.core.SpanByteAllocator{Tsavorite.core.StoreFunctions{Tsavorite.core.SpanByte,Tsavorite.core.SpanByte,Tsavorite.core.SpanByteComparer,Tsavorite.core.SpanByteRecordDisposer}}},Tsavorite.core.BasicContext{System.Byte[],Garnet.server.IGarnetObject,Garnet.server.ObjectInput,Garnet.server.GarnetObjectStoreOutput,System.Int64,Garnet.server.ObjectSessionFunctions,Tsavorite.core.StoreFunctions{System.Byte[],Garnet.server.IGarnetObject,Tsavorite.core.ByteArrayKeyComparer,Tsavorite.core.DefaultRecordDisposer{System.Byte[],Garnet.server.IGarnetObject}},Tsavorite.core.GenericAllocator{System.Byte[],Garnet.server.IGarnetObject,Tsavorite.core.StoreFunctions{System.Byte[],Garnet.server.IGarnetObject,Tsavorite.core.ByteArrayKeyComparer,Tsavorite.core.DefaultRecordDisposer{System.Byte[],Garnet.server.IGarnetObject}}}}},Garnet.networking.INetworkSender,Microsoft.Extensions.Logging.ILogger)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.cluster.ClusterProvider.UpdateClusterAuth(System.String,System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.cluster.ClusterProvider.Dispose">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.cluster.ClusterProvider.IsReplica">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.cluster.ClusterProvider.IsReplica(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.cluster.ClusterProvider.ResetGossipStats">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.cluster.ClusterProvider.FlushConfig">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.cluster.ClusterProvider.FlushDB(System.Boolean)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.cluster.ClusterProvider.SafeTruncateAOF(System.Boolean,System.Int64,System.Guid,System.Guid)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.cluster.ClusterProvider.SafeTruncateAOF(System.Int64)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.cluster.ClusterProvider.OnCheckpointInitiated(System.Int64@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.cluster.ClusterProvider.GetReplicationInfo">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.cluster.ClusterProvider.GetPrimaryInfo">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.cluster.ClusterProvider.GetReplicaInfo">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.cluster.ClusterProvider.GetReplicationOffset">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.cluster.ClusterProvider.GetGossipStats(System.Boolean)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.cluster.ClusterProvider.BumpCurrentEpoch">
+            <summary>
+            Bump Garnet epoch
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ClusterProvider.BumpAndWaitForEpochTransition">
+            <summary>
+            Wait for config transition
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterProvider.GetRunId">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.cluster.ClusterUtils.WriteInto(Tsavorite.core.IDevice,Tsavorite.core.SectorAlignedBufferPool,System.UInt64,System.Byte[],System.Int32,Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            Note: pads the bytes with zeros to achieve sector alignment
+            </summary>
+            <param name="device"></param>
+            <param name="pool"></param>
+            <param name="address"></param>
+            <param name="buffer"></param>
+            <param name="size"></param>
+            <param name="logger"></param>
+        </member>
+        <member name="M:Garnet.cluster.ClusterUtils.ReadInto(Tsavorite.core.IDevice,Tsavorite.core.SectorAlignedBufferPool,System.UInt64,System.Byte[]@,System.Int32,Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            Note: will read potentially more data (based on sector alignment)
+            </summary>
+            <param name="device"></param>
+            <param name="pool"></param>
+            <param name="address"></param>
+            <param name="buffer"></param>
+            <param name="size"></param>
+            <param name="logger"></param>
+        </member>
+        <member name="M:Garnet.cluster.FailoverManager.TryAbortReplicaFailover">
+            <summary>
+            Abort ongoing failover
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.FailoverManager.GetFailoverStatus">
+            <summary>
+            Retrieve the status of an ongoing failover
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.FailoverManager.GetLastFailoverStatus">
+            <summary>
+            Retrieve the status of the last failover
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.FailoverManager.TryStartReplicaFailover(Garnet.common.FailoverOption,System.TimeSpan)">
+            <summary>
+            Method used to initiate a background failover from a replica (CLUSTER FAILOVER command)
+            </summary>
+            <param name="option">Failover type option.</param>
+            <param name="failoverTimeout">Timeout per failover operation.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.FailoverManager.TryStartPrimaryFailover(System.String,System.Int32,Garnet.common.FailoverOption,System.TimeSpan)">
+            <summary>
+            Method used to initiate a failover from a primary (FAILOVER command).
+            </summary>
+            <param name="replicaAddress">IP address of replica.</param>
+            <param name="replicaPort">Port of replica.</param>
+            <param name="option">Failover option type.</param>
+            <param name="timeout">Timeout per failover operation.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.FailoverSession.#ctor(Garnet.cluster.ClusterProvider,Garnet.common.FailoverOption,System.TimeSpan,System.TimeSpan,System.Boolean,System.String,System.Int32,Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            FailoverSession constructor
+            </summary>
+            <param name="clusterProvider">ClusterProvider object</param>
+            <param name="option">Failover options for replica failover session.</param>
+            <param name="clusterTimeout">Timeout for individual communication between replica.</param>
+            <param name="failoverTimeout">End to end timeout for failover</param>
+            <param name="isReplicaSession">Flag indicating if this session is controlled by a replica</param>
+            <param name="hostAddress"></param>
+            <param name="hostPort"></param>
+            <param name="logger"></param>
+        </member>
+        <member name="F:Garnet.cluster.FailoverSession.primaryClient">
+            <summary>
+            Connection to primary if reachable
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.FailoverSession.sendPageSize">
+            <summary>
+            Send page size for GarnetClient
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.FailoverSession.CreateConnectionAsync(System.String)">
+            <summary>
+            Helper method to establish connection towards remote node
+            </summary>
+            <param name="nodeId">Id of node to create connection for</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.FailoverSession.GetConnectionAsync(System.String)">
+            <summary>
+            Acquire a connection to the node identified by given node-id.
+            </summary>
+            <param name="nodeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.FailoverSession.PauseWritesAndWaitForSync">
+            <summary>
+            Send stop writes message to PRIMARY
+            </summary>
+            <returns>True on success, false otherwise</returns>
+        </member>
+        <member name="M:Garnet.cluster.FailoverSession.TakeOverAsPrimary">
+            <summary>
+            Perform series of steps to update local config and take ownership of primary slots.
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.FailoverSession.BroadcastConfigAndRequestAttach(System.String,System.Byte[])">
+            <summary>
+            Issue gossip and attach request to replica
+            </summary>
+            <param name="replicaId">Replica-id to issue gossip and attache request</param>
+            <param name="configByteArray">Serialized local cluster config data</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.FailoverSession.IssueAttachReplicas">
+            <summary>
+            Issue attach message to remote replicas
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.FailoverSession.BeginAsyncReplicaFailover">
+            <summary>
+            REPLICA main failover task
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Garnet.cluster.FailoverStatus">
+            <summary>
+            Failover status flags
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.FailoverUtils.GetFailoverStatus(System.Nullable{Garnet.cluster.FailoverStatus})">
+            <summary>
+            Convert failover to string message for info command.
+            </summary>
+            <param name="status">Failover status type.</param>
+            <returns>String message for provided status, otherwise exception is thrown.</returns>
+            <exception cref="T:System.Exception"></exception>
+        </member>
+        <member name="M:Garnet.cluster.GarnetClientExtensions.Gossip(Garnet.client.GarnetClient,System.Memory{System.Byte},System.Threading.CancellationToken)">
+            <summary>
+            Send config
+            </summary>
+            <param name="client"></param>
+            <param name="data"></param>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.GarnetClientExtensions.GossipWithMeet(Garnet.client.GarnetClient,System.Memory{System.Byte},System.Threading.CancellationToken)">
+            <summary>
+            Send config
+            </summary>
+            <param name="client"></param>
+            <param name="data"></param>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.GarnetClientExtensions.failstopwrites(Garnet.client.GarnetClient,System.Memory{System.Byte},System.Threading.CancellationToken)">
+            <summary>
+            Send stop writes to primary
+            </summary>
+            <param name="client"></param>
+            <param name="nodeid"></param>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.GarnetClientExtensions.failreplicationoffset(Garnet.client.GarnetClient,System.Int64,System.Threading.CancellationToken)">
+            <summary>
+            Send request to await for replication offset sync with replica
+            </summary>
+            <param name="client"></param>
+            <param name="primaryReplicationOffset"></param>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.GarnetClusterConnectionStore.#ctor(System.Int32,Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            Connection store for cluster gossip connections.
+            </summary>
+            <param name="initialSize">Size for array of connection (auto-grows as connections are added).</param>
+            <param name="logger">Logger instance</param>
+        </member>
+        <member name="M:Garnet.cluster.GarnetClusterConnectionStore.UnsafeDisposeConnections">
+            <summary>
+            Dispose connections
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.GarnetClusterConnectionStore.Dispose">
+            <summary>
+            Dispose cluster connection store.
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.GarnetClusterConnectionStore.CloseAll">
+            <summary>
+            Close all connections
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.GarnetClusterConnectionStore.UnsafeGetConnection(System.String,Garnet.cluster.GarnetServerNode@)">
+            <summary>
+            Linear search of the array of connections without read-lock protection.
+            Caller responsible for locking.
+            </summary>
+            <param name="nodeId">Node-id to search for.</param>
+            <param name="conn">Connection object returned on success otherwise null.</param>
+            <returns>True if connection is found otherwise false.</returns>
+        </member>
+        <member name="M:Garnet.cluster.GarnetClusterConnectionStore.UnsafeAddConnection(Garnet.cluster.GarnetServerNode)">
+            <summary>
+            Add new connection by expanding base array if necessary
+            </summary>
+            <param name="conn"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.GarnetClusterConnectionStore.AddConnection(Garnet.cluster.GarnetServerNode)">
+            <summary>
+            Add new GarnetServerNode to the connection store.
+            </summary>
+            <param name="conn">Connection object to add.</param>
+            <returns>True on success, false otherwise</returns>
+        </member>
+        <member name="M:Garnet.cluster.GarnetClusterConnectionStore.GetOrAdd(Garnet.cluster.ClusterProvider,System.Net.IPEndPoint,Garnet.server.TLS.IGarnetTlsOptions,System.String,Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            Get or add a connection to the store.
+            </summary>
+            <param name="clusterProvider"></param>
+            <param name="endpoint">The cluster node endpoint</param>
+            <param name="tlsOptions"></param>
+            <param name="nodeId"></param>
+            <param name="logger"></param>
+            <returns>True if connection was added, false otherwise</returns>
+        </member>
+        <member name="M:Garnet.cluster.GarnetClusterConnectionStore.TryRemoveConnection(System.String)">
+            <summary>
+            Remove GarnetServerNode connection object from store.
+            </summary>
+            <param name="nodeId">Node-id to search for.</param>
+            <returns>True on successful removal of connection otherwise false.</returns>
+        </member>
+        <member name="M:Garnet.cluster.GarnetClusterConnectionStore.GetConnection(System.String,Garnet.cluster.GarnetServerNode@)">
+            <summary>
+            Get connection object corresponding to provided node-id.
+            </summary>
+            <param name="nodeId">Node-id to search for.</param>
+            <param name="conn">Connection object returned on success otherwise null.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.GarnetClusterConnectionStore.GetConnectionAtOffset(System.UInt32,Garnet.cluster.GarnetServerNode@)">
+            <summary>
+            Retrieve connection at given offset.
+            </summary>
+            <param name="offset">Offset in array of connections.</param>
+            <param name="conn">Connection object to return on success.</param>
+            <returns>True if offset within range else false.</returns>
+        </member>
+        <member name="M:Garnet.cluster.GarnetClusterConnectionStore.GetRandomConnection(Garnet.cluster.GarnetServerNode@)">
+            <summary>
+            Pick a random connection object to retrieve.
+            </summary>
+            <param name="conn">Connection retrieved.</param>
+            <returns>True on success otherwise false.</returns>
+        </member>
+        <member name="M:Garnet.cluster.GarnetClusterConnectionStore.GetConnectionInfo(System.String,Garnet.cluster.ConnectionInfo@)">
+            <summary>
+            Populate metrics related to link connection status.
+            </summary>
+            <param name="nodeId">Node-id to search for.</param>
+            <param name="info">Connection info corresponding to specified connection.</param>
+            <returns></returns>
+        </member>
+        <member name="F:Garnet.cluster.GarnetServerNode.lastConfig">
+            <summary>
+            Last transmitted configuration
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.GarnetServerNode.gossipTask">
+            <summary>
+            Outstanding gossip task if any
+            </summary>
+        </member>
+        <member name="P:Garnet.cluster.GarnetServerNode.GossipSend">
+            <summary>
+            Timestamp of last gossipSend for this connection
+            </summary>
+        </member>
+        <member name="P:Garnet.cluster.GarnetServerNode.Client">
+            <summary>
+            GarnetClient connection
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.GarnetServerNode.NodeId">
+            <summary>
+            NodeId of remote node
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.GarnetServerNode.EndPoint">
+            <summary>
+            EndPoint of remote node
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.GarnetServerNode.defaultSendPageSize">
+            <summary>
+            Default send page size for GarnetClient
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.GarnetServerNode.defaultMaxOutstandingTask">
+            <summary>
+            Default max outstanding tasks for GarnetClient
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.GarnetServerNode.#ctor(Garnet.cluster.ClusterProvider,System.Net.EndPoint,System.Net.Security.SslClientAuthenticationOptions,Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            GarnetServerNode constructor
+            </summary>
+            <param name="clusterProvider"></param>
+            <param name="endpoint">The endpoint of the remote node</param>
+            <param name="tlsOptions"></param>
+            <param name="logger"></param>
+        </member>
+        <member name="M:Garnet.cluster.GarnetServerNode.InitializeAsync">
+            <summary>
+            Initialize connection and cancellation tokens.
+            Initialization is performed only once
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.GarnetServerNode.GetMostRecentConfig">
+            <summary>
+            Keep track of updated config per connection. Useful when gossip sampling so as to ensure updates are propagated
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.GarnetServerNode.Gossip(System.Byte[])">
+            <summary>
+            Schedule a Gossip task for provided serialized configuration
+            </summary>
+            <param name="configByteArray"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.GarnetServerNode.TryMeetAsync(System.Byte[])">
+            <summary>
+            Issue gossip meet with meet to force receiving node to trust an untrusted node
+            </summary>
+            <param name="configByteArray"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.GarnetServerNode.TryGossip">
+            <summary>
+            Send gossip message or process response and send again.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.GarnetServerNode.GetConnectionInfo">
+            <summary>
+            Get connection info
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.GarnetServerNode.TryClusterPublish(Garnet.server.RespCommand,System.Span{System.Byte}@,System.Span{System.Byte}@)">
+            <summary>
+            Send a CLUSTER PUBLISH message to another remote node
+            </summary>
+            <param name="cmd"></param>
+            <param name="channel"></param>
+            <param name="message"></param>
+        </member>
+        <member name="F:Garnet.cluster.GossipStats.meet_requests_recv">
+            <summary>
+            number of requests for received for processing
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.GossipStats.meet_requests_succeed">
+            <summary>
+            number of succeeded meet requests
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.GossipStats.meet_requests_failed">
+            <summary>
+            number of failed meet requests
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.GossipStats.gossip_success_count">
+            <summary>
+            number of gossip requests send successfully
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.GossipStats.gossip_failed_count">
+            <summary>
+            number of gossip requests failed to send
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.GossipStats.gossip_timeout_count">
+            <summary>
+            number of gossip requests that timed out
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.GossipStats.gossip_full_send">
+            <summary>
+            number of gossip requests that contained full config array
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.GossipStats.gossip_empty_send">
+            <summary>
+            number of gossip requests send with empty array (i.e. ping)
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.GossipStats.gossip_bytes_send">
+            <summary>
+            Aggregate bytes gossip has send
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.GossipStats.gossip_bytes_recv">
+            <summary>
+            Aggregate bytes gossip has received
+            </summary>
+        </member>
+        <member name="T:Garnet.cluster.SlotState">
+            <summary>
+            NodeRole identifier
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.SlotState.OFFLINE">
+            <summary>
+            Slot not assigned
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.SlotState.STABLE">
+            <summary>
+            Slot assigned and ready to be used.
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.SlotState.MIGRATING">
+            <summary>
+            Slot is being moved to another node.
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.SlotState.IMPORTING">
+            <summary>
+            Reverse of migrating, preparing node to receive commands for that slot.
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.SlotState.FAIL">
+            <summary>
+            Slot in FAIL state.
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.SlotState.NODE">
+            <summary>
+            Not a slot state. Used with SETSLOT
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.SlotState.INVALID">
+            <summary>
+            Invalid slot state
+            </summary>
+        </member>
+        <member name="T:Garnet.cluster.HashSlot">
+            <summary>
+            Hashslot info
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.HashSlot._workerId">
+            <summary>
+            WorkerId of slot owner.
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.HashSlot._state">
+            <summary>
+            State of this slot.
+            </summary>
+        </member>
+        <member name="P:Garnet.cluster.HashSlot.workerId">
+            <summary>
+            Slot in migrating state points to target node though still owned by local node until migration completes.
+            </summary>
+        </member>
+        <member name="T:Garnet.cluster.MigrateSession">
+            <summary>
+            MigrateSession
+            </summary>
+            <summary>
+            This code implements operations associated with the MIGRATE KEYS transfer option.
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.MigrateSession.MigrateOperation.Scan(Garnet.server.StoreType,System.Int64@,System.Int64)">
+            <summary>
+            Perform scan to gather keys and build sketch
+            </summary>
+            <param name="storeType"></param>
+            <param name="currentAddress"></param>
+            <param name="endAddress"></param>
+        </member>
+        <member name="M:Garnet.cluster.MigrateSession.MigrateOperation.TrasmitSlots(Garnet.server.StoreType)">
+            <summary>
+            Transmit gathered keys
+            </summary>
+            <param name="storeType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.MigrateSession.MigrateOperation.DeleteKeys">
+            <summary>
+            Delete keys after migration if copyOption is not set
+            </summary>
+        </member>
+        <member name="P:Garnet.cluster.MigrateSession.Status">
+            <summary>
+            Get/Set migration status
+            </summary>
+        </member>
+        <member name="P:Garnet.cluster.MigrateSession.GetTargetEndpoint">
+            <summary>
+            Get endpoint of target node
+            </summary>
+        </member>
+        <member name="P:Garnet.cluster.MigrateSession.GetSourceNodeId">
+            <summary>
+            Source nodeId of migration task
+            </summary>
+        </member>
+        <member name="P:Garnet.cluster.MigrateSession.GetTargetNodeId">
+            <summary>
+            Target nodeId of migration task
+            </summary>
+        </member>
+        <member name="P:Garnet.cluster.MigrateSession.GetSlots">
+            <summary>
+            Return slots for migration
+            </summary>
+        </member>
+        <member name="P:Garnet.cluster.MigrateSession.GetNetworkBufferSettings">
+            <summary>
+            Get network buffer specs
+            </summary>
+        </member>
+        <member name="P:Garnet.cluster.MigrateSession.GetNetworkPool">
+            <summary>
+            Get network pool
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.MigrateSession.Overlap(Garnet.cluster.MigrateSession)">
+            <summary>
+            Check for overlapping slots between migrate sessions
+            </summary>
+            <param name="session"></param>
+            <returns></returns>
+        </member>
+        <member name="F:Garnet.cluster.MigrateSession.transferOption">
+            <summary>
+            Transfer option used for this migrateSession
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.MigrateSession.migrateOperation">
+            <summary>
+            MigrateTask for background slot migrate tasks
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.MigrateSession.#ctor(Garnet.cluster.ClusterSession,Garnet.cluster.ClusterProvider,System.String,System.Int32,System.String,System.String,System.String,System.String,System.Boolean,System.Boolean,System.Int32,System.Collections.Generic.HashSet{System.Int32},Garnet.cluster.Sketch,Garnet.cluster.TransferOption)">
+            <summary>
+            MigrateSession Constructor
+            </summary>
+            <param name="clusterSession"></param>
+            <param name="clusterProvider"></param>
+            <param name="_targetAddress"></param>
+            <param name="_targetPort"></param>
+            <param name="_targetNodeId"></param>
+            <param name="_username"></param>
+            <param name="_passwd"></param>
+            <param name="_sourceNodeId"></param>
+            <param name="_copyOption"></param>
+            <param name="_replaceOption"></param>
+            <param name="_timeout"></param>
+            <param name="_slots"></param>
+            <param name="sketch"></param>
+            <param name="transferOption"></param>
+        </member>
+        <member name="M:Garnet.cluster.MigrateSession.Dispose">
+            <summary>
+            Dispose
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.MigrateSession.GetRanges">
+            <summary>
+            Get slot ranges from slot list
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.MigrateSession.TrySetSlotRanges(System.String,Garnet.cluster.MigrateState)">
+            <summary>
+            Change remote slot state
+            </summary>
+            <param name="nodeid"></param>
+            <param name="state"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.MigrateSession.ResetLocalSlot">
+            <summary>
+            Reset local slot state
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.MigrateSession.TryPrepareLocalForMigration">
+            <summary>
+            Prepare remote node for importing
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.MigrateSession.RelinquishOwnership">
+            <summary>
+            Clean migration state
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.MigrateSession.TryRecoverFromFailure">
+            <summary>
+            Try recover to cluster state before migration task.
+            Used only for MIGRATE SLOTS option.
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.MigrateSession.HandleMigrateTaskResponse(System.Threading.Tasks.Task{System.String})">
+            <summary>
+            Handle response from migrate data task
+            </summary>
+            <param name="task"></param>
+            <returns>True on successful completion of data send, otherwise false</returns>
+        </member>
+        <member name="M:Garnet.cluster.MigrateSession.WaitForConfigPropagation">
+            <summary>
+            Wait for config propagation based on the type of MigrateSession that is currently in progress
+            </summary>
+            <exception cref="T:Garnet.common.GarnetException"></exception>
+        </member>
+        <member name="M:Garnet.cluster.MigrateSession.CanAccessKey(Garnet.server.ArgSlice@,System.Int32,System.Boolean)">
+            <summary>
+            Check if it is safe to operate on the provided key when a slot state is set to MIGRATING
+            </summary>
+            <param name="key"></param>
+            <param name="slot"></param>
+            <param name="readOnly"></param>
+            <returns></returns>
+            <exception cref="T:Garnet.common.GarnetException"></exception>
+        </member>
+        <member name="M:Garnet.cluster.MigrateSession.MigrateKeysFromMainStore">
+            <summary>
+            Method used to migrate individual keys from main store to target node.
+            Used with MIGRATE KEYS option
+            </summary>
+            <returns>True on success, false otherwise</returns>
+        </member>
+        <member name="M:Garnet.cluster.MigrateSession.MigrateKeysFromObjectStore">
+            <summary>
+            Method used to migrate individual keys from object store to target node.
+            Used with MIGRATE KEYS option
+            </summary>
+            <returns>True on success, false otherwise</returns>
+        </member>
+        <member name="M:Garnet.cluster.MigrateSession.DeleteKeys">
+            <summary>
+            Delete local copy of keys if _copyOption is set to false.
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.MigrateSession.MigrateKeys">
+            <summary>
+            Method used to migrate keys from main and object stores.
+            This method is used to process the MIGRATE KEYS transfer option.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.MigrateSession.MigrateSlotsDriverInline">
+            <summary>
+            Migrate Slots inline driver
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.MigrateSession.TryStartMigrationTask(System.ReadOnlySpan{System.Byte}@)">
+            <summary>
+            Begin migration task
+            </summary>
+            <param name="errorMessage">The ASCII encoded error message if the method returned <see langword="false"/>; otherwise <see langword="default"/></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.MigrateSession.BeginAsyncMigrationTask">
+            <summary>
+            Migrate slots session background task
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.MigrateSessionTaskStore.GetNumSessions">
+            <summary>
+            Count active MigrateSessions
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.MigrateSessionTaskStore.TryRemove(Garnet.cluster.MigrateSession)">
+            <summary>
+            Remove only the provided session instance
+            </summary>
+            <param name="mSession"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.MigrateSessionTaskStore.TryRemove(System.String)">
+            <summary>
+            Remove all sessions associated with the provided targetNodeId
+            </summary>
+            <param name="targetNodeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.MigrateSessionTaskStore.CanAccessKey(Garnet.server.ArgSlice@,System.Int32,System.Boolean)">
+            <summary>
+            Check if provided key can be operated on.
+            </summary>
+            <param name="key"></param>
+            <param name="slot"></param>
+            <param name="readOnly"></param>
+            <returns>True if we can operate on the key, otherwise false (i.e. key is being migrated)</returns>
+        </member>
+        <member name="T:Garnet.cluster.MigrateState">
+            <summary>
+            MigrateState
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.MigrateState.SUCCESS">
+            <summary>
+            SUCCESS
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.MigrateState.FAIL">
+            <summary>
+            FAIL
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.MigrateState.PENDING">
+            <summary>
+            PENDING
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.MigrateState.IMPORT">
+            <summary>
+            IMPORT
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.MigrateState.STABLE">
+            <summary>
+            STABLE
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.MigrateState.NODE">
+            <summary>
+            NODE
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.MigrationManager.networkBufferSettings">
+            <summary>
+            NetworkBufferSettings for MigrateSession instances
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.MigrationManager.networkPool">
+            <summary>
+            NetworkPool instance created according to spec
+            </summary>
+        </member>
+        <member name="P:Garnet.cluster.MigrationManager.GetNetworkBufferSettings">
+            <summary>
+            Get NetworkBuffers object
+            </summary>
+        </member>
+        <member name="P:Garnet.cluster.MigrationManager.GetNetworkPool">
+            <summary>
+            Get NetworkPool instance
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.MigrationManager.Dispose">
+            <summary>
+            Dispose
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.MigrationManager.Purge">
+            <summary>
+            Used to free up buffer pool
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.MigrationManager.GetMigrationTaskCount">
+            <summary>
+            Get number of active migrate sessions
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.MigrationManager.TryAddMigrationTask(Garnet.cluster.ClusterSession,System.String,System.String,System.Int32,System.String,System.String,System.String,System.Boolean,System.Boolean,System.Int32,System.Collections.Generic.HashSet{System.Int32},Garnet.cluster.Sketch,Garnet.cluster.TransferOption,Garnet.cluster.MigrateSession@)">
+            <summary>
+             Add a new migration task in response to an associated request.
+            </summary>
+            <param name="clusterSession"></param>
+            <param name="sourceNodeId"></param>
+            <param name="targetAddress"></param>
+            <param name="targetPort"></param>
+            <param name="targetNodeId"></param>
+            <param name="username"></param>
+            <param name="passwd"></param>
+            <param name="copyOption"></param>
+            <param name="replaceOption"></param>
+            <param name="timeout"></param>
+            <param name="slots"></param>
+            <param name="sketch"></param>
+            <param name="transferOption"></param>
+            <param name="mSession"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.MigrationManager.TryRemoveMigrationTask(Garnet.cluster.MigrateSession)">
+            <summary>
+            Remove provided migration task
+            </summary>
+            <param name="mSession"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.MigrationManager.TryRemoveMigrationTask(System.String)">
+            <summary>
+            Remove migration task associated with provided target nodeId 
+            </summary>
+            <param name="targetNodeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.MigrationManager.CanAccessKey(Garnet.server.ArgSlice@,System.Int32,System.Boolean)">
+            <summary>
+            Check if provided key can be operated on.
+            </summary>
+            <param name="slot"></param>
+            <param name="key"></param>
+            <param name="readOnly"></param>
+        </member>
+        <member name="M:Garnet.cluster.Sketch.HashAndStore(Garnet.server.ArgSlice@)">
+            <summary>
+            Hash key to bloomfilter and store it for future use (NOTE: Use only with KEYS option)
+            </summary>
+            <param name="key"></param>
+        </member>
+        <member name="M:Garnet.cluster.Sketch.Probe(Tsavorite.core.SpanByte,Garnet.cluster.SketchStatus@)">
+            <summary>
+            Probe sketch to check if key has been added
+            </summary>
+            <param name="key"></param>
+            <param name="status"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.Sketch.Clear">
+            <summary>
+            Clear keys from working set
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.Sketch.SetStatus(Garnet.cluster.SketchStatus)">
+            <summary>
+            Set KeyMigrationStatus
+            </summary>
+            <param name="status"></param>
+        </member>
+        <member name="T:Garnet.cluster.SketchStatus">
+            <summary>
+            Use to mark the status of the sketch that contains a collection of keys that need to be migrated
+            to a target node.
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.SketchStatus.INITIALIZING">
+            <summary>
+            Sketch is being constructed by adding keys to be sent to the target node.
+            Reads and writes can be served if the keys exists in the database.
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.SketchStatus.TRANSMITTING">
+            <summary>
+            Keys previously added to the sketch are being actively send to the target node.
+            Writes to referenced keys will be delayed until sketch status reaches MIGRATED.
+            Reads can be served without any restriction.
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.SketchStatus.DELETING">
+            <summary>
+            Keys previously added to the sketch are being deleted, after being sent to the target node.
+            Reads and writes to referenced kesy will be delayed.
+            We need to delay reads to avoid the scenario where a key exists during validation but was deleted before the actual read operation executes.
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.SketchStatus.MIGRATED">
+            <summary>
+            Keys added to the corresponding sketch are now migrated to the target node.
+            Read and writes are free to proceed.
+            Because keys were deleted earlier the operations will result in a -ASK redirection message.
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.CheckpointEntry.TryAddReader">
+            <summary>
+            Indicate addition of new reader by trying to increment reader counter
+            </summary>
+            <returns>(true) on success, (false) otherwise</returns>
+        </member>
+        <member name="M:Garnet.cluster.CheckpointEntry.RemoveReader">
+            <summary>
+            Indicate removal of a reader by decrementing reader counter
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.CheckpointEntry.TrySuspendReaders">
+            <summary>
+            Suspend addition of new readers by setting the reader counter to int.MinValue
+            </summary>
+            <returns>(true) if operation succeeded, (false) otherwise</returns>
+        </member>
+        <member name="M:Garnet.cluster.CheckpointEntry.ContainsSharedToken(Garnet.cluster.CheckpointEntry,Garnet.cluster.CheckpointFileType)">
+            <summary>
+            Compare tokens for specified CheckpointFileType
+            </summary>
+            <param name="entry"></param>
+            <param name="fileType"></param>
+            <returns>(true) if token is shared between entries, (false) otherwise</returns>
+            <exception cref="T:System.Exception"></exception>
+        </member>
+        <member name="M:Garnet.cluster.CheckpointEntry.ToByteArray">
+            <summary>
+            Serialize CheckpointEntry
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.CheckpointEntry.FromByteArray(System.Byte[])">
+            <summary>
+            Deserialize CheckpointEntry
+            </summary>
+            <param name="serialized"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.CheckpointEntry.ToString">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Garnet.cluster.CheckpointFileType">
+            <summary>
+            Checkpoint file type
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.CheckpointFileType.NONE">
+            <summary>
+            None
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.CheckpointFileType.STORE_HLOG">
+            <summary>
+            Store Hybrid LOG
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.CheckpointFileType.STORE_DLOG">
+            <summary>
+            Store Delta Log
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.CheckpointFileType.STORE_INDEX">
+            <summary>
+            Store Index
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.CheckpointFileType.STORE_SNAPSHOT">
+            <summary>
+            Store Snapshot
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.CheckpointFileType.OBJ_STORE_HLOG">
+            <summary>
+            Object Store Hybrid Log - Main
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.CheckpointFileType.OBJ_STORE_HLOG_OBJ">
+            <summary>
+            Object Store Hybrid Log - Object
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.CheckpointFileType.OBJ_STORE_DLOG">
+            <summary>
+            Object Store Delta Log
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.CheckpointFileType.OBJ_STORE_INDEX">
+            <summary>
+            Object Store Index
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.CheckpointFileType.OBJ_STORE_SNAPSHOT">
+            <summary>
+            Object Store Snapshot - Main
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.CheckpointFileType.OBJ_STORE_SNAPSHOT_OBJ">
+            <summary>
+            Object Store Snapshot - Object
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.CheckpointStore.Initialize">
+            <summary>
+            Initialize in-memory checkpoint store.
+            Assume during initialization checkpoint requests will not be issued/processed.
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.CheckpointStore.WaitForReplicas">
+            <summary>
+            Wait for replicas to finish reading
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.CheckpointStore.PurgeAllCheckpointsExceptEntry(Garnet.cluster.CheckpointEntry)">
+            <summary>
+            Method used at initialization to purge any orphan checkpoints except the latest checkpoint
+            </summary>
+            <param name="entry">CheckpointEntry</param>
+        </member>
+        <member name="M:Garnet.cluster.CheckpointStore.AddCheckpointEntry(Garnet.cluster.CheckpointEntry,System.Boolean)">
+            <summary>
+            Add new checkpoint entry to in memory list.
+            Assume that addition of new entries executes at completion of a checkpoint.
+            Since there can be not concurrent checkpoints this method is not thread safe.
+            </summary>
+            <param name="entry"></param>
+            <param name="fullCheckpoint"></param>
+        </member>
+        <member name="M:Garnet.cluster.CheckpointStore.DeleteOutdatedCheckpoints">
+            <summary>
+            Method used to delete outdated checkpoints from in-memory list of checkpoint entries
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.CheckpointStore.TryGetLatestCheckpointEntryFromMemory(Garnet.cluster.CheckpointEntry@)">
+            <summary>
+            Return latest checkpoint entry and increment readers counter.
+            Caller is responsible for releasing reader by calling removeReader on entry
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.CheckpointStore.GetLatestCheckpointEntryFromDisk">
+            <summary>
+            Return latest checkpoint entry from disk by scanning all available tokens
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.CheckpointStore.GetLatestCheckpointFromMemoryInfo">
+            <summary>
+            Get latest checkpoint from memory info
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.CheckpointStore.GetLatestCheckpointFromDiskInfo">
+            <summary>
+            Get latest checkpoint from memory info
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Garnet.cluster.GarnetClusterCheckpointManager">
+            <summary>
+            Checkpoint manager for Garnet cluster, inherits from GarnetCheckpointManager.
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.GarnetClusterCheckpointManager.CommitLogCheckpointSendFromPrimary(System.Guid,System.Byte[])">
+            <summary>
+            Commit log checkpoint metadata with included cookie in byte array
+            </summary>
+            <param name="logToken"></param>
+            <param name="checkpointMetadata"></param>
+        </member>
+        <member name="M:Garnet.cluster.GarnetClusterCheckpointManager.GetCheckpointCookieMetadata(System.Guid,Tsavorite.core.DeltaLog,System.Boolean,System.Int64)">
+            <summary>
+            Retrieve RecoveredSafeAofAddress and RecoveredReplicationId for checkpoint
+            </summary>
+            <param name="logToken"></param>
+            <param name="deltaLog"></param>
+            <param name="scanDelta"></param>
+            <param name="recoverTo"></param>
+            <returns></returns>
+            <exception cref="T:System.Exception"></exception>
+        </member>
+        <member name="P:Garnet.cluster.AofSyncTaskInfo.IsConnected">
+            <summary>
+            Check if client connection is healthy
+            </summary>
+        </member>
+        <member name="P:Garnet.cluster.AofSyncTaskInfo.StartAddress">
+            <summary>
+            Return start address for this AOF iterator
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.AofSyncTaskInfo.ReplicaSyncTask">
+            <summary>
+            Main replica aof sync task.
+            </summary>
+        </member>
+        <member name="T:Garnet.cluster.AofTaskStore">
+            <summary>
+            Storage provider for AOF tasks
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.AofTaskStore.SafeTruncateAof(System.Int64)">
+            <summary>
+            Safely truncate iterator
+            </summary>
+            <param name="CheckpointCoveredAofAddress"></param>
+            <returns></returns>
+        </member>
+        <member name="P:Garnet.cluster.ReplicaSyncSession.AofSyncTask">
+            <summary>
+            Get the associated aof sync task instance with this replica sync session
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.ReplicaSyncSession.checkpointCoveredAofAddress">
+            <summary>
+            Pessimistic checkpoint covered AOF address
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ReplicaSyncSession.Connect">
+            <summary>
+            Connect client
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ReplicaSyncSession.ExecuteAsync(System.String[])">
+            <summary>
+            Execute async command
+            </summary>
+            <param name="commands"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ReplicaSyncSession.InitializeIterationBuffer">
+            <summary>
+            Initialize iteration buffer
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ReplicaSyncSession.SetClusterSyncHeader(System.Boolean)">
+            <summary>
+            Set Cluster Sync header
+            </summary>
+            <param name="isMainStore"></param>
+        </member>
+        <member name="M:Garnet.cluster.ReplicaSyncSession.TryWriteKeyValueSpanByte(Tsavorite.core.SpanByte@,Tsavorite.core.SpanByte@,System.Threading.Tasks.Task{System.String}@)">
+            <summary>
+            Try write main store key value pair
+            </summary>
+            <param name="key"></param>
+            <param name="value"></param>
+            <param name="task"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ReplicaSyncSession.TryWriteKeyValueByteArray(System.Byte[],System.Byte[],System.Int64,System.Threading.Tasks.Task{System.String}@)">
+            <summary>
+            Try write object store key value pair
+            </summary>
+            <param name="key"></param>
+            <param name="value"></param>
+            <param name="expiration"></param>
+            <param name="task"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ReplicaSyncSession.SendAndResetIterationBuffer">
+            <summary>
+            Send and reset iteration buffer
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ReplicaSyncSession.AddAofSyncTask(Garnet.cluster.AofSyncTaskInfo)">
+            <summary>
+            Associated aof sync task instance with this replica sync session
+            </summary>
+            <param name="aofSyncTask"></param>
+        </member>
+        <member name="M:Garnet.cluster.ReplicaSyncSession.SetStatus(Garnet.cluster.SyncStatus,System.String)">
+            <summary>
+            Set status of replica sync session
+            </summary>
+            <param name="status"></param>
+            <param name="error"></param>
+        </member>
+        <member name="M:Garnet.cluster.ReplicaSyncSession.SetFlushTask(System.Threading.Tasks.Task{System.String})">
+            <summary>
+            Set network flush task for checkpoint snapshot stream data
+            </summary>
+            <param name="task"></param>
+        </member>
+        <member name="M:Garnet.cluster.ReplicaSyncSession.WaitForFlush">
+            <summary>
+            Wait for network buffer flush
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ReplicaSyncSession.WaitForSyncCompletion">
+            <summary>
+            Wait until sync of checkpoint is completed
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ReplicaSyncSession.NeedToFullSync">
+            <summary>
+            Should stream
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ReplicaSyncSession.BeginAofSync">
+            <summary>
+            Begin syncing AOF to the replica
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ReplicaSyncSession.SendCheckpoint">
+            <summary>
+            Start sending the latest checkpoint to replica
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ReplicaSyncSession.ReadInto(Tsavorite.core.IDevice,System.UInt64,System.Int32,System.Int32)">
+            <summary>
+            Note: will read potentially more data (based on sector alignment)
+            </summary>
+            <param name="device"></param>
+            <param name="address"></param>
+            <param name="size"></param>
+            <param name="segmentId"></param>
+        </member>
+        <member name="M:Garnet.cluster.SnapshotIteratorManager.IsProgressing">
+            <summary>
+            Check if stream is progressing
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ReplicationSyncManager.IsActive(System.Int32)">
+            <summary>
+            Check if sync session is active
+            </summary>
+            <param name="offset"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ReplicationSyncManager.WaitForFlush">
+            <summary>
+            Wait for network flush to complete for all sessions
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ReplicationSyncManager.AddReplicaSyncSession(Garnet.cluster.SyncMetadata,Garnet.cluster.ReplicaSyncSession@)">
+            <summary>
+            Create and add ReplicaSyncSession to store
+            </summary>
+            <param name="replicaSyncMetadata">Replica sync metadata</param>
+            <param name="replicaSyncSession">Replica sync session created</param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ReplicationSyncManager.ReplicationSyncDriver(Garnet.cluster.ReplicaSyncSession)">
+            <summary>
+            Start sync session
+            </summary>
+            <param name="replicaSyncSession"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ReplicationSyncManager.MainStreamingSnapshotDriver">
+            <summary>
+            Streaming snapshot driver
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Garnet.cluster.SyncStatus">
+            <summary>
+            Replication attach sync status
+            </summary>
+        </member>
+        <member name="T:Garnet.cluster.SyncStatusInfo">
+            <summary>
+            Replication sync status info
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ReplicationManager.TryAttachSync(Garnet.cluster.SyncMetadata,System.ReadOnlySpan{System.Byte}@)">
+            <summary>
+            Try attach sync session from replica
+            </summary>
+            <param name="replicaSyncMetadata"></param>
+            <param name="errorMessage"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ReplicationManager.TryBeginPrimarySync(System.String,System.String,Garnet.cluster.CheckpointEntry,System.Int64,System.Int64,System.ReadOnlySpan{System.Byte}@)">
+            <summary>
+            Start sync of remote replica from this primary
+            </summary>
+            <param name="replicaNodeId"></param>
+            <param name="replicaAssignedPrimaryId"></param>
+            <param name="replicaCheckpointEntry"></param>
+            <param name="replicaAofBeginAddress"></param>
+            <param name="replicaAofTailAddress"></param>
+            <param name="errorMessage"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ReplicationManager.TryBeginDiskSync(System.String,System.String,Garnet.cluster.CheckpointEntry,System.Int64,System.Int64,System.ReadOnlySpan{System.Byte}@)">
+            <summary>
+            Begin background replica sync session
+            </summary>
+            <param name="replicaNodeId">Node-id of replica that is currently attaching</param>
+            <param name="replicaAssignedPrimaryId">Primary-id of replica that is currently attaching</param>
+            <param name="replicaCheckpointEntry">Most recent checkpoint entry at replica</param>
+            <param name="replicaAofBeginAddress">AOF begin address at replica</param>
+            <param name="replicaAofTailAddress">AOF tail address at replica</param>
+            <param name="errorMessage">The ASCII encoded error message if the method returned <see langword="false"/>; otherwise <see langword="default"/></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ReplicationManager.SafeTruncateAof(System.Int64)">
+            <summary>
+            Safely truncate iterator
+            </summary>
+            <param name="CheckpointCoveredAofAddress"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ReplicationManager.TryConnectToReplica(System.String,System.Int64,Garnet.cluster.AofSyncTaskInfo,System.ReadOnlySpan{System.Byte}@)">
+            <summary>
+            Try to initiate connection from primary to replica in order to stream aof.
+            </summary>
+            <param name="nodeid"></param>
+            <param name="startAddress"></param>
+            <param name="aofSyncTaskInfo"></param>
+            <param name="errorMessage">The ASCII encoded error message if the method returned <see langword="false"/>; otherwise <see langword="default"/></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ReplicationManager.TryReplicateDisklessSync(Garnet.cluster.ClusterSession,Garnet.cluster.Server.Replication.ReplicateSyncOptions,System.ReadOnlySpan{System.Byte}@)">
+            <summary>
+            Try to replicate using diskless sync
+            </summary>
+            <param name="session">ClusterSession for this connection.</param>
+            <param name="options">Options for the sync.</param>
+            <param name="errorMessage">The ASCII encoded error message if the method returned <see langword="false"/>; otherwise <see langword="default"/></param>
+            <returns>A boolean indicating whether replication initiation was successful.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ReplicationManager.TryReplicateDiskbasedSync(Garnet.cluster.ClusterSession,Garnet.cluster.Server.Replication.ReplicateSyncOptions,System.ReadOnlySpan{System.Byte}@)">
+            <summary>
+            Try initiate replicate attach
+            </summary>
+            <param name="session">ClusterSession for this connection.</param>
+            <param name="options">Options for the sync.</param>
+            <param name="errorMessage">The ASCII encoded error message if the method returned <see langword="false"/>; otherwise <see langword="default"/></param>
+            <returns>A boolean indicating whether replication initiation was successful.</returns>
+        </member>
+        <member name="M:Garnet.cluster.ReplicationManager.ProcessCheckpointMetadata(System.Guid,Garnet.cluster.CheckpointFileType,System.Byte[])">
+            <summary>
+            Process checkpoint metadata transmitted from primary during replica synchronization.
+            </summary>
+            <param name="fileToken">Checkpoint metadata token.</param>
+            <param name="fileType">Checkpoint metadata filetype.</param>
+            <param name="checkpointMetadata">Raw bytes of checkpoint metadata.</param>
+            <exception cref="T:System.Exception">Throws invalid type checkpoint metadata.</exception>
+        </member>
+        <member name="M:Garnet.cluster.ReplicationManager.ShouldInitialize(Garnet.cluster.CheckpointFileType)">
+            <summary>
+            Check if device needs to be initialized with a specifi segment size depending on the checkpoint file type
+            </summary>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ReplicationManager.GetInitializedSegmentFileDevice(System.Guid,Garnet.cluster.CheckpointFileType)">
+            <summary>
+            Get an IDevice that is also initialized if needed
+            </summary>
+            <param name="token"></param>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ReplicationManager.BeginReplicaRecover(System.Boolean,System.Boolean,System.Boolean,System.String,Garnet.cluster.CheckpointEntry,System.Int64,System.Int64,System.ReadOnlySpan{System.Byte}@)">
+            <summary>
+            Process request from primary to start recovery process from the retrieved checkpoint.
+            </summary>
+            <param name="recoverMainStoreFromToken"></param>
+            <param name="recoverObjectStoreFromToken"></param>
+            <param name="replayAOF"></param>
+            <param name="primaryReplicationId"></param>
+            <param name="remoteCheckpoint"></param>
+            <param name="beginAddress"></param>
+            <param name="recoveredReplicationOffset"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ReplicationManager.ResetReplayIterator">
+            <summary>
+            Reset background replay iterator
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ReplicationManager.ProcessPrimaryStream(System.Byte*,System.Int32,System.Int64,System.Int64,System.Int64)">
+            <summary>
+            Apply primary AOF records.
+            </summary>
+            <param name="record"></param>
+            <param name="recordLength"></param>
+            <param name="previousAddress"></param>
+            <param name="currentAddress"></param>
+            <param name="nextAddress"></param>
+        </member>
+        <member name="M:Garnet.cluster.ReplicationManager.TryAcquireSettledMetadataForMainStore(Garnet.cluster.CheckpointEntry,Tsavorite.core.LogFileInfo@,System.Int64@)">
+            <summary>
+             Keep trying to acquire main store metadata until it settles
+            </summary>
+            <param name="entry">CheckpointEntry to retrieve metadata for</param>
+            <param name="hlog_size">LogFileInfo to return</param>
+            <param name="index_size">Index size in bytes to return</param>
+        </member>
+        <member name="M:Garnet.cluster.ReplicationManager.TryAcquireSettledMetadataForObjectStore(Garnet.cluster.CheckpointEntry,Tsavorite.core.LogFileInfo@,System.Int64@)">
+            <summary>
+             Keep trying to acquire object store metadata until it settles
+            </summary>
+            <param name="entry">CheckpointEntry to retrieve metadata for</param>
+            <param name="hlog_size">LogFileInfo to return</param>
+            <param name="index_size">Index size in bytes to return</param>
+        </member>
+        <member name="M:Garnet.cluster.ReplicationManager.AddCheckpointEntry(Garnet.cluster.CheckpointEntry,System.Boolean)">
+            <summary>
+            Add new checkpoint entry to the in-memory store
+            </summary>
+            <param name="entry"></param>
+            <param name="fullCheckpoint"></param>
+        </member>
+        <member name="M:Garnet.cluster.ReplicationManager.UpdateCommitSafeAofAddress(System.Int64)">
+            <summary>
+            Update current aof address for pending commit.
+            This is necessary to recover safe aof address along with the commit information.
+            </summary>
+            <param name="safeAofTailAddress"></param>
+        </member>
+        <member name="M:Garnet.cluster.ReplicationManager.SetPrimaryReplicationId">
+            <summary>
+            Update replicationId for both stores to use for signing future checkpoints
+            Should be called only at initialization of replication manager and during a failover
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ReplicationManager.TryUpdateForFailover">
+            <summary>
+            Called during failover so replica can generate new replication id and keep track of valid replicationOffset before switching over.
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.ReplicationManager.ReplicationCheckpointStartOffset">
+            <summary>
+            Replication offset corresponding to the checkpoint start marker. We will truncate only to this point after taking a checkpoint (the checkpoint
+            is taken only when we encounter a checkpoint end marker).
+            </summary>
+        </member>
+        <member name="P:Garnet.cluster.ReplicationManager.ReplicationOffset2">
+            <summary>
+            Replication offset until which AOF address is valid for old primary if failover has occurred
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.ReplicationManager.currentRecoveryStatus">
+            <summary>
+            Recovery status
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ReplicationManager.EnsureReplication(Garnet.cluster.ClusterSession,System.Collections.Generic.IEnumerable{Garnet.server.IClusterSession})">
+            <summary>
+            If this node is a Replica, ensures that a session engaged in replication exists from its paired primary.
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ReplicationManager.Purge">
+            <summary>
+            Used to free up buffer pool
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ReplicationManager.BeginRecovery(Garnet.cluster.RecoveryStatus,System.Boolean)">
+            <summary>
+            Acquire recovery and checkpoint locks to prevent checkpoints and parallel recovery tasks
+            </summary>
+            <param name="nextRecoveryStatus">Status to transition to on success</param>
+            <param name="upgradeLock">If true, will attempt to upgrade a read lock to a write lock.  Assumes a prior successful call to <see cref="M:Garnet.cluster.ReplicationManager.BeginRecovery(Garnet.cluster.RecoveryStatus,System.Boolean)"/> with <see cref="F:Garnet.cluster.RecoveryStatus.ReadRole"/>.</param>
+        </member>
+        <member name="M:Garnet.cluster.ReplicationManager.EndRecovery(Garnet.cluster.RecoveryStatus,System.Boolean)">
+            <summary>
+            Release recovery and checkpoint locks
+            </summary>
+            <param name="nextRecoveryStatus">State to transition to.</param>
+            <param name="downgradeLock">If true, downgrades the held write lock to a read lock instead of just releasing the write lock.</param>
+        </member>
+        <member name="M:Garnet.cluster.ReplicationManager.Recover">
+            <summary>
+            Main recover method for replication
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ReplicationManager.RecoverCheckpointAndAOF">
+            <summary>
+            Recover whatever is available from <see cref="F:Garnet.cluster.ReplicationManager.storeWrapper"/>.
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ReplicationManager.WaitForReplicationOffset(System.Int64)">
+            <summary>
+            Wait for local replication offset to sync with input value
+            </summary>
+            <param name="primaryReplicationOffset"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ReplicationManager.Start">
+            <summary>
+            Initiate connection with PRIMARY after restart
+            </summary>
+        </member>
+        <member name="P:Garnet.cluster.ReplicationManager.networkBufferSettings">
+            <summary>
+            NetworkBufferSettings for the buffer pool maintained by the ReplicationManager
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.ReplicationManager.networkPool">
+            <summary>
+            Network pool maintained by the ReplicationManager
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.ReplicationManager.rssSendBufferSize">
+            <summary>
+            NetworkBufferSettings for the replica sync session clients
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.ReplicationManager.irsSendBufferSize">
+            <summary>
+            NetworkBufferSettings for the client used for InitiateReplicaSync (ReplicateReceiveCheckpoint.cs)
+            </summary>
+        </member>
+        <member name="P:Garnet.cluster.ReplicationManager.aofSyncSendBufferSize">
+            <summary>
+            NetworkBufferSettings for the AOF sync task clients
+            NOTE: double buffer size for send page to ensure payload (command header + page size) always fits into client buffer.
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ReplicaSyncSessionTaskStore.Dispose">
+            <summary>
+            Dispose this Replica Sync Session Task Store
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ReplicaSyncSessionTaskStore.IsFirst(Garnet.cluster.ReplicaSyncSession)">
+            <summary>
+            Check if the session is the first in the array
+            NOTE: used for leader task spawn in AttachSync
+            </summary>
+            <param name="session"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ReplicaSyncSessionTaskStore.TryAddReplicaSyncSession(Garnet.cluster.ReplicaSyncSession)">
+            <summary>
+            Add a new replica sync session
+            </summary>
+            <param name="session"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ReplicaSyncSessionTaskStore.TryAddReplicaSyncSession(System.String,System.String,Garnet.cluster.CheckpointEntry,System.Int64,System.Int64)">
+            <summary>
+            Add a new replica sync session
+            </summary>
+            <param name="replicaNodeId"></param>
+            <param name="replicaAssignedPrimaryId"></param>
+            <param name="replicaCheckpointEntry"></param>
+            <param name="replicaAofBeginAddress"></param>
+            <param name="replicaAofTailAddress"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ReplicaSyncSessionTaskStore.TryGetSession(System.String,Garnet.cluster.ReplicaSyncSession@)">
+            <summary>
+            Get session associated with replica sync session
+            </summary>
+            <param name="remoteNodeId"></param>
+            <param name="session"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ReplicaSyncSessionTaskStore.Clear">
+            <summary>
+            Clear references to task store
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Garnet.cluster.RecoveryStatus">
+            <summary>
+            Recovery status
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.RecoveryStatus.NoRecovery">
+            <summary>
+            No recovery
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.RecoveryStatus.InitializeRecover">
+            <summary>
+            Recovery at initialization
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.RecoveryStatus.ClusterReplicate">
+            <summary>
+            Recovery at cluster replicate
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.RecoveryStatus.ClusterFailover">
+            <summary>
+            Recovery at cluster failover
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.RecoveryStatus.ReplicaOfNoOne">
+            <summary>
+            Recovery at replica of no one
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.RecoveryStatus.CheckpointRecoveredAtReplica">
+            <summary>
+            Replica has recovered the checkpoint after signal from primary
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.RecoveryStatus.ReadRole">
+            <summary>
+            Need to ensure a node does not change its role during a commit or checkpoint
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ReceiveCheckpointHandler.ProcessFileSegments(System.Int32,System.Guid,Garnet.cluster.CheckpointFileType,System.Int64,System.ReadOnlySpan{System.Byte})">
+            <summary>
+            Process file segments send from primary
+            </summary>
+            <param name="token"></param>
+            <param name="type"></param>
+            <param name="startAddress"></param>
+            <param name="data"></param>
+            <param name="segmentId"></param>
+        </member>
+        <member name="M:Garnet.cluster.ReceiveCheckpointHandler.WriteInto(Tsavorite.core.IDevice,System.UInt64,System.ReadOnlySpan{System.Byte},System.Int32,System.Int32)">
+            <summary>
+            Note: pads the bytes with zeros to achieve sector alignment
+            </summary>
+            <param name="device"></param>
+            <param name="segmentId"></param>
+            <param name="address"></param>
+            <param name="buffer"></param>
+            <param name="size"></param>
+        </member>
+        <member name="T:Garnet.cluster.Server.Replication.ReplicateSyncOptions">
+            <summary>
+            Holds options for initiating a replica sync between the current node and another node.
+            </summary>
+            <param name="NodeId">Id of node to replicate.</param>
+            <param name="Background">If sync should occur on a background task.</param>
+            <param name="Force">Force adding the current node as a Replica of <paramref name="NodeId"/>.  If <paramref name="TryAddReplica"/> is false, this is ignored.</param>
+            <param name="TryAddReplica">Try to add the current node as a Replica of <paramref name="NodeId"/>.  If <paramref name="Force"/> is false, this can fail.</param>
+            <param name="AllowReplicaResetOnFailure">If sync fails, reset the current node to a Primary.</param>
+            <param name="UpgradeLock">If set, a <see cref="F:Garnet.cluster.RecoveryStatus.ReadRole"/> read lock can be upgraded to a write lock.  After sync, the lock will be reset to a read lock.</param>
+        </member>
+        <member name="M:Garnet.cluster.Server.Replication.ReplicateSyncOptions.#ctor(System.String,System.Boolean,System.Boolean,System.Boolean,System.Boolean,System.Boolean)">
+            <summary>
+            Holds options for initiating a replica sync between the current node and another node.
+            </summary>
+            <param name="NodeId">Id of node to replicate.</param>
+            <param name="Background">If sync should occur on a background task.</param>
+            <param name="Force">Force adding the current node as a Replica of <paramref name="NodeId"/>.  If <paramref name="TryAddReplica"/> is false, this is ignored.</param>
+            <param name="TryAddReplica">Try to add the current node as a Replica of <paramref name="NodeId"/>.  If <paramref name="Force"/> is false, this can fail.</param>
+            <param name="AllowReplicaResetOnFailure">If sync fails, reset the current node to a Primary.</param>
+            <param name="UpgradeLock">If set, a <see cref="F:Garnet.cluster.RecoveryStatus.ReadRole"/> read lock can be upgraded to a write lock.  After sync, the lock will be reset to a read lock.</param>
+        </member>
+        <member name="P:Garnet.cluster.Server.Replication.ReplicateSyncOptions.NodeId">
+            <summary>Id of node to replicate.</summary>
+        </member>
+        <member name="P:Garnet.cluster.Server.Replication.ReplicateSyncOptions.Background">
+            <summary>If sync should occur on a background task.</summary>
+        </member>
+        <member name="P:Garnet.cluster.Server.Replication.ReplicateSyncOptions.Force">
+            <summary>Force adding the current node as a Replica of <paramref name="NodeId"/>.  If <paramref name="TryAddReplica"/> is false, this is ignored.</summary>
+        </member>
+        <member name="P:Garnet.cluster.Server.Replication.ReplicateSyncOptions.TryAddReplica">
+            <summary>Try to add the current node as a Replica of <paramref name="NodeId"/>.  If <paramref name="Force"/> is false, this can fail.</summary>
+        </member>
+        <member name="P:Garnet.cluster.Server.Replication.ReplicateSyncOptions.AllowReplicaResetOnFailure">
+            <summary>If sync fails, reset the current node to a Primary.</summary>
+        </member>
+        <member name="P:Garnet.cluster.Server.Replication.ReplicateSyncOptions.UpgradeLock">
+            <summary>If set, a <see cref="F:Garnet.cluster.RecoveryStatus.ReadRole"/> read lock can be upgraded to a write lock.  After sync, the lock will be reset to a read lock.</summary>
+        </member>
+        <member name="M:Garnet.cluster.SyncMetadataLoggingExtensions.LogSyncMetadata(Microsoft.Extensions.Logging.ILogger,Microsoft.Extensions.Logging.LogLevel,System.String,Garnet.cluster.SyncMetadata)">
+            <summary>
+            Log sync metadata
+            </summary>
+            <param name="log"></param>
+            <param name="logLevel"></param>
+            <param name="msg"></param>
+            <param name="syncMetadata"></param>
+        </member>
+        <member name="M:Garnet.cluster.SyncMetadataLoggingExtensions.LogSyncMetadata(Microsoft.Extensions.Logging.ILogger,Microsoft.Extensions.Logging.LogLevel,System.String,Garnet.cluster.SyncMetadata,Garnet.cluster.SyncMetadata)">
+            <summary>
+            Log sync metadata
+            </summary>
+            <param name="log"></param>
+            <param name="logLevel"></param>
+            <param name="msg"></param>
+            <param name="origin"></param>
+            <param name="local"></param>
+        </member>
+        <member name="T:Garnet.cluster.NodeRole">
+            <summary>
+            NodeRole identifier
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.NodeRole.PRIMARY">
+            <summary>
+            PRIMARY Role identifier
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.NodeRole.REPLICA">
+            <summary>
+            REPLICA Role identifier
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.NodeRole.UNASSIGNED">
+            <summary>
+            UNASSIGNED Role identifier
+            </summary>
+        </member>
+        <member name="T:Garnet.cluster.Worker">
+            <summary>
+            Cluster worker definition
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.Worker.Nodeid">
+            <summary>
+            Unique node ID
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.Worker.Address">
+            <summary>
+            IP address
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.Worker.Port">
+            <summary>
+            Port
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.Worker.ConfigEpoch">
+            <summary>
+            Configuration epoch.
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.Worker.Role">
+            <summary>
+            Role of node (i.e 0: primary 1: replica).
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.Worker.ReplicaOfNodeId">
+            <summary>
+            Node ID that this node is replicating (i.e. primary id).
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.Worker.ReplicationOffset">
+            <summary>
+            Replication offset (readonly value for information only)
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.Worker.hostname">
+            <summary>
+            Hostname of this instance
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.Worker.ToString">
+            <summary>
+            ToString
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Garnet.cluster.SessionParseStateExtensions">
+            <summary>
+            Extension methods for <see cref="T:Garnet.server.SessionParseState"/>.
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.SessionParseStateExtensions.TryGetSlotState(Garnet.server.SessionParseState,System.Int32,Garnet.cluster.SlotState@)">
+            <summary>
+            Parse slot state from parse state at specified index
+            </summary>
+            <param name="parseState">The parse state</param>
+            <param name="idx">The argument index</param>
+            <param name="value">Parsed value</param>
+            <returns>True if value parsed successfully</returns>
+        </member>
+        <member name="M:Garnet.cluster.SessionParseStateExtensions.TryGetFailoverOption(Garnet.server.SessionParseState,System.Int32,Garnet.common.FailoverOption@)">
+            <summary>
+            Parse failover option from parse state at specified index
+            </summary>
+            <param name="parseState">The parse state</param>
+            <param name="idx">The argument index</param>
+            <param name="value">Parsed value</param>
+            <returns>True if value parsed successfully</returns>
+        </member>
+        <member name="T:Garnet.cluster.ClusterCommandInfo">
+            <summary>
+            Info on what cluster commands is supported
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ClusterCommandInfo.GetClusterCommands">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Garnet.cluster.ClusterSession">
+            <summary>
+            Server session for RESP protocol - cluster commands are in this file
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.TryParseSlots(System.Int32,System.Collections.Generic.HashSet{System.Int32}@,System.ReadOnlySpan{System.Byte}@,System.Boolean)">
+            <summary>
+            Try to parse slots
+            </summary>
+            <param name="startIdx"></param>
+            <param name="slots"></param>
+            <param name="errorMessage">
+            The ASCII encoded error message if there one of the following conditions is true
+            <list type="bullet">
+              <item>If the same slot is specified multiple times.</item>
+              <item>If the slot is out of range.</item>
+            </list>
+            otherwise <see langword="default" />
+            </param>
+            <param name="range"></param>
+            <returns>A boolean indicating that there was error in parsing of the arguments.</returns>
+            <remarks>
+            The error handling is little special for this method because we need to drain all arguments even in the case of error.
+            <para/>
+            The <paramref name="errorMessage"/> will only have a generic error message set in the event of duplicate or out of range slot. 
+            The method will still return <see langword="true" /> in case of such error.
+            </remarks>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.ProcessClusterCommands(Garnet.server.RespCommand,System.Boolean@)">
+            <summary>
+            Handle cluster subcommands.
+            </summary>
+            <param name="command">Subcommand to execute.</param>
+            <param name="invalidParameters">True if number of parameters is invalid</param>
+            <returns>True if command is fully processed, false if more processing is needed.</returns>
+        </member>
+        <member name="F:Garnet.cluster.ClusterSession.readWriteSession">
+            <summary>
+            Indicates if this is a session that allows for reads and writes
+            </summary>
+        </member>
+        <member name="P:Garnet.cluster.ClusterSession.IsReplicating">
+            <inheritdoc/>
+        </member>
+        <member name="P:Garnet.cluster.ClusterSession.Server">
+            <inheritdoc/>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.SetUserHandle(Garnet.server.ACL.UserHandle)">
+            <summary>
+            Updates the user currently authenticated in the session.
+            </summary>
+            <param name="userHandle"><see cref="T:Garnet.server.ACL.UserHandle"/> to set as authenticated user.</param>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.UnsafeBumpAndWaitForEpochTransition">
+            <summary>
+            Release epoch, wait for config transition and re-acquire the epoch
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterBumpEpoch(System.Boolean@)">
+            <summary>
+            Implements CLUSTER BUMPEPOCH command
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterForget(System.Boolean@)">
+            <summary>
+            Implements CLUSTER FORGET command
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterInfo(System.Boolean@)">
+            <summary>
+            Implements CLUSTER INFO command
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterHelp(System.Boolean@)">
+            <summary>
+            Implements CLUSTER HELP command
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterMeet(System.Boolean@)">
+            <summary>
+            Implements CLUSTER MEET command
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterMyId(System.Boolean@)">
+            <summary>
+            Implements CLUSTER MYID command
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterMyParentId(System.Boolean@)">
+            <summary>
+            Implements CLUSTER MYPARENTID command
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterEndpoint(System.Boolean@)">
+            <summary>
+            Implements CLUSTER ENDPOINT command
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterNodes(System.Boolean@)">
+            <summary>
+            Implements CLUSTER NODES command
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterSetConfigEpoch(System.Boolean@)">
+            <summary>
+            Implements CLUSTER SET-CONFIG-EPOCH command
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterShards(System.Boolean@)">
+            <summary>
+            Implements CLUSTER SHARDS command
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterGossip(System.Boolean@)">
+            <summary>
+            Implements CLUSTER GOSSIP command
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterReset(System.Boolean@)">
+            <summary>
+            Implements CLUSTER RESET command
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterPublish(System.Boolean@)">
+            <summary>
+            Implement CLUSTER PUBLISH command
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterFailover(System.Boolean@)">
+            <summary>
+            Implements CLUSTER FAILOVER command
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterFailStopWrites(System.Boolean@)">
+            <summary>
+            Implements CLUSTER failstopwrites (only for internode use)
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterFailReplicationOffset(System.Boolean@)">
+            <summary>
+            Implements CLUSTER failreplicationoffset (only for internode use)
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.TrackImportProgress(System.Int32,System.Boolean,System.Boolean)">
+            <summary>
+            Logging of migrate session status
+            </summary>
+            <param name="keyCount"></param>
+            <param name="isMainStore"></param>
+            <param name="completed"></param>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterMigrate(System.Boolean@)">
+            <summary>
+            Implements CLUSTER MIGRATE command (only for internode use)
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+            <exception cref="T:System.Exception"></exception>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterMTasks(System.Boolean@)">
+            <summary>
+            Implements CLUSTER MTASKS command
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterReplicas(System.Boolean@)">
+            <summary>
+            Implements CLUSTER REPLICAS command
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterReplicate(System.Boolean@)">
+            <summary>
+            Implements CLUSTER REPLICATE command
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterAOFSync(System.Boolean@)">
+            <summary>
+            Implements CLUSTER aofsync command (only for internode use)
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterAppendLog(System.Boolean@)">
+            <summary>
+            Implements CLUSTER appendlog command (only for internode use)
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterInitiateReplicaSync(System.Boolean@)">
+            <summary>
+            Implements CLUSTER initiate_replica_sync command (only for internode use)
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterSendCheckpointMetadata(System.Boolean@)">
+            <summary>
+            Implement CLUSTER send_ckpt_metadata command (only for internode use)
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterSendCheckpointFileSegment(System.Boolean@)">
+            <summary>
+            Implements CLUSTER send_ckpt_file_segment command (only for internode use)
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterBeginReplicaRecover(System.Boolean@)">
+            <summary>
+            Implements CLUSTER begin_replica_recover (only for internode use)
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterAttachSync(System.Boolean@)">
+            <summary>
+            Implements CLUSTER attach_sync command (only for internode use)
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterSync(System.Boolean@)">
+            <summary>
+            Implements CLUSTER SYNC
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterFlushAll(System.Boolean@)">
+            <summary>
+            Implements CLUSTER FLUSHALL
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterAddSlots(System.Boolean@)">
+            <summary>
+            Implements CLUSTER ADDSLOTS command
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterAddSlotsRange(System.Boolean@)">
+            <summary>
+            Implements CLUSTER ADDSLOTSRANGE command
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterBanList(System.Boolean@)">
+            <summary>
+            Implements CLUSTER BANLIST command
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterCountKeysInSlot(System.Boolean@)">
+            <summary>
+            Implements CLUSTER COUNTKEYSINSLOT command
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterDelSlots(System.Boolean@)">
+            <summary>
+            Implements CLUSTER DELSLOTS command
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterDelSlotsRange(System.Boolean@)">
+            <summary>
+            Implements CLUSTER DELSLOTSRANGE command
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterDelKeysInSlot(System.Boolean@)">
+            <summary>
+            Implements CLUSTER DELKEYSINSLOT command
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterDelKeysInSlotRange(System.Boolean@)">
+            <summary>
+            Implements CLUSTER DELKEYSINSLOTRANGE command
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterGetKeysInSlot(System.Boolean@)">
+            <summary>
+            Implements CLUSTER GETKEYSINSLOT command
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterKeySlot(System.Boolean@)">
+            <summary>
+            Implements CLUSTER KEYSLOT
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterSetSlot(System.Boolean@)">
+            <summary>
+            Implements CLUSTER SETSLOT command
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterSetSlotsRange(System.Boolean@)">
+            <summary>
+            Implements CLUSTER SETSLOTSRANGE command
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterSlots(System.Boolean@)">
+            <summary>
+            Implements CLUSTER SLOTS command
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkClusterSlotState(System.Boolean@)">
+            <summary>
+            Implements CLUSTER SLOTSTATE
+            </summary>
+            <param name="invalidParameters"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.ResetCachedSlotVerificationResult">
+            <summary>
+            Reset cache slot verification result
+            </summary>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkIterativeSlotVerify(Garnet.server.ArgSlice,System.Boolean,System.Byte)">
+            <summary>
+            Iterative verify slot for a single key
+            </summary>
+            <param name="keySlice"></param>
+            <param name="readOnly"></param>
+            <param name="SessionAsking"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.WriteCachedSlotVerificationMessage(Garnet.common.MemoryResult{System.Byte}@)">
+            <summary>
+            Write cached slot verification message to output
+            </summary>
+            <param name="output"></param>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.Redirect(System.UInt16,Garnet.cluster.ClusterConfig)">
+            <summary>
+            Redirect message for readonly operation COUNTKEYS GETKEYSINSLOT
+            </summary>
+            <param name="slot"></param>
+            <param name="config"></param>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.GetSlotVerificationMessage(Garnet.cluster.ClusterConfig,Garnet.cluster.ClusterSlotVerificationResult)">
+            <summary>
+            Get slot verification message
+            </summary>
+            <param name="config"></param>
+            <param name="vres"></param>
+            <returns></returns>
+            <exception cref="T:System.Exception"></exception>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.WriteClusterSlotVerificationMessage(Garnet.cluster.ClusterConfig,Garnet.cluster.ClusterSlotVerificationResult,System.Byte*@,System.Byte*@)">
+            <summary>
+            Write slot verification message to output wire
+            </summary>
+            <param name="config"></param>
+            <param name="vres"></param>
+            <param name="dcurr"></param>
+            <param name="dend"></param>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkKeyArraySlotVerify(System.Span{Garnet.server.ArgSlice},System.Boolean,System.Byte,System.Byte*@,System.Byte*@,System.Int32)">
+            <summary>
+            Check if read/write is permitted on an array of keys and generate appropriate resp response.
+            </summary>
+            <param name="keys"></param>
+            <param name="readOnly"></param>
+            <param name="sessionAsking"></param>
+            <param name="dcurr"></param>
+            <param name="dend"></param>
+            <param name="count"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkMultiKeySlotVerify(Garnet.server.SessionParseState@,Garnet.server.ClusterSlotVerificationInput@,System.Byte*@,System.Byte*@)">
+            <summary>
+            Verify multi-key slot ownership
+            </summary>
+            <param name="parseState"></param>
+            <param name="csvi"></param>
+            <param name="dcurr"></param>
+            <param name="dend"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Garnet.cluster.ClusterSession.NetworkMultiKeySlotVerifyNoResponse(Garnet.server.SessionParseState@,Garnet.server.ClusterSlotVerificationInput@,System.Byte*@,System.Byte*@)">
+            <summary>
+            Verify multi-key slot ownership without generating a response
+            </summary>
+            <param name="parseState"></param>
+            <param name="csvi"></param>
+            <param name="dcurr"></param>
+            <param name="dend"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Garnet.cluster.SlotVerifiedState">
+            <summary>
+            SlotVerifiedState
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.SlotVerifiedState.OK">
+            <summary>
+            OK to server request
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.SlotVerifiedState.CLUSTERDOWN">
+            <summary>
+            Slot down
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.SlotVerifiedState.MOVED">
+            <summary>
+            Slot moved to remote node
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.SlotVerifiedState.ASK">
+            <summary>
+            Ask target node
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.SlotVerifiedState.CROSSSLOT">
+            <summary>
+            Crossslot operation
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.SlotVerifiedState.TRYAGAIN">
+            <summary>
+            Used for multi-key operations referring to a collection of keys some of which have migrated
+            </summary>
+        </member>
+        <member name="T:Garnet.cluster.TransferOption">
+            <summary>
+            Transfer option supported by MIGRATE
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.TransferOption.KEYS">
+            <summary>
+            Transfer all provided keys
+            </summary>
+        </member>
+        <member name="F:Garnet.cluster.TransferOption.SLOTS">
+            <summary>
+            Transfer all keys in a single slot
+            </summary>
+        </member>
+    </members>
+</doc>

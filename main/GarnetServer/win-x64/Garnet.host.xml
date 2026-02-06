@@ -1,0 +1,778 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Garnet.host</name>
+    </assembly>
+    <members>
+        <member name="T:Garnet.CommandLineBooleanOption">
+            <summary>
+            Enum to specify boolean variable over command line.
+            </summary>
+        </member>
+        <member name="T:Garnet.CompactObjectJsonConverter`1">
+            <summary>
+            Serializes an object into a JSON stream while skipping default values
+            defined by specified object in the constructor.
+            </summary>
+            <typeparam name="T">Destination object type</typeparam>
+        </member>
+        <member name="M:Garnet.CompactObjectJsonConverter`1.#ctor(`0,System.Type[],System.Type[])">
+            <summary>
+            Creates a converter that serializes an object to json while skipping default values
+            </summary>
+            <param name="defaultInstance">The object containing default values to skip</param>
+            <param name="includeAttributes">Attributes marking properties to include in serialization (empty of all included)</param>
+            <param name="excludeAttributes">Attributes marking properties to exclude in serialization (empty if none excluded)</param>
+        </member>
+        <member name="M:Garnet.CompactObjectJsonConverter`1.Read(System.Text.Json.Utf8JsonReader@,System.Type,System.Text.Json.JsonSerializerOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.CompactObjectJsonConverter`1.Write(System.Text.Json.Utf8JsonWriter,`0,System.Text.Json.JsonSerializerOptions)">
+            <inheritdoc />
+        </member>
+        <member name="T:Garnet.IConfigProvider">
+            <summary>
+            Interface for importing / exporting options from different configuration file types
+            </summary>
+        </member>
+        <member name="P:Garnet.IConfigProvider.DefaultOptions">
+            <summary>
+            Object containing default configuration values
+            </summary>
+        </member>
+        <member name="M:Garnet.IConfigProvider.TryImportOptions(System.String,Garnet.common.IStreamProvider,Garnet.Options,Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            Import an Options object from path using a stream provider
+            </summary>
+            <param name="path">Path to the config file containing the serialized object</param>
+            <param name="streamProvider">Stream provider to use when reading from the path</param>
+            <param name="options">Options object to populate with deserialized options</param>
+            <param name="logger">Logger</param>
+            <returns>True if import succeeded</returns>
+        </member>
+        <member name="M:Garnet.IConfigProvider.TryExportOptions(System.String,Garnet.common.IStreamProvider,Garnet.Options,Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            Export an Options object to path using a stream provider
+            </summary>
+            <param name="path">Path to the config file to write into</param>
+            <param name="streamProvider">Stream provider to use when writing to the path</param>
+            <param name="options">Options object to serialize</param>
+            <param name="logger">Logger</param>
+            <returns>True if export succeeded</returns>
+        </member>
+        <member name="M:Garnet.IConfigProvider.TrySerializeOptions(Garnet.Options,System.Boolean,Microsoft.Extensions.Logging.ILogger,System.String@)">
+            <summary>
+            Serialize an Options object
+            </summary>
+            <param name="options">Options object to serialize</param>
+            <param name="skipDefaultOptions">If true, serializer should not serialize properties with default values</param>
+            <param name="logger">Logger</param>
+            <param name="value">The serialized object</param>
+            <returns>True if serialization succeeded</returns>
+        </member>
+        <member name="M:Garnet.IConfigProvider.TryDeserializeOptions(System.String,Microsoft.Extensions.Logging.ILogger,Garnet.Options@)">
+            <summary>
+            Deserialize an Options object
+            </summary>
+            <param name="value">The serialized object</param>
+            <param name="logger">Logger</param>
+            <param name="options">The deserialized object</param>
+            <returns>True if deserialization succeeded</returns>
+        </member>
+        <member name="M:Garnet.IConfigProvider.TryDeserializeOptions(Garnet.Options,System.String,Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            Deserialize an Options object
+            </summary>
+            <param name="options">Options object to populate with deserialized options</param>
+            <param name="value">The serialized object</param>
+            <param name="logger">Logger</param>
+            <returns>True if deserialization succeeded</returns>
+        </member>
+        <member name="M:Garnet.ConfigProviderFactory.GetConfigProvider(Garnet.ConfigFileType,Garnet.Options)">
+            <summary>
+            Get a IConfigProvider instance based on its configuration file type
+            </summary>
+            <param name="fileType">The configuration file type</param>
+            <param name="defaultOptions">Options object containing default configuration values (used only when calling TrySerializeOptions with skipDefaultOptions)</param>
+            <returns></returns>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
+        <member name="T:Garnet.GarnetConfigProvider">
+            <summary>
+            Config provider for a garnet.conf file (JSON serialized Options object)
+            </summary>
+        </member>
+        <member name="T:Garnet.RedisConfigProvider">
+            <summary>
+            Config provider for a redis.conf file
+            </summary>
+        </member>
+        <member name="T:Garnet.CompactOptionsJsonConverter">
+            <summary>
+            Converter for serializing Options object while skipping default values
+            Converter will serialize properties marked by the OptionAttribute and exclude options marked by the HiddenOptionAttribute.
+            </summary>
+        </member>
+        <member name="M:Garnet.CompactOptionsJsonConverter.#ctor(Garnet.Options)">
+            <inheritdoc />
+        </member>
+        <member name="T:Garnet.IGarnetCustomTransformer`2">
+            <summary>
+            Defines an interface for custom transformers that transform a RedisOptions property value to an Options property value and vice versa
+            The custom transformer is specified by the RedisOptionAttribute decorating the RedisOptions property
+            </summary>
+            <typeparam name="TIn">RedisOptions property value type</typeparam>
+            <typeparam name="TOut">Options property value type</typeparam>
+        </member>
+        <member name="M:Garnet.IGarnetCustomTransformer`2.Transform(`0,`1@,System.String@)">
+            <summary>
+            Transforms a RedisOptions property value to an Options property value
+            </summary>
+            <param name="input">RedisOptions property value</param>
+            <param name="output">Options property value</param>
+            <param name="errorMessage">Error message, empty if no error occurred</param>
+            <returns>True if transform successful</returns>
+        </member>
+        <member name="M:Garnet.IGarnetCustomTransformer`2.TransformBack(`1,`0@,System.String@)">
+            <summary>
+            Transforms an Options property value back to a RedisOptions property value
+            </summary>
+            <param name="input">Options property value</param>
+            <param name="output">RedisOptions property value</param>
+            <param name="errorMessage">Error message, empty if no error occurred</param>
+            <returns>True if transform successful</returns>
+        </member>
+        <member name="T:Garnet.FileToContentTransformer">
+            <summary>
+            Transforms a string containing a file path to a string containing the contents of the file in the specified path
+            </summary>
+        </member>
+        <member name="T:Garnet.ArrayToFirstItemTransformer`1">
+            <summary>
+            Transforms an array of type T to an object of type T by taking only the first element in the array
+            </summary>
+            <typeparam name="T">The type of the array</typeparam>
+        </member>
+        <member name="T:Garnet.NonDefaultObjectToBooleanTransformer`1">
+            <summary>
+            Transforms an object of type T to a nullable boolean by setting boolean to True if object is non-default, and False otherwise
+            </summary>
+            <typeparam name="T">The type of the input object</typeparam>
+        </member>
+        <member name="T:Garnet.Options">
+            <summary>
+            This class contains all configurable settings for Garnet
+            In order to add a new configurable setting:
+            1. Add a new property and decorate it with an OptionAttribute.
+            2. If needed, decorate with a new or existing ValidationAttribute from OptionsValidators.cs
+            3. Add a default value for the new property in defaults.conf (do NOT use the OptionAttribute.Default property, it can cause unexpected behavior)
+            4. If needed, add a matching property in Garnet.server/Servers/GarnetServerOptions.cs and initialize it in Options.GetServerOptions()
+            5. If new setting has a matching setting in redis.conf, add the matching setting to RedisOptions.cs
+            </summary>
+        </member>
+        <member name="P:Garnet.Options.UnparsedArguments">
+            <summary>
+            This property contains all arguments that were not parsed by the command line argument parser
+            </summary>
+        </member>
+        <member name="P:Garnet.Options.runtimeLogger">
+            <summary>
+            Logger instance used for runtime option validation
+            </summary>
+        </member>
+        <member name="M:Garnet.Options.IsValid(System.Collections.Generic.List{System.String}@,Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            Check the validity of all options with an explicit ValidationAttribute
+            </summary>
+            <param name="invalidOptions">List of invalid options</param>
+            <param name="logger">Logger</param>
+            <returns>True if all property values are valid</returns>
+        </member>
+        <member name="M:Garnet.Options.Clone">
+            <summary>
+            Creates a clone of the current Options object
+            This method creates a shallow copy of the values of properties decorated with the OptionAttribute
+            For IEnumerable types it creates a list containing a shallow copy of all the values in the original IEnumerable
+            </summary>
+            <returns>The cloned object</returns>
+        </member>
+        <member name="T:Garnet.ConfigFileType">
+            <summary>
+            Current supported configuration types
+            </summary>
+        </member>
+        <member name="T:Garnet.HiddenOptionAttribute">
+            <summary>
+            This attribute ensures that a decorated configuration option is not dumped into the log
+            when the DumpConfig flag is set.
+            </summary>
+        </member>
+        <member name="T:Garnet.OptionValidationAttribute">
+            <summary>
+            Basic validation logic for Options property
+            Valid if value is required and has value or if value is not required
+            </summary>
+        </member>
+        <member name="P:Garnet.OptionValidationAttribute.Logger">
+            <summary>
+            Logger to use for validation
+            </summary>
+        </member>
+        <member name="F:Garnet.OptionValidationAttribute.IsRequired">
+            <summary>
+            Determines if current property is required to have a value
+            </summary>
+        </member>
+        <member name="M:Garnet.OptionValidationAttribute.GetDefault(System.Type)">
+            <summary>
+            Determine object default value at runtime
+            </summary>
+        </member>
+        <member name="M:Garnet.OptionValidationAttribute.IsValid(System.Object,System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Checks if current property is valid by checking if value is required and not default or if value is not required
+            </summary>
+            <param name="value">Property value to validate</param>
+            <param name="validationContext">Current validation context</param>
+            <returns>Validation result</returns>
+        </member>
+        <member name="M:Garnet.OptionValidationAttribute.TryInitialValidation``1(System.Object,System.ComponentModel.DataAnnotations.ValidationContext,System.ComponentModel.DataAnnotations.ValidationResult@,``0@)">
+            <summary>
+            Initial validation logic to check if further validation can be skipped -
+            Valid result if value is not required value is default
+            Invalid result if value is not of the expected type
+            If neither conditions are true, further validation is required
+            </summary>
+            <typeparam name="T">Type expected by the validator</typeparam>
+            <param name="value">Value to validate</param>
+            <param name="validationContext">Validation context</param>
+            <param name="validationResult">Validation result - only set if initial validation suffices</param>
+            <param name="convertedValue">Value converted to type T</param>
+            <returns>True if further validation can be skipped and validation result is set</returns>
+        </member>
+        <member name="T:Garnet.DirectoryPathValidationAttribute">
+            <summary>
+            Validation logic for path of type string representing a local directory
+            </summary>
+        </member>
+        <member name="F:Garnet.DirectoryPathValidationAttribute._mustExist">
+            <summary>
+            Determines if current directory must exist
+            </summary>
+        </member>
+        <member name="M:Garnet.DirectoryPathValidationAttribute.IsValid(System.Object,System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Directory validation logic, checks access to directory by instantiating a DirectoryInfo object
+            Invalid if exception thrown during DirectoryInfo instantiation or if directory must exist and doesn't (not applicable for Azure Storage)
+            </summary>
+            <param name="value">Path to the local directory</param>
+            <param name="validationContext">Validation context</param>
+            <returns></returns>
+        </member>
+        <member name="T:Garnet.DirectoryPathsValidationAttribute">
+            <summary>
+            Validation logic for multiple paths of type string representing local directories
+            </summary>
+        </member>
+        <member name="F:Garnet.DirectoryPathsValidationAttribute._mustExist">
+            <summary>
+            Determines if all directories must exist
+            </summary>
+        </member>
+        <member name="M:Garnet.DirectoryPathsValidationAttribute.IsValid(System.Object,System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Directories validation logic, calls DirectoryPathValidationAttribute for each directory
+            </summary>
+            <param name="value">Paths to the local directories</param>
+            <param name="validationContext">Validation context</param>
+            <returns></returns>
+        </member>
+        <member name="T:Garnet.FilePathValidationAttribute">
+            <summary>
+            Validation logic for path of type string representing a local file
+            </summary>
+        </member>
+        <member name="F:Garnet.FilePathValidationAttribute._fileMustExist">
+            <summary>
+            Determines if current file must exist
+            </summary>
+        </member>
+        <member name="F:Garnet.FilePathValidationAttribute._directoryMustExist">
+            <summary>
+            Determines if current directory must exist
+            </summary>
+        </member>
+        <member name="F:Garnet.FilePathValidationAttribute._acceptedFileExtensions">
+            <summary>
+            Determines which file extensions are expected for this file
+            </summary>
+        </member>
+        <member name="M:Garnet.FilePathValidationAttribute.IsValid(System.Object,System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            File validation logic, checks access to file by instantiating a FileInfo object
+            Invalid if exception thrown during FileInfo instantiation or if directory must exist and doesn't or if file must exist and doesn't (not applicable for Azure Storage)
+            </summary>
+            <param name="value">Path to the local file</param>
+            <param name="validationContext">Validation context</param>
+        </member>
+        <member name="T:Garnet.IpAddressValidationAttribute">
+            <summary>
+            Validation logic for a string representing an IP address (either IPv4 or IPv6)
+            </summary>
+        </member>
+        <member name="M:Garnet.IpAddressValidationAttribute.IsValid(System.Object,System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            IP validation logic, checks if string matches either IPv4 or IPv6 regex patterns
+            </summary>
+            <param name="value">String containing IP address</param>
+            <param name="validationContext">Validation Logic</param>
+            <returns></returns>
+        </member>
+        <member name="T:Garnet.MemorySizeValidationAttribute">
+            <summary>
+            Validation logic for a string representing a memory size (1k, 1kb, 5M, 5Mb, 10g, 10GB etc.)
+            </summary>
+        </member>
+        <member name="M:Garnet.MemorySizeValidationAttribute.IsValid(System.Object,System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Memory size validation logic, checks if string matches memory size regex pattern
+            </summary>
+            <param name="value">String containing memory size</param>
+            <param name="validationContext">Validation context</param>
+            <returns></returns>
+        </member>
+        <member name="T:Garnet.PercentageValidationAttribute">
+            <summary>
+            Validation logic for an integer representing a percentage (range between 0 and 100)
+            </summary>
+        </member>
+        <member name="T:Garnet.RangeValidationAttribute">
+            <summary>
+            Validation logic for an object of specified type that implements IComparable, checks if value is contained in a specified range
+            </summary>
+        </member>
+        <member name="M:Garnet.RangeValidationAttribute.IsValid(System.Object,System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Integer validation logic, valid if integer is contained in a specified range
+            </summary>
+            <param name="value">Integer value</param>
+            <param name="validationContext">Validation context</param>
+            <returns></returns>
+        </member>
+        <member name="T:Garnet.IntRangeValidationAttribute">
+            <summary>
+            Validation logic for an integer, checks if integer is contained in a specified range
+            </summary>
+        </member>
+        <member name="T:Garnet.DoubleRangeValidationAttribute">
+            <summary>
+            Validation logic for an double, checks if double is contained in a specified range
+            </summary>
+        </member>
+        <member name="T:Garnet.LogDirValidationAttribute">
+            <summary>
+            Validation logic for Log Directory
+            </summary>
+        </member>
+        <member name="M:Garnet.LogDirValidationAttribute.IsValid(System.Object,System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validation logic for Log Directory, valid if <see cref="P:Garnet.Options.DeviceType"/> is AzureStorage or if <see cref="P:Garnet.Options.EnableStorageTier"/> is not specified in parent Options object
+            If neither applies, reverts to <see cref="T:Garnet.OptionValidationAttribute"/> validation
+            </summary>
+            <param name="value">Value of Log Directory</param>
+            <param name="validationContext">Validation context</param>
+            <returns>Validation result</returns>
+        </member>
+        <member name="T:Garnet.CheckpointDirValidationAttribute">
+            <summary>
+            Validation logic for Checkpoint Directory
+            </summary>
+        </member>
+        <member name="M:Garnet.CheckpointDirValidationAttribute.IsValid(System.Object,System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validation logic for <see cref="P:Garnet.Options.CheckpointDir"/>, valid if <see cref="P:Garnet.Options.DeviceType"/> is AzureStorage in parent Options object
+            If not, reverts to <see cref="T:Garnet.OptionValidationAttribute"/> validation
+            </summary>
+            <param name="value">Value of Log Directory</param>
+            <param name="validationContext">Validation context</param>
+            <returns>Validation result</returns>
+        </member>
+        <member name="T:Garnet.CertFileValidationAttribute">
+            <summary>
+            Validation logic for <see cref="P:Garnet.Options.CertFileName"/>
+            </summary>
+        </member>
+        <member name="M:Garnet.CertFileValidationAttribute.IsValid(System.Object,System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validation logic for CertFileName, valid if EnableTLS is false in parent Options object
+            If not, reverts to FilePathValidationAttribute validation
+            </summary>
+            <param name="value">Value of CertFileName</param>
+            <param name="validationContext">Validation context</param>
+            <returns>Validation result</returns>
+        </member>
+        <member name="T:Garnet.ForbiddenWithOptionAttribute">
+            <summary>
+            Forbids a config option from being set if the another option has particular values.
+            </summary>
+        </member>
+        <member name="M:Garnet.ForbiddenWithOptionAttribute.IsValid(System.Object,System.ComponentModel.DataAnnotations.ValidationContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Garnet.SupportedOSValidationAttribute">
+            <summary>
+            Forbids a config option from being set if the current OS platform is not supported.
+            </summary>
+        </member>
+        <member name="M:Garnet.SupportedOSValidationAttribute.IsValid(System.Object,System.ComponentModel.DataAnnotations.ValidationContext)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Garnet.HttpsUrlValidationAttribute">
+            <summary>
+            Represents an attribute used for validating HTTPS URLs as options.
+            </summary>
+        </member>
+        <member name="M:Garnet.HttpsUrlValidationAttribute.IsValid(System.Object,System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            HTTPS URLs validation logic, checks if string is a valid HTTPS URL.
+            </summary>
+            <param name="value">URL string</param>
+            <param name="validationContext">Validation Logic</param>
+            <returns>Validation result</returns>
+        </member>
+        <member name="T:Garnet.PopulateObjectJsonConverter`1">
+            <summary>
+            Deserializes a JSON-serialized stream into an existing object
+            </summary>
+            <typeparam name="T">Destination object type</typeparam>
+        </member>
+        <member name="M:Garnet.PopulateObjectJsonConverter`1.#ctor(`0)">
+            <summary>
+            Create a new converter instance
+            </summary>
+            <param name="existingInstance">Instance to populate</param>
+        </member>
+        <member name="M:Garnet.PopulateObjectJsonConverter`1.Read(System.Text.Json.Utf8JsonReader@,System.Type,System.Text.Json.JsonSerializerOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.PopulateObjectJsonConverter`1.Write(System.Text.Json.Utf8JsonWriter,`0,System.Text.Json.JsonSerializerOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Garnet.RedisConfigSerializer.Deserialize(System.IO.StreamReader,Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            Deserializes a RedisOptions object from a StreamReader
+            </summary>
+            <param name="reader">The stream reader to deserialize from</param>
+            <param name="logger">Logger</param>
+            <returns>The deserialized RedisOptions object</returns>
+            <exception cref="T:Garnet.RedisSerializationException"></exception>
+        </member>
+        <member name="M:Garnet.RedisConfigSerializer.Serialize(Garnet.RedisOptions)">
+            <summary>
+            Serializes a RedisOptions object to a string
+            </summary>
+            <param name="options">The RedisOptions object to serialize</param>
+            <returns>A string containing the serialized RedisOptions object</returns>
+        </member>
+        <member name="M:Garnet.RedisConfigSerializer.TryPopulateOptions(Garnet.RedisOptions,Garnet.Options)">
+            <summary>
+            Populate Options object with properties from RedisOptions object 
+            </summary>
+            <param name="redisOptions">The RedisOptions object to populate properties from</param>
+            <param name="options">The Options object to populate</param>
+            <returns>True if succeeded</returns>
+        </member>
+        <member name="M:Garnet.RedisConfigSerializer.TryApplyTransform``3(``0,``1@,System.String@)">
+            <summary>
+            Tries to apply a custom IGarnetCustomTransformer to transform a RedisOptions property to an Options property
+            </summary>
+            <typeparam name="TIn">Type of source value</typeparam>
+            <typeparam name="TOut">Type of destination value</typeparam>
+            <typeparam name="TTransformer">Type of transformer</typeparam>
+            <param name="input">Source value</param>
+            <param name="output">Transformed source value</param>
+            <param name="errorMessage">Error message, empty if no error occurred</param>
+            <returns>True if transformed value successfully</returns>
+        </member>
+        <member name="M:Garnet.RedisConfigSerializer.TryChangeType(System.Object,System.Type,System.Type,System.Object@)">
+            <summary>
+            Tries to convert src object of type srcType to type dstType
+            </summary>
+            <param name="src">Source object to convert</param>
+            <param name="srcType">Source object type</param>
+            <param name="dstType">Converted source object type</param>
+            <param name="dst">Converted source object</param>
+            <returns>True if conversion succeeded</returns>
+        </member>
+        <member name="T:Garnet.RedisOptions">
+            <summary>
+            This class contains all redis.conf settings that have a matching configurable setting in Garnet's Options class.
+            In order to add a new redis.conf setting:
+            1. Verify that the matching Garnet setting is defined in Options.cs
+            2. If a custom type is necessary (e.g. enum), use existing or create a new one under RedisTypes.cs 
+            3. Add a new property and decorate it with an RedisOptionAttribute, pointing it to the matching Options property name.
+            4. If a type conversion is needed to convert between the Redis option and the Garnet option,
+               use existing type converters or add a new one under TypeConverters.cs
+            5. If a more complex transformer is needed to transform the Redis option and the Garnet option,
+               use existing type converters or add a new one under GarnetCustomTransformers.cs, and add its type to the RedisOptionAttribute
+            </summary>
+        </member>
+        <member name="P:Garnet.RedisOptions.TlsCertFile">
+            <summary>
+            Note: Garnet currently supports TLS using a .pfx file and passphrase, while Redis supports TLS using .crt and .key files.
+            In order to use TLS in Garnet while using redis.conf, convert your certificate to .pfx format (more details in the Security section on Garnet's website),
+            then use the .pfx file path as the `tls-cert-file` value.
+            If a passphrase was used when creating the original certificate, specify it in the `tls-key-file-pass` parameter
+            as you would in Redis (or via the `--cert-password` command line argument). When starting the server,
+            use the `--cert-subject-name` command line argument to set the certificate subject name, if applicable.
+            </summary>
+        </member>
+        <member name="T:Garnet.Option`1">
+            <summary>
+            Wrapper for each RedisOption value, we use this in order to distinguish between an unset value and a value set to default
+            i.e. if the Option object is null - the value was not set, if the underlying value is default(T), then the value was set to default(T)
+            This is required in order to determine order of precedence when setting options from multiple sources
+            </summary>
+            <typeparam name="T">The underlying type of the option</typeparam>
+        </member>
+        <member name="T:Garnet.RedisOptionAttribute">
+            <summary>
+            Attribute defining a RedisOption, must decorate each property in RedisOptions that is deserialized from a redis.conf file
+            </summary>
+        </member>
+        <member name="P:Garnet.RedisOptionAttribute.Key">
+            <summary>
+            Redis key
+            </summary>
+        </member>
+        <member name="P:Garnet.RedisOptionAttribute.GarnetOptionName">
+            <summary>
+            Matching property name in Options.cs
+            </summary>
+        </member>
+        <member name="P:Garnet.RedisOptionAttribute.GarnetCustomTransformer">
+            <summary>
+            Optional custom transformer type, to transform RedisOption property value to Options property value
+            </summary>
+        </member>
+        <member name="P:Garnet.RedisOptionAttribute.UsageWarning">
+            <summary>
+            Optional warning to user when option usage may differ from Redis
+            </summary>
+        </member>
+        <member name="M:Garnet.RedisOptionAttribute.#ctor(System.String,System.String,System.String,System.Type)">
+            <summary>
+            Defines a RedisOption
+            </summary>
+            <param name="key">Redis Key</param>
+            <param name="garnetOptionName">Matching property name in Options.cs</param>
+            <param name="usageWarning">Optional warning to user when option usage may differ from Redis</param>
+            <param name="garnetCustomTransformer">Optional custom transformer type, to transform RedisOption property value to Options property value</param>
+        </member>
+        <member name="T:Garnet.RedisConnectionProtectionOption">
+            <summary>
+            Legal values for redis.conf enable-debug-command and enable-protected-configs keys.
+            </summary>
+        </member>
+        <member name="T:Garnet.RedisTlsAuthClients">
+            <summary>
+            Legal values for redis.conf tls-auth-clients key
+            </summary>
+        </member>
+        <member name="T:Garnet.RedisLogLevel">
+            <summary>
+            Legal values for redis.conf loglevel key
+            </summary>
+        </member>
+        <member name="T:Garnet.RedisBoolean">
+            <summary>
+            Legal values for redis.conf booleans
+            </summary>
+        </member>
+        <member name="T:Garnet.RedisBooleanTypeConverter">
+            <summary>
+            Custom converter that converts between a RedisBoolean and a nullable boolean, boolean or string
+            </summary>
+        </member>
+        <member name="T:Garnet.RedisLogLevelTypeConverter">
+            <summary>
+            Custom converter that converts between a RedisLogLevel and a Microsoft.Extensions.Logging.LogLevel or string
+            </summary>
+        </member>
+        <member name="T:Garnet.RedisTlsClientsTypeConverter">
+            <summary>
+            Custom converter that converts between a RedisTlsAuthClients enum and a nullable boolean, boolean or string
+            </summary>
+        </member>
+        <member name="T:Garnet.RedisConnectionProtectionOptionConverter">
+            <summary>
+            Custom converter that converts between a RedisConnectionProtectionOption and a ConnectionProtectionOption or string
+            </summary>
+        </member>
+        <member name="T:Garnet.GarnetServer">
+            <summary>
+            Implementation Garnet server
+            </summary>
+        </member>
+        <member name="F:Garnet.GarnetServer.RedisProtocolVersion">
+            <summary>
+            Resp protocol version
+            </summary>
+        </member>
+        <member name="F:Garnet.GarnetServer.storeWrapper">
+            <summary>
+            Store and associated information used by this Garnet server
+            </summary>
+        </member>
+        <member name="F:Garnet.GarnetServer.Metrics">
+            <summary>
+            Metrics API
+            </summary>
+        </member>
+        <member name="F:Garnet.GarnetServer.Register">
+            <summary>
+            Command registration API
+            </summary>
+        </member>
+        <member name="F:Garnet.GarnetServer.Store">
+            <summary>
+            Store API
+            </summary>
+        </member>
+        <member name="M:Garnet.GarnetServer.#ctor(System.String[],Microsoft.Extensions.Logging.ILoggerFactory,System.Boolean,Garnet.server.Auth.Settings.IAuthenticationSettings)">
+            <summary>
+            Create Garnet Server instance using specified command line arguments; use Start to start the server.
+            </summary>
+            <param name="commandLineArgs">Command line arguments</param>
+            <param name="loggerFactory">Logger factory</param>
+            <param name="cleanupDir">Clean up directory.</param>
+            <param name="authenticationSettingsOverride">Override for custom authentication settings.</param>
+        </member>
+        <member name="M:Garnet.GarnetServer.#ctor(Garnet.server.GarnetServerOptions,Microsoft.Extensions.Logging.ILoggerFactory,Garnet.server.IGarnetServer[],System.Boolean)">
+            <summary>
+            Create Garnet Server instance using GarnetServerOptions instance; use Start to start the server.
+            </summary>
+            <param name="opts">Server options</param>
+            <param name="loggerFactory">Logger factory</param>
+            <param name="servers">The IGarnetServer to use. If none is provided, will use a GarnetServerTcp.</param>
+            <param name="cleanupDir">Whether to clean up data folders on dispose</param>
+        </member>
+        <member name="M:Garnet.GarnetServer.Start">
+            <summary>
+            Start server instance
+            </summary>
+        </member>
+        <member name="M:Garnet.GarnetServer.Dispose">
+            <summary>
+            Dispose store (including log and checkpoint directory)
+            </summary>
+        </member>
+        <member name="M:Garnet.GarnetServer.Dispose(System.Boolean)">
+            <summary>
+            Dispose, optionally deleting logs and checkpoints
+            </summary>
+            <param name="deleteDir">Whether to delete logs and checkpoints</param>
+        </member>
+        <member name="M:Garnet.GarnetServer.FlushMemoryLogger(Garnet.MemoryLogger,System.String,Microsoft.Extensions.Logging.ILoggerFactory)">
+            <summary>
+            Flushes MemoryLogger entries into a destination logger.
+            Destination logger is either created from ILoggerFactory parameter or from a default console logger.
+            </summary>
+            <param name="memoryLogger">The memory logger</param>
+            <param name="categoryName">The category name of the destination logger</param>
+            <param name="dstLoggerFactory">Optional logger factory for creating the destination logger</param>
+        </member>
+        <member name="T:Garnet.MemoryLogger">
+            <summary>
+            Custom logger that writes logs to memory
+            </summary>
+        </member>
+        <member name="M:Garnet.MemoryLogger.FlushLogger(Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            Flushes logger entries into a destination logger.
+            </summary>
+            <param name="dstLogger">The logger to which to flush log entries</param>
+        </member>
+        <member name="T:Garnet.MemoryLoggerProvider">
+            <summary>
+            Custom logger provider that creates instances of MemoryLogger
+            </summary>
+        </member>
+        <member name="T:Garnet.ServerSettingsManager">
+            <summary>
+            Server settings manager
+            </summary>
+        </member>
+        <member name="M:Garnet.ServerSettingsManager.TryParseCommandLineArguments(System.String[],Garnet.Options@,System.Collections.Generic.List{System.String}@,System.String@,System.Boolean@,System.Boolean,Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            Parses command line arguments and sets settings to Options object
+            Options are initialized to values in ConfigDefaultImportPath (defaults to ./defaults.conf if not specified),
+            overridden by any options specified by ConfigImportPath (if specified)
+            then overridden by any options specified in the command line arguments (if any).
+            </summary>
+            <param name="args">Command line arguments</param>
+            <param name="options">Options object containing parsed configuration settings</param>
+            <param name="invalidOptions">List of Options properties that did not pass validation</param>
+            <param name="optionsJson">Serialized JSON containing all non-default configuration options</param>
+            <param name="exitGracefully">True if should exit gracefully when parse is unsuccessful</param>
+            <param name="silentMode">If true, help text will not be printed to console when parse is unsuccessful</param>
+            <param name="logger">Logger</param>
+            <returns>True if parsing succeeded</returns>
+        </member>
+        <member name="M:Garnet.ServerSettingsManager.GetArgumentNameToValue(Garnet.Options)">
+            <summary>
+            Gets a mapping between an argument name (LongName defined by OptionAttribute)
+            and property value in the specified Options object
+            </summary>
+            <param name="options">Options object from which to get values</param>
+            <returns>Argument name to value mapping</returns>
+        </member>
+        <member name="M:Garnet.ServerSettingsManager.TryParseArguments``1(CommandLine.Parser,System.String[],System.Collections.Generic.IDictionary{System.String,System.Object},``0@,System.Boolean@,System.Func{``0},System.Boolean)">
+            <summary>
+            Extension method for CommandLine.Parser, outputs parsed object if parse successful,
+            Prints error message to console otherwise
+            </summary>
+            <typeparam name="T">Type of object to parse</typeparam>
+            <param name="parser">CommandLine.Parser object</param>
+            <param name="args">Command line arguments</param>
+            <param name="argNameToDefaultValue">Argument long name to default value mapping</param>
+            <param name="obj">Parsed object, default(T) if parse unsuccessful</param>
+            <param name="exitGracefully">True if should exit gracefully when parse is unsuccessful</param>
+            <param name="factory">Optional T factory for object initialization</param>
+            <param name="silentMode">If true, help messages will not be printed to console.</param>
+            <returns>True if parse successful</returns>
+        </member>
+        <member name="M:Garnet.ServerSettingsManager.TryImportServerOptions(System.String,Garnet.ConfigFileType,Garnet.Options,Microsoft.Extensions.Logging.ILogger,Garnet.common.FileLocationType,System.String)">
+            <summary>
+            Tries to import options from file into Options object
+            </summary>
+            <param name="path">Path of source configuration file</param>
+            <param name="configFileType">Configuration file type</param>
+            <param name="options">Options object to import options into</param>
+            <param name="logger">Logger</param>
+            <param name="fileLocationType">Type of file location of configuration file</param>
+            <param name="connString">Connection string to Azure Storage, if applicable</param>
+            <returns>True if import succeeded</returns>
+        </member>
+        <member name="M:Garnet.ServerSettingsManager.TryExportServerOptions(System.String,Garnet.ConfigFileType,Garnet.Options,Microsoft.Extensions.Logging.ILogger,Garnet.common.FileLocationType,System.String)">
+            <summary>
+            Tries to export options from Options object into file
+            </summary>
+            <param name="path">Path of destination configuration file</param>
+            <param name="configFileType">Configuration file type</param>
+            <param name="options">Options object to export</param>
+            <param name="logger">Logger</param>
+            <param name="fileLocationType">Type of file location of configuration file</param>
+            <param name="connString">Connection string to Azure Storage, if applicable</param>
+            <returns>True if export succeeded</returns>
+        </member>
+        <member name="M:Garnet.ServerSettingsManager.ConsolidateFlagArguments(System.String[])">
+            <summary>
+            This method takes the current list of command line arguments and injects the boolean value "true" after each flag-type argument,
+            as the current parser does not support flag-type arguments to set nullable bool properties.
+            </summary>
+            <param name="args">List of arguments</param>
+            <returns>Consolidated list of arguments</returns>
+        </member>
+    </members>
+</doc>
