@@ -135,4 +135,70 @@ This implements a production-grade storage device that persists Tsavorite segmen
 
 ---
 
-This plan delivers a production-ready SQL Server storage device with enterprise-grade reliability, ready to handle workloads requiring durable remote storage with SQL Server's management, backup, and HA capabilities.
+## Garnet Integration
+
+The SQL Server storage device has been fully integrated into Garnet with the following components:
+
+### Factory Classes
+1. **SqlServerStorageNamedDeviceFactory** - Implements INamedDeviceFactory for SQL Server
+   - Location: `libs/storage/Tsavorite/cs/src/core/Index/CheckpointManagement/SqlServerStorageNamedDeviceFactory.cs`  
+   - Creates SQL Server storage devices with unique table names per file descriptor
+   - Handles table name sanitization for SQL Server compliance
+   - Supports listing and deleting SQL Server storage tables
+
+2. **SqlServerStorageNamedDeviceFactoryCreator** - Implements INamedDeviceFactoryCreator
+   - Location: `libs/storage/Tsavorite/cs/src/core/Index/CheckpointManagement/SqlServerStorageNamedDeviceFactoryCreator.cs`  
+   - Configures SQL Server storage with connection string, table name, chunk size, and connection pool size
+   - Validates configuration on creation
+
+### Configuration Options (Options.cs)
+Added command-line options for SQL Server storage configuration:
+- `--use-sql-server-storage` - Enable SQL Server storage backend
+- `--sql-server-connection-string` - SQL Server connection string (supports Integrated Security)
+- `--sql-server-database` - SQL Server database name (can also be in connection string)
+- `--sql-server-table-name` - Base table name (default: TsavoriteSegments)
+- `--sql-server-chunk-size` - Chunk size in MB (default: 256)
+- `--sql-server-connection-pool-size` - Connection pool size (default: 8)
+- `--sql-server-windows-auth` - Enable Windows Authentication (sets Integrated Security=true)
+
+### Windows Authentication Support
+Windows Authentication is fully supported through two methods:
+1. **Command-line flag:** `--sql-server-windows-auth` automatically adds `Integrated Security=true` to connection string
+2. **Connection string:** Include `Integrated Security=true` directly in `--sql-server-connection-string`
+
+Example usage:
+```bash
+# Using Windows Authentication flag
+GarnetServer --use-sql-server-storage --sql-server-connection-string "Server=localhost;Database=GarnetDB" --sql-server-windows-auth
+
+# Using connection string directly
+GarnetServer --use-sql-server-storage --sql-server-connection-string "Server=localhost;Database=GarnetDB;Integrated Security=true"
+
+# SQL Server authentication with credentials
+GarnetServer --use-sql-server-storage --sql-server-connection-string "Server=localhost;Database=GarnetDB;User ID=garnet;Password=***"
+```
+
+### Validation Updates
+Updated validation logic in `OptionsValidators.cs` to support SQL Server storage:
+- Skip directory existence checks for SQL Server storage (like Azure Storage)
+- Skip file existence checks for SQL Server storage
+- LogDir validation allows SQL Server storage
+- CheckpointDir validation allows SQL Server storage
+
+### Device Type Integration
+- DeviceType enum already included `SqlServer = 5` in `DeviceType.cs`
+- `GetDeviceType()` method updated to handle `UseSqlServerStorage` flag
+- Factory selection logic updated to create `SqlServerStorageNamedDeviceFactoryCreator` when device type is SqlServer
+
+### Implementation Files
+- `SqlServerStorageDevice.cs` - Main storage device implementation
+- `SqlServerStorageConfig.cs` - Configuration class  
+- `SqlServerStorageNamedDeviceFactory.cs` - Factory implementation
+- `SqlServerStorageNamedDeviceFactoryCreator.cs` - Factory creator
+- Updated: `Options.cs` - Command-line options and factory selection
+- Updated: `OptionsValidators.cs` - Validation logic
+- Updated: `DeviceType.cs` - Already had SqlServer enum value
+
+---
+
+This plan delivers a production-ready SQL Server storage device with enterprise-grade reliability, ready to handle workloads requiring durable remote storage with SQL Server's management, backup, and HA capabilities. The integration with Garnet is complete with full support for Windows Authentication and comprehensive configuration options.

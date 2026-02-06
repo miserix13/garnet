@@ -18,6 +18,7 @@ using CommandLine;
 using Garnet.common;
 using Garnet.server;
 using Garnet.server.Auth.Aad;
+using Microsoft.Data.SqlClient;
 using Garnet.server.Auth.Settings;
 using Garnet.server.TLS;
 using Microsoft.Extensions.Logging;
@@ -416,6 +417,32 @@ namespace Garnet
         [HiddenOption]
         [Option("storage-string", Required = false, HelpText = "The connection string to use when establishing connection to Azure Blobs Storage.")]
         public string AzureStorageConnectionString { get; set; }
+
+        [OptionValidation]
+        [Option("use-sql-server-storage", Required = false, HelpText = "Use Microsoft SQL Server for storage instead of local storage.")]
+        public bool? UseSqlServerStorage { get; set; }
+
+        [HiddenOption]
+        [Option("sql-server-connection-string", Required = false, HelpText = "The connection string to use when establishing connection to SQL Server. Use Integrated Security=true for Windows Authentication.")]
+        public string SqlServerConnectionString { get; set; }
+
+        [Option("sql-server-database", Required = false, HelpText = "The SQL Server database name to use for storage (can also be specified in connection string).")]
+        public string SqlServerDatabase { get; set; }
+
+        [Option("sql-server-table-name", Required = false, HelpText = "Base table name for SQL Server storage (default: TsavoriteSegments).")]
+        public string SqlServerTableName { get; set; }
+
+        [IntRangeValidation(1, int.MaxValue)]
+        [Option("sql-server-chunk-size", Required = false, HelpText = "Chunk size in MB for splitting large segments in SQL Server (default: 256).")]
+        public int SqlServerChunkSizeMB { get; set; }
+
+        [IntRangeValidation(1, 100)]
+        [Option("sql-server-connection-pool-size", Required = false, HelpText = "Connection pool size for SQL Server storage (default: 8).")]
+        public int SqlServerConnectionPoolSize { get; set; }
+
+        [OptionValidation]
+        [Option("sql-server-windows-auth", Required = false, HelpText = "Use Windows Authentication for SQL Server (sets Integrated Security=true in connection string).")]
+        public bool? SqlServerWindowsAuth { get; set; }
 
         [IntRangeValidation(-1, int.MaxValue)]
         [Option("checkpoint-throttle-delay", Required = false, HelpText = "Whether and by how much should we throttle the disk IO for checkpoints: -1 - disable throttling; >= 0 - run checkpoint flush in separate task, sleep for specified time after each WriteAsync")]
@@ -831,6 +858,49 @@ namespace Garnet
                 return new AzureStorageNamedDeviceFactoryCreator(AzureStorageServiceUri, credential, logger);
             };
 
+            Func<INamedDeviceFactoryCreator> sqlServerFactoryCreator = () =>
+            {
+                // Build SQL Server connection string
+                var connectionString = SqlServerConnectionString;
+                
+                // If Windows Authentication is requested, ensure it's in the connection string
+                if (SqlServerWindowsAuth.GetValueOrDefault())
+                {
+                    var builder = new SqlConnectionStringBuilder(connectionString ?? string.Empty);
+                    builder.IntegratedSecurity = true;
+                    
+                    // Add database if specified and not already in connection string
+                    if (!string.IsNullOrEmpty(SqlServerDatabase) && string.IsNullOrEmpty(builder.InitialCatalog))
+                    {
+                        builder.InitialCatalog = SqlServerDatabase;
+                    }
+                    
+                    connectionString = builder.ConnectionString;
+                }
+                else if (!string.IsNullOrEmpty(SqlServerDatabase))
+                {
+                    // Add database to connection string if specified
+                    var builder = new SqlConnectionStringBuilder(connectionString ?? string.Empty);
+                    if (string.IsNullOrEmpty(builder.InitialCatalog))
+                    {
+                        builder.InitialCatalog = SqlServerDatabase;
+                    }
+                    connectionString = builder.ConnectionString;
+                }
+
+                var tableName = string.IsNullOrEmpty(SqlServerTableName) ? "TsavoriteSegments" : SqlServerTableName;
+                var chunkSize = SqlServerChunkSizeMB > 0 ? SqlServerChunkSizeMB * 1024 * 1024 : 256 * 1024 * 1024;
+                var poolSize = SqlServerConnectionPoolSize > 0 ? SqlServerConnectionPoolSize : 8;
+
+                return new SqlServerStorageNamedDeviceFactoryCreator(
+                    connectionString,
+                    logger,
+                    tableName,
+                    chunkSize,
+                    poolSize,
+                    deleteOnClose: false);
+            };
+
             return new GarnetServerOptions(logger)
             {
                 EndPoints = endpoints,
@@ -919,6 +989,7 @@ namespace Garnet
                 ThreadPoolMaxIOCompletionThreads = ThreadPoolMaxIOCompletionThreads,
                 NetworkConnectionLimit = NetworkConnectionLimit,
                 DeviceFactoryCreator = deviceType == DeviceType.AzureStorage ? azureFactoryCreator()
+                    : deviceType == DeviceType.SqlServer ? sqlServerFactoryCreator()
                     : new LocalStorageNamedDeviceFactoryCreator(deviceType: deviceType, logger: logger),
                 CheckpointThrottleFlushDelayMs = CheckpointThrottleFlushDelayMs,
                 EnableScatterGatherGet = EnableScatterGatherGet.GetValueOrDefault(),
@@ -975,6 +1046,11 @@ namespace Garnet
             {
                 logger?.LogInformation("The UseAzureStorage flag is deprecated, use DeviceType of AzureStorage instead");
                 deviceType = DeviceType.AzureStorage;
+            }
+            if (UseSqlServerStorage.GetValueOrDefault())
+            {
+                logger?.LogInformation("Using SQL Server storage");
+                deviceType = DeviceType.SqlServer;
             }
             return deviceType;
         }

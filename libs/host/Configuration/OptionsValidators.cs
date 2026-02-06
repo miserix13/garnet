@@ -154,10 +154,11 @@ namespace Garnet
 
             var options = (Options)validationContext.ObjectInstance;
 
-            // Ignore directory exists if pertains to path on Azure Storage
+            // Ignore directory exists if pertains to path on Azure Storage or SQL Server Storage
             if ((validationContext.MemberName == nameof(Options.ConfigImportPath) && options.UseAzureStorageForConfigImport.GetValueOrDefault()) ||
                 (validationContext.MemberName == nameof(Options.ConfigExportPath) && options.UseAzureStorageForConfigExport.GetValueOrDefault()) ||
-                (validationContext.MemberName != nameof(Options.ConfigImportPath) && validationContext.MemberName != nameof(Options.ConfigExportPath) && options.GetDeviceType() == Tsavorite.core.DeviceType.AzureStorage))
+                (validationContext.MemberName != nameof(Options.ConfigImportPath) && validationContext.MemberName != nameof(Options.ConfigExportPath) && 
+                 (options.GetDeviceType() == Tsavorite.core.DeviceType.AzureStorage || options.GetDeviceType() == Tsavorite.core.DeviceType.SqlServer)))
                 return ValidationResult.Success;
 
             if (this._mustExist && !directoryInfo.Exists)
@@ -273,10 +274,11 @@ namespace Garnet
 
             var options = (Options)validationContext.ObjectInstance;
 
-            // Ignore file exists / directory exists if pertains to path on Azure Storage
+            // Ignore file exists / directory exists if pertains to path on Azure Storage or SQL Server Storage
             if ((validationContext.MemberName == nameof(Options.ConfigImportPath) && options.UseAzureStorageForConfigImport.GetValueOrDefault()) ||
                 (validationContext.MemberName == nameof(Options.ConfigExportPath) && options.UseAzureStorageForConfigExport.GetValueOrDefault()) ||
-                (validationContext.MemberName != nameof(Options.ConfigImportPath) && validationContext.MemberName != nameof(Options.ConfigExportPath) && options.GetDeviceType() == Tsavorite.core.DeviceType.AzureStorage))
+                (validationContext.MemberName != nameof(Options.ConfigImportPath) && validationContext.MemberName != nameof(Options.ConfigExportPath) && 
+                 (options.GetDeviceType() == Tsavorite.core.DeviceType.AzureStorage || options.GetDeviceType() == Tsavorite.core.DeviceType.SqlServer)))
                 return ValidationResult.Success;
 
             if (this._fileMustExist && !fileInfo.Exists)
@@ -519,7 +521,7 @@ namespace Garnet
         }
 
         /// <summary>
-        /// Validation logic for Log Directory, valid if <see cref="Options.DeviceType"/> is AzureStorage or if <see cref="Options.EnableStorageTier"/> is not specified in parent Options object
+        /// Validation logic for Log Directory, valid if <see cref="Options.DeviceType"/> is AzureStorage or SqlServer, or if <see cref="Options.EnableStorageTier"/> is not specified in parent Options object
         /// If neither applies, reverts to <see cref="OptionValidationAttribute"/> validation
         /// </summary>
         /// <param name="value">Value of Log Directory</param>
@@ -528,7 +530,10 @@ namespace Garnet
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
             var options = (Options)validationContext.ObjectInstance;
-            if (options.GetDeviceType() == Tsavorite.core.DeviceType.AzureStorage || !options.EnableStorageTier.GetValueOrDefault())
+            var deviceType = options.GetDeviceType();
+            if (deviceType == Tsavorite.core.DeviceType.AzureStorage || 
+                deviceType == Tsavorite.core.DeviceType.SqlServer || 
+                !options.EnableStorageTier.GetValueOrDefault())
                 return ValidationResult.Success;
 
             return base.IsValid(value, validationContext);
@@ -546,7 +551,7 @@ namespace Garnet
         }
 
         /// <summary>
-        /// Validation logic for <see cref="Options.CheckpointDir"/>, valid if <see cref="Options.DeviceType"/> is AzureStorage in parent Options object
+        /// Validation logic for <see cref="Options.CheckpointDir"/>, valid if <see cref="Options.DeviceType"/> is AzureStorage or SqlServer in parent Options object
         /// If not, reverts to <see cref="OptionValidationAttribute"/> validation
         /// </summary>
         /// <param name="value">Value of Log Directory</param>
@@ -555,7 +560,9 @@ namespace Garnet
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
             var options = (Options)validationContext.ObjectInstance;
-            if (options.GetDeviceType() == Tsavorite.core.DeviceType.AzureStorage)
+            var deviceType = options.GetDeviceType();
+            if (deviceType == Tsavorite.core.DeviceType.AzureStorage || 
+                deviceType == Tsavorite.core.DeviceType.SqlServer)
                 return ValidationResult.Success;
 
             return base.IsValid(value, validationContext);
