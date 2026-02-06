@@ -4,6 +4,7 @@
 [![](https://img.shields.io/nuget/dt/microsoft.garnet.svg?label=nuget%20library&color=007edf&logo=nuget)](https://www.nuget.org/packages/microsoft.garnet)
 [![](https://img.shields.io/nuget/dt/garnet-server.svg?label=dotnet%20tool&color=007edf&logo=nuget)](https://www.nuget.org/packages/garnet-server)
 [![BDN Charts](https://img.shields.io/badge/BDN%20Charts-8A2BE2)](https://microsoft.github.io/garnet/charts/)
+[![Allure Report](https://img.shields.io/badge/Allure%20Report-orange)](https://microsoft.github.io/garnet/allure/)
 [![Discord Shield](https://discordapp.com/api/guilds/1213937452272582676/widget.png?style=shield)](https://aka.ms/garnet-discord)
 
 Garnet is a new remote cache-store from Microsoft Research, that offers several unique benefits:
@@ -16,6 +17,8 @@ Garnet is a new remote cache-store from Microsoft Research, that offers several 
   state-of-the-art performance on both Linux and Windows.
 
 This repo contains the code to build and run Garnet. For more information and documentation, check out our website at [https://microsoft.github.io/garnet](https://microsoft.github.io/garnet).
+
+**Looking for a fully managed service?** [Azure Cosmos DB Garnet Cache](https://microsoft.github.io/garnet/docs/azure/overview) provides Garnet as a fully managed, enterprise-ready caching solution with built-in high availability, performance guarantees and zero infrastructure management.
 
 ## Feature Summary
 

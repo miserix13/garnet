@@ -8,6 +8,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using Allure.NUnit;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
@@ -22,8 +23,9 @@ using Garnet.common;
 
 namespace Garnet.test.cluster
 {
+    [AllureNUnit]
     [TestFixture, NonParallelizable]
-    public class ClusterNegativeTests
+    public class ClusterNegativeTests : AllureTestBase
     {
         ClusterTestContext context;
 
@@ -518,6 +520,43 @@ namespace Garnet.test.cluster
                 {
                     Assert.Fail($"There should be no replica with assigned hashslots.{context.clusterTestUtils.ClusterStatus([0, 1, 2, 3])}");
                 }
+            }
+        }
+
+
+        [Test, CancelAfter(60_000)]
+        public void ClusterMeetFromReplica(CancellationToken cancellationToken)
+        {
+            var nodes_count = 3;
+            context.CreateInstances(
+                nodes_count,
+                disableObjects: false,
+                enableAOF: true,
+                timeout: timeout,
+                OnDemandCheckpoint: true,
+                FastAofTruncate: true,
+                CommitFrequencyMs: -1,
+                useAofNullDevice: true);
+            context.CreateConnection();
+
+            context.clusterTestUtils.SetConfigEpoch(0, 1);
+            context.clusterTestUtils.SetConfigEpoch(1, 2);
+            context.clusterTestUtils.SetConfigEpoch(2, 3);
+            context.clusterTestUtils.Meet(0, 1, logger: context.logger);
+            context.clusterTestUtils.WaitForConfigPropagation(1, [0, 1], null);
+
+            context.clusterTestUtils.ClusterReplicate(1, 0, logger: context.logger);
+            context.clusterTestUtils.WaitForConfigPropagation(1, [0, 1], null);
+
+            context.clusterTestUtils.AddSlotsRange(0, [(0, 16383)], logger: context.logger);
+            context.clusterTestUtils.WaitForConfigPropagation(0, [0, 1], null);
+
+            context.clusterTestUtils.Meet(2, 1, logger: context.logger);
+            context.clusterTestUtils.WaitForConfigPropagation(2, [0, 1, 2], null);
+
+            for (int i = 0; i < nodes_count; i++)
+            {
+                Assert.That(nodes_count, Is.EqualTo(context.clusterTestUtils.ClusterNodes(i).Nodes.Count));
             }
         }
     }

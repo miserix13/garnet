@@ -3,6 +3,8 @@
 
 using System;
 using System.IO;
+using Allure.NUnit;
+using Garnet.test;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using Tsavorite.core;
@@ -12,8 +14,9 @@ namespace Tsavorite.test
     //** Fundamental basic test for TryEnqueue that covers all the parameters in TryEnqueue
     //** Other tests in TsavoriteLog.cs provide more coverage for TryEnqueue
 
+    [AllureNUnit]
     [TestFixture]
-    internal class TryEnqueueTests
+    internal class TryEnqueueTests : AllureTestBase
     {
         private TsavoriteLog log;
         private IDevice device;
@@ -57,7 +60,7 @@ namespace Tsavorite.test
         [Test]
         [Category("TsavoriteLog")]
         [Category("Smoke")]
-        public void TryEnqueueBasicTest([Values] TryEnqueueIteratorType iteratorType, [Values] TestUtils.DeviceType deviceType)
+        public void TryEnqueueBasicTest([Values] TryEnqueueIteratorType iteratorType, [Values] TestUtils.TestDeviceType deviceType)
         {
             int entryLength = 50;
             int numEntries = 10000;
@@ -69,7 +72,7 @@ namespace Tsavorite.test
             log = new TsavoriteLog(new TsavoriteLogSettings { LogDevice = device, SegmentSizeBits = 22, LogCommitDir = TestUtils.MethodTestDir });
 
             // Issue with Non Async Commit and Emulated Azure so don't run it - at least put after device creation to see if crashes doing that simple thing
-            if (OperatingSystem.IsWindows() && deviceType == TestUtils.DeviceType.EmulatedAzure)
+            if (OperatingSystem.IsWindows() && deviceType == TestUtils.TestDeviceType.EmulatedAzure)
                 return;
 
             // Reduce SpanBatch to make sure entry fits on page

@@ -2,6 +2,8 @@
 // Licensed under the MIT license.
 
 using System.IO;
+using Allure.NUnit;
+using Garnet.test;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using Tsavorite.core;
@@ -12,8 +14,9 @@ namespace Tsavorite.test
     using StructAllocator = BlittableAllocator<KeyStruct, ValueStruct, StoreFunctions<KeyStruct, ValueStruct, KeyStruct.Comparer, DefaultRecordDisposer<KeyStruct, ValueStruct>>>;
     using StructStoreFunctions = StoreFunctions<KeyStruct, ValueStruct, KeyStruct.Comparer, DefaultRecordDisposer<KeyStruct, ValueStruct>>;
 
+    [AllureNUnit]
     [TestFixture]
-    internal class BasicStorageTests
+    internal class BasicStorageTests : AllureTestBase
     {
         [Test]
         [Category("TsavoriteKV")]
@@ -77,7 +80,7 @@ namespace Tsavorite.test
         [Test]
         [Category("TsavoriteKV")]
         [Category("Smoke")]
-        public void OmitSegmentIdTest([Values] TestUtils.DeviceType deviceType)
+        public void OmitSegmentIdTest([Values] TestUtils.TestDeviceType deviceType)
         {
             var filename = Path.Join(TestUtils.MethodTestDir, "test.log");
             var omit = false;

@@ -8,19 +8,22 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Allure.NUnit;
+using Garnet.test;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using Tsavorite.core;
 
 namespace Tsavorite.test
 {
+    [AllureNUnit]
     [TestFixture]
-    internal class TsavoriteLogStandAloneTests
+    internal class TsavoriteLogStandAloneTests : AllureTestBase
     {
         [Test]
         [Category("TsavoriteLog")]
         [Category("Smoke")]
-        public void TestDisposeReleasesFileLocksWithCompletedCommit([Values] TestUtils.DeviceType deviceType)
+        public void TestDisposeReleasesFileLocksWithCompletedCommit([Values] TestUtils.TestDeviceType deviceType)
         {
             string filename = Path.Join(TestUtils.MethodTestDir, "TestDisposeRelease" + deviceType.ToString() + ".log");
 
@@ -54,7 +57,7 @@ namespace Tsavorite.test
     }
 
     // This test base class allows splitting up the tests into separate fixtures that can be run in parallel
-    internal class TsavoriteLogTestBase
+    internal class TsavoriteLogTestBase : AllureTestBase
     {
         protected const int entryLength = 100;
         protected const int numEntries = 10000; //1000000;
@@ -186,6 +189,7 @@ namespace Tsavorite.test
         }
     }
 
+    [AllureNUnit]
     [TestFixture]
     internal class TsavoriteLogGeneralTests : TsavoriteLogTestBase
     {
@@ -400,6 +404,7 @@ namespace Tsavorite.test
     }
 
 
+    [AllureNUnit]
     [TestFixture]
     internal class TsavoriteLogEnqueueTests : TsavoriteLogTestBase
     {
@@ -465,7 +470,7 @@ namespace Tsavorite.test
         [Category("TsavoriteLog")]
         [Category("Smoke")]
         public async ValueTask TryEnqueue2([Values] LogChecksumType logChecksum, [Values] IteratorType iteratorType,
-            [Values] TestUtils.DeviceType deviceType)
+            [Values] TestUtils.TestDeviceType deviceType)
         {
             string filename = Path.Join(TestUtils.MethodTestDir, "TryEnqueue2" + deviceType.ToString() + ".log");
             device = TestUtils.CreateTestDevice(deviceType, filename);
@@ -537,6 +542,7 @@ namespace Tsavorite.test
         }
     }
 
+    [AllureNUnit]
     [TestFixture]
     internal class TsavoriteLogTruncateTests : TsavoriteLogTestBase
     {
@@ -550,7 +556,7 @@ namespace Tsavorite.test
         [Category("TsavoriteLog")]
         [Category("Smoke")]
         public async ValueTask TruncateUntilBasic([Values] LogChecksumType logChecksum,
-            [Values] IteratorType iteratorType, [Values] TestUtils.DeviceType deviceType)
+            [Values] IteratorType iteratorType, [Values] TestUtils.TestDeviceType deviceType)
         {
             string filename = Path.Join(TestUtils.MethodTestDir, "TruncateUntilBasic" + deviceType.ToString() + ".log");
             device = TestUtils.CreateTestDevice(deviceType, filename);
@@ -606,7 +612,7 @@ namespace Tsavorite.test
         [Category("TsavoriteLog")]
         [Category("Smoke")]
         public async ValueTask EnqueueAndWaitForCommitAsyncBasicTest([Values] LogChecksumType logChecksum,
-            [Values] TestUtils.DeviceType deviceType)
+            [Values] TestUtils.TestDeviceType deviceType)
         {
             CancellationToken cancellationToken = default;
 
@@ -835,7 +841,7 @@ namespace Tsavorite.test
         [Test]
         [Category("TsavoriteLog")]
         [Category("Smoke")]
-        public void CommitNoSpinWait([Values] TestUtils.DeviceType deviceType)
+        public void CommitNoSpinWait([Values] TestUtils.TestDeviceType deviceType)
         {
             string filename = Path.Join(TestUtils.MethodTestDir, "CommitNoSpinWait" + deviceType.ToString() + ".log");
             device = TestUtils.CreateTestDevice(deviceType, filename);
@@ -887,7 +893,7 @@ namespace Tsavorite.test
         [Test]
         [Category("TsavoriteLog")]
         [Category("Smoke")]
-        public async ValueTask CommitAsyncPrevTask([Values] TestUtils.DeviceType deviceType)
+        public async ValueTask CommitAsyncPrevTask([Values] TestUtils.TestDeviceType deviceType)
         {
             CancellationTokenSource cts = new CancellationTokenSource();
             CancellationToken token = cts.Token;
@@ -955,7 +961,7 @@ namespace Tsavorite.test
         [Category("TsavoriteLog")]
         [Category("Smoke")]
         public async ValueTask RefreshUncommittedAsyncTest([Values] IteratorType iteratorType,
-            [Values] TestUtils.DeviceType deviceType)
+            [Values] TestUtils.TestDeviceType deviceType)
         {
             CancellationTokenSource cts = new CancellationTokenSource();
             CancellationToken token = cts.Token;
@@ -1040,6 +1046,7 @@ namespace Tsavorite.test
         }
     }
 
+    [AllureNUnit]
     [TestFixture]
     internal class TsavoriteLogCustomCommitTests : TsavoriteLogTestBase
     {

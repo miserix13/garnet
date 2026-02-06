@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.Intrinsics.X86;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -483,9 +484,130 @@ namespace Tsavorite.core
                 internalStatus = InternalRead(ref key, keyHash, ref input, ref output, context, ref pcontext, sessionFunctions);
             while (HandleImmediateRetryStatus(internalStatus, sessionFunctions, ref pcontext));
 
-            var status = HandleOperationStatus(sessionFunctions.Ctx, ref pcontext, internalStatus);
+            return HandleOperationStatus(sessionFunctions.Ctx, ref pcontext, internalStatus);
+        }
 
-            return status;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [SkipLocalsInit] // Span<long> in here can be sizeable, so 0-init'ing isn't free
+        internal unsafe void ContextReadWithPrefetch<TBatch, TInput, TOutput, TContext, TSessionFunctionsWrapper>(ref TBatch batch, TContext context, TSessionFunctionsWrapper sessionFunctions)
+            where TSessionFunctionsWrapper : ISessionFunctionsWrapper<TKey, TValue, TInput, TOutput, TContext, TStoreFunctions, TAllocator>
+            where TBatch : IReadArgBatch<TKey, TInput, TOutput>
+#if NET9_0_OR_GREATER
+            , allows ref struct
+#endif
+        {
+            if (batch.Count == 1)
+            {
+                // Not actually a batch, no point prefetching
+
+                batch.GetKey(0, out var key);
+                batch.GetInput(0, out var input);
+                batch.GetOutput(0, out var output);
+
+                var hash = storeFunctions.GetKeyHashCode64(ref key);
+
+                var pcontext = new PendingContext<TInput, TOutput, TContext>(sessionFunctions.Ctx.ReadCopyOptions);
+                OperationStatus internalStatus;
+
+                do
+                    internalStatus = InternalRead(ref key, hash, ref input, ref output, context, ref pcontext, sessionFunctions);
+                while (HandleImmediateRetryStatus(internalStatus, sessionFunctions, ref pcontext));
+
+                batch.SetStatus(0, HandleOperationStatus(sessionFunctions.Ctx, ref pcontext, internalStatus));
+                batch.SetOutput(0, output);
+            }
+            else
+            {
+                // Prefetch if we can
+
+                if (Sse.IsSupported)
+                {
+                    const int PrefetchSize = 12;
+
+                    var hashes = stackalloc long[PrefetchSize];
+
+                    // Prefetch the hash table entries for all keys
+                    var tableAligned = state[resizeInfo.version].tableAligned;
+                    var sizeMask = state[resizeInfo.version].size_mask;
+
+                    var batchCount = batch.Count;
+
+                    var nextBatchIx = 0;
+                    while (nextBatchIx < batchCount)
+                    {
+                        // First level prefetch
+                        var hashIx = 0;
+                        for (; hashIx < PrefetchSize && nextBatchIx < batchCount; hashIx++)
+                        {
+                            batch.GetKey(nextBatchIx, out var key);
+                            var hash = hashes[hashIx] = storeFunctions.GetKeyHashCode64(ref key);
+
+                            Sse.Prefetch0(tableAligned + (hash & sizeMask));
+
+                            nextBatchIx++;
+                        }
+
+                        // Second level prefetch
+                        for (var i = 0; i < hashIx; i++)
+                        {
+                            var keyHash = hashes[i];
+                            var hei = new HashEntryInfo(keyHash);
+
+                            // If the hash entry exists in the table, points to main memory in the main log (not read cache), also prefetch the record header address
+                            if (FindTag(ref hei) && !hei.IsReadCache && hei.Address >= hlogBase.HeadAddress)
+                            {
+                                Sse.Prefetch0((void*)hlog.GetPhysicalAddress(hei.Address));
+                            }
+                        }
+
+                        nextBatchIx -= hashIx;
+
+                        // Perform the reads
+                        for (var i = 0; i < hashIx; i++)
+                        {
+                            batch.GetKey(nextBatchIx, out var key);
+                            batch.GetInput(nextBatchIx, out var input);
+                            batch.GetOutput(nextBatchIx, out var output);
+
+                            var hash = hashes[i];
+
+                            var pcontext = new PendingContext<TInput, TOutput, TContext>(sessionFunctions.Ctx.ReadCopyOptions);
+                            OperationStatus internalStatus;
+
+                            do
+                                internalStatus = InternalRead(ref key, hash, ref input, ref output, context, ref pcontext, sessionFunctions);
+                            while (HandleImmediateRetryStatus(internalStatus, sessionFunctions, ref pcontext));
+
+                            batch.SetStatus(nextBatchIx, HandleOperationStatus(sessionFunctions.Ctx, ref pcontext, internalStatus));
+                            batch.SetOutput(nextBatchIx, output);
+
+                            nextBatchIx++;
+                        }
+                    }
+                }
+                else
+                {
+                    // Perform the reads
+                    for (var i = 0; i < batch.Count; i++)
+                    {
+                        batch.GetKey(i, out var key);
+                        batch.GetInput(i, out var input);
+                        batch.GetOutput(i, out var output);
+
+                        var hash = storeFunctions.GetKeyHashCode64(ref key);
+
+                        var pcontext = new PendingContext<TInput, TOutput, TContext>(sessionFunctions.Ctx.ReadCopyOptions);
+                        OperationStatus internalStatus;
+
+                        do
+                            internalStatus = InternalRead(ref key, hash, ref input, ref output, context, ref pcontext, sessionFunctions);
+                        while (HandleImmediateRetryStatus(internalStatus, sessionFunctions, ref pcontext));
+
+                        batch.SetStatus(i, HandleOperationStatus(sessionFunctions.Ctx, ref pcontext, internalStatus));
+                        batch.SetOutput(i, output);
+                    }
+                }
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -753,40 +875,41 @@ namespace Tsavorite.core
             }
 
             var distribution =
-                $"Number of hash buckets: {table_size_}\n" +
-                $"Number of overflow buckets: {OverflowBucketCount}\n" +
-                $"Size of each bucket: {Constants.kEntriesPerBucket * sizeof(HashBucketEntry)} bytes\n" +
-                $"Total distinct hash-table entry count: {{{total_record_count}}}\n" +
-                $"Average #entries per hash bucket: {{{total_record_count / (double)table_size_:0.00}}}\n" +
-                $"Total zeroed out slots: {total_zeroed_out_slots} \n" +
-                $"Total entries below begin addr: {total_entries_below_begin_address} \n" +
-                $"Total entries in overflow buckets: {total_entries_in_ofb} \n" +
-                $"Total entries in overflow buckets below begin addr: {total_entries_in_ofb_below_begin_address} \n" +
-                $"Total entries with tentative bit set: {total_entries_with_tentative_bit_set} \n" +
-                $"Histogram of #entries per bucket:\n";
+                $"Number of hash buckets: {table_size_}\r\n" +
+                $"Number of overflow buckets: {OverflowBucketCount}\r\n" +
+                $"Size of each bucket: {Constants.kEntriesPerBucket * sizeof(HashBucketEntry)} bytes\r\n" +
+                $"Hash-table size: {Constants.kEntriesPerBucket * sizeof(HashBucketEntry) * table_size_} bytes\r\n" +
+                $"Total distinct hash-table entry count: {{{total_record_count}}}\r\n" +
+                $"Average #entries per hash bucket: {{{total_record_count / (double)table_size_:0.00}}}\r\n" +
+                $"Total zeroed out slots: {total_zeroed_out_slots} \r\n" +
+                $"Total entries below begin addr: {total_entries_below_begin_address} \r\n" +
+                $"Total entries in overflow buckets: {total_entries_in_ofb} \r\n" +
+                $"Total entries in overflow buckets below begin addr: {total_entries_in_ofb_below_begin_address} \r\n" +
+                $"Total entries with tentative bit set: {total_entries_with_tentative_bit_set} \r\n" +
+                $"Histogram of #entries per bucket:\r\n";
 
             foreach (var kvp in histogram.OrderBy(e => e.Key))
             {
-                distribution += $"  {kvp.Key} : {kvp.Value}\n";
+                distribution += $"  {kvp.Key} : {kvp.Value}\r\n";
             }
 
-            distribution += $"Histogram of #buckets per OFB chain and their frequencies: \n";
+            distribution += $"Histogram of #buckets per OFB chain and their frequencies: \r\n";
             foreach (var kvp in ofb_chaining_histogram.OrderBy(e => e.Key))
             {
-                distribution += $"  {kvp.Key} : {kvp.Value}\n";
+                distribution += $"  {kvp.Key} : {kvp.Value}\r\n";
             }
 
             // Histogram of slots unused per bucket in OFB and non-OFB
-            distribution += $"Histogram of #unused slots per bucket in main hash index:\n";
+            distribution += $"Histogram of #unused slots per bucket in main hash index:\r\n";
             foreach (var kvp in slots_unused_by_nonofb_buckets_histogram.OrderBy(e => e.Key))
             {
-                distribution += $"  {kvp.Key} : {kvp.Value}\n";
+                distribution += $"  {kvp.Key} : {kvp.Value}\r\n";
             }
 
-            distribution += $"Histogram of #unused slots per bucket in overflow buckets:\n";
+            distribution += $"Histogram of #unused slots per bucket in overflow buckets:\r\n";
             foreach (var kvp in slots_unused_by_ofb_buckets_histogram.OrderBy(e => e.Key))
             {
-                distribution += $"  {kvp.Key} : {kvp.Value}\n";
+                distribution += $"  {kvp.Key} : {kvp.Value}\r\n";
             }
 
             return distribution;

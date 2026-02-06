@@ -4,14 +4,17 @@
 using System.Buffers;
 using System.IO;
 using System.Threading;
+using Allure.NUnit;
+using Garnet.test;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using Tsavorite.core;
 
 namespace Tsavorite.test
 {
+    [AllureNUnit]
     [TestFixture]
-    internal class LogReadAsyncTests
+    internal class LogReadAsyncTests : AllureTestBase
     {
         private TsavoriteLog log;
         private IDevice device;
@@ -46,7 +49,7 @@ namespace Tsavorite.test
         [Test]
         [Category("TsavoriteLog")]
         [Category("Smoke")]
-        public void LogReadAsyncBasicTest([Values] ParameterDefaultsIteratorType iteratorType, [Values] TestUtils.DeviceType deviceType)
+        public void LogReadAsyncBasicTest([Values] ParameterDefaultsIteratorType iteratorType, [Values] TestUtils.TestDeviceType deviceType)
         {
             int entryLength = 20;
             int numEntries = 500;

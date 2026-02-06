@@ -2,6 +2,8 @@
 // Licensed under the MIT license.
 
 using System.IO;
+using Allure.NUnit;
+using Garnet.test;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using Tsavorite.core;
@@ -12,8 +14,9 @@ namespace Tsavorite.test
     using StringAllocator = GenericAllocator<string, string, StoreFunctions<string, string, StringKeyComparer, DefaultRecordDisposer<string, string>>>;
     using StringStoreFunctions = StoreFunctions<string, string, StringKeyComparer, DefaultRecordDisposer<string, string>>;
 
+    [AllureNUnit]
     [TestFixture]
-    internal class GenericStringTests
+    internal class GenericStringTests : AllureTestBase
     {
         private TsavoriteKV<string, string, StringStoreFunctions, StringAllocator> store;
         private ClientSession<string, string, string, string, Empty, MyFuncs, StringStoreFunctions, StringAllocator> session;
@@ -44,7 +47,7 @@ namespace Tsavorite.test
         [Test]
         [Category("TsavoriteKV")]
         [Category("Smoke")]
-        public void StringBasicTest([Values] DeviceType deviceType)
+        public void StringBasicTest([Values] TestDeviceType deviceType)
         {
             string logfilename = Path.Join(MethodTestDir, "GenericStringTests" + deviceType.ToString() + ".log");
             string objlogfilename = Path.Join(MethodTestDir, "GenericStringTests" + deviceType.ToString() + ".obj.log");

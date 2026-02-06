@@ -5,6 +5,8 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Allure.NUnit;
+using Garnet.test;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using Tsavorite.core;
@@ -15,7 +17,7 @@ namespace Tsavorite.test.recovery
     using LongAllocator = BlittableAllocator<long, long, StoreFunctions<long, long, LongKeyComparer, DefaultRecordDisposer<long, long>>>;
     using LongStoreFunctions = StoreFunctions<long, long, LongKeyComparer, DefaultRecordDisposer<long, long>>;
 
-    public abstract class StateMachineDriverTestsBase
+    public abstract class StateMachineDriverTestsBase : AllureTestBase
     {
         readonly int numOpThreads = 2;
         protected readonly int numKeys = 4;
@@ -32,7 +34,7 @@ namespace Tsavorite.test.recovery
             opsDone = false;
             expectedV1Count = new long[numKeys];
             expectedV2Count = new long[numKeys];
-            log = CreateTestDevice(DeviceType.LSD, Path.Join(MethodTestDir, "Test.log"));
+            log = CreateTestDevice(TestDeviceType.LSD, Path.Join(MethodTestDir, "Test.log"));
         }
 
         protected void BaseTearDown()
@@ -254,6 +256,7 @@ namespace Tsavorite.test.recovery
         }
     }
 
+    [AllureNUnit]
     [TestFixture]
     public class CheckpointVersionSwitchRmw : StateMachineDriverTestsBase
     {
@@ -309,6 +312,7 @@ namespace Tsavorite.test.recovery
             => await DoGrowIndexVersionSwitchEquivalenceCheck(indexSize, useTimingFuzzing);
     }
 
+    [AllureNUnit]
     [TestFixture]
     public class CheckpointVersionSwitchTxn : StateMachineDriverTestsBase
     {

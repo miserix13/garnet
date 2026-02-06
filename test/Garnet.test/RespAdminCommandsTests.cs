@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Allure.NUnit;
 using Garnet.server;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
@@ -14,8 +15,9 @@ using NotImplementedException = System.NotImplementedException;
 
 namespace Garnet.test
 {
+    [AllureNUnit]
     [TestFixture]
-    public class RespAdminCommandsTests
+    public class RespAdminCommandsTests : AllureTestBase
     {
         GarnetServer server;
 
@@ -643,17 +645,10 @@ namespace Garnet.test
         {
             using var redis = ConnectionMultiplexer.Connect(TestUtils.GetConfig());
             var db = redis.GetDatabase(0);
-            try
-            {
-                db.Execute("CONFIG");
-                Assert.Fail("Shouldn't be reachable, command is incorrect");
-            }
-            catch (Exception ex)
-            {
-                var expectedMessage = string.Format(CmdStrings.GenericErrWrongNumArgs,
-                    $"{nameof(RespCommand.CONFIG)}");
-                ClassicAssert.AreEqual(expectedMessage, ex.Message);
-            }
+            var ex = Assert.Throws<RedisServerException>(() => db.Execute("CONFIG"));
+            var expectedMessage = string.Format(CmdStrings.GenericErrWrongNumArgs,
+                $"{nameof(RespCommand.CONFIG)}");
+            ClassicAssert.AreEqual(expectedMessage, ex.Message);
         }
 
         [Test]
@@ -661,17 +656,10 @@ namespace Garnet.test
         {
             using var redis = ConnectionMultiplexer.Connect(TestUtils.GetConfig());
             var db = redis.GetDatabase(0);
-            try
-            {
-                db.Execute("CONFIG", "GET");
-                Assert.Fail("Shouldn't be reachable, command is incorrect");
-            }
-            catch (Exception ex)
-            {
-                var expectedMessage = Encoding.ASCII.GetBytes(string.Format(CmdStrings.GenericErrWrongNumArgs,
-                    $"{nameof(RespCommand.CONFIG)}|{nameof(CmdStrings.GET)}"));
-                ClassicAssert.AreEqual(expectedMessage, ex.Message);
-            }
+            var ex = Assert.Throws<RedisServerException>(() => db.Execute("CONFIG", "GET"));
+            var expectedMessage = Encoding.ASCII.GetBytes(string.Format(CmdStrings.GenericErrWrongNumArgs,
+                $"{nameof(RespCommand.CONFIG)}|{nameof(CmdStrings.GET)}"));
+            ClassicAssert.AreEqual(expectedMessage, ex.Message);
         }
         #endregion
     }

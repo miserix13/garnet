@@ -3,6 +3,10 @@
 
 using System;
 using System.Collections.Generic;
+using Allure.NUnit;
+#if DEBUG
+using Garnet.common;
+#endif
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
@@ -18,8 +22,10 @@ namespace Garnet.test.cluster
     /// 3. Replica same history and different version and AOF
     /// 4. Replica different history, version and AOF
     /// </summary>
+    [AllureNUnit]
+    [TestFixture]
     [NonParallelizable]
-    public class ClusterReplicationDisklessSyncTests
+    public class ClusterReplicationDisklessSyncTests : AllureTestBase
     {
         ClusterTestContext context;
         readonly int keyCount = 256;
@@ -395,5 +401,39 @@ namespace Garnet.test.cluster
             for (var replica = 1; replica < nodes_count; replica++)
                 Validate(nOffsets[primary], nOffsets[replica], disableObjects);
         }
+
+#if DEBUG
+        [Test, Order(6)]
+        [Category("REPLICATION")]
+        public void ClusterDisklessSyncResetSyncManagerCts()
+        {
+            var nodes_count = 2;
+            var primaryIndex = 0;
+            var replicaOneIndex = 1;
+            context.CreateInstances(nodes_count, enableAOF: true, useTLS: useTLS, enableDisklessSync: true, timeout: timeout);
+            context.CreateConnection(useTLS: useTLS);
+
+            _ = context.clusterTestUtils.AddDelSlotsRange(primaryIndex, [(0, 16383)], addslot: true, logger: context.logger);
+            context.clusterTestUtils.SetConfigEpoch(primaryIndex, primaryIndex + 1, logger: context.logger);
+            context.clusterTestUtils.SetConfigEpoch(replicaOneIndex, replicaOneIndex + 1, logger: context.logger);
+
+            context.clusterTestUtils.Meet(primaryIndex, replicaOneIndex, logger: context.logger);
+            context.clusterTestUtils.WaitUntilNodeIsKnown(replicaOneIndex, primaryIndex, logger: context.logger);
+
+            try
+            {
+                ExceptionInjectionHelper.EnableException(ExceptionInjectionType.Replication_Diskless_Sync_Reset_Cts);
+                var _resp = context.clusterTestUtils.ClusterReplicate(replicaNodeIndex: replicaOneIndex, primaryNodeIndex: primaryIndex, failEx: false, logger: context.logger);
+                ClassicAssert.AreEqual("Wait for sync task faulted", _resp);
+            }
+            finally
+            {
+                ExceptionInjectionHelper.DisableException(ExceptionInjectionType.Replication_Diskless_Sync_Reset_Cts);
+            }
+
+            var resp = context.clusterTestUtils.ClusterReplicate(replicaNodeIndex: replicaOneIndex, primaryNodeIndex: primaryIndex, logger: context.logger);
+            ClassicAssert.AreEqual("OK", resp);
+        }
+#endif
     }
 }

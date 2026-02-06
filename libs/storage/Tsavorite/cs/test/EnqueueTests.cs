@@ -5,15 +5,17 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Allure.NUnit;
+using Garnet.test;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using Tsavorite.core;
 
-
 namespace Tsavorite.test
 {
+    [AllureNUnit]
     [TestFixture]
-    internal class EnqueueTests
+    internal class EnqueueTests : AllureTestBase
     {
         private TsavoriteLog log;
         private IDevice device;
@@ -69,7 +71,7 @@ namespace Tsavorite.test
         [Test]
         [Category("TsavoriteLog")]
         [Category("Smoke")]
-        public void EnqueueBasicTest([Values] EnqueueIteratorType iteratorType, [Values] TestUtils.DeviceType deviceType)
+        public void EnqueueBasicTest([Values] EnqueueIteratorType iteratorType, [Values] TestUtils.TestDeviceType deviceType)
         {
 
             int entryLength = 20;
@@ -165,7 +167,7 @@ namespace Tsavorite.test
         [Test]
         [Category("TsavoriteLog")]
         [Category("Smoke")]
-        public async Task EnqueueAsyncBasicTest([Values] TestUtils.DeviceType deviceType)
+        public async Task EnqueueAsyncBasicTest([Values] TestUtils.TestDeviceType deviceType)
         {
 
             const int expectedEntryCount = 11;
@@ -174,7 +176,7 @@ namespace Tsavorite.test
             device = TestUtils.CreateTestDevice(deviceType, filename);
             log = new TsavoriteLog(new TsavoriteLogSettings { LogDevice = device, SegmentSizeBits = 22, LogCommitDir = TestUtils.MethodTestDir });
 
-            if (OperatingSystem.IsWindows() && deviceType == TestUtils.DeviceType.EmulatedAzure)
+            if (OperatingSystem.IsWindows() && deviceType == TestUtils.TestDeviceType.EmulatedAzure)
                 return;
 
             CancellationToken cancellationToken = default;

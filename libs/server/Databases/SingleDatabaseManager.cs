@@ -215,15 +215,19 @@ namespace Garnet.server
             if (!TryPauseCheckpointsContinuousAsync(defaultDatabase.Id, token: token).GetAwaiter().GetResult())
                 return;
 
-            logger?.LogInformation("Enforcing AOF size limit currentAofSize: {aofSize} >  AofSizeLimit: {aofSizeLimit}",
-                aofSize, aofSizeLimit);
-
             try
             {
-                var result = await TakeCheckpointAsync(defaultDatabase, logger: logger, token: token);
+                // Checkpoint will be triggered from AOF replay
+                if (StoreWrapper.serverOptions.EnableCluster && StoreWrapper.clusterProvider.IsReplica())
+                {
+                    logger?.LogInformation("Replica skipping {method}", nameof(TaskCheckpointBasedOnAofSizeLimitAsync));
+                    return;
+                }
 
-                var storeTailAddress = result.Item1;
-                var objectStoreTailAddress = result.Item2;
+                logger?.LogInformation("Enforcing AOF size limit currentAofSize: {aofSize} >  AofSizeLimit: {aofSizeLimit}",
+                    aofSize, aofSizeLimit);
+
+                var (storeTailAddress, objectStoreTailAddress) = await TakeCheckpointAsync(defaultDatabase, logger: logger, token: token);
 
                 if (storeTailAddress.HasValue)
                     defaultDatabase.LastSaveStoreTailAddress = storeTailAddress.Value;

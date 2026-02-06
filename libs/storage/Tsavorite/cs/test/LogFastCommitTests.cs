@@ -5,12 +5,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using Allure.NUnit;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using Tsavorite.core;
 
 namespace Tsavorite.test
 {
+    [AllureNUnit]
     [TestFixture]
     internal class LogFastCommitTests : TsavoriteLogTestBase
     {
@@ -23,7 +25,7 @@ namespace Tsavorite.test
         [Test]
         [Category("TsavoriteLog")]
         [Category("Smoke")]
-        public void TsavoriteLogSimpleFastCommitTest([Values] TestUtils.DeviceType deviceType)
+        public void TsavoriteLogSimpleFastCommitTest([Values] TestUtils.TestDeviceType deviceType)
         {
             var cookie = new byte[100];
             new Random().NextBytes(cookie);
@@ -98,7 +100,7 @@ namespace Tsavorite.test
         [Test]
         [Category("TsavoriteLog")]
         [Category("Smoke")]
-        public void CommitRecordBoundedGrowthTest([Values] TestUtils.DeviceType deviceType)
+        public void CommitRecordBoundedGrowthTest([Values] TestUtils.TestDeviceType deviceType)
         {
             var cookie = new byte[100];
             new Random().NextBytes(cookie);

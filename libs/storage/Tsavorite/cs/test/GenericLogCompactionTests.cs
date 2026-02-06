@@ -2,6 +2,8 @@
 // Licensed under the MIT license.
 
 using System.IO;
+using Allure.NUnit;
+using Garnet.test;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using Tsavorite.core;
@@ -12,8 +14,9 @@ namespace Tsavorite.test
     using ClassAllocator = GenericAllocator<MyKey, MyValue, StoreFunctions<MyKey, MyValue, MyKey.Comparer, DefaultRecordDisposer<MyKey, MyValue>>>;
     using ClassStoreFunctions = StoreFunctions<MyKey, MyValue, MyKey.Comparer, DefaultRecordDisposer<MyKey, MyValue>>;
 
+    [AllureNUnit]
     [TestFixture]
-    internal class GenericLogCompactionTests
+    internal class GenericLogCompactionTests : AllureTestBase
     {
         private TsavoriteKV<MyKey, MyValue, ClassStoreFunctions, ClassAllocator> store;
         private ClientSession<MyKey, MyValue, MyInput, MyOutput, int, MyFunctionsDelete, ClassStoreFunctions, ClassAllocator> session;
@@ -44,7 +47,7 @@ namespace Tsavorite.test
             {
                 // For this class, deviceType is the only parameter. Using this to illustrate the approach; NUnit doesn't provide metadata for arguments,
                 // so for multi-parameter tests it is probably better to stay with the "separate SetUp method" approach.
-                var deviceType = (DeviceType)TestContext.CurrentContext.Test.Arguments[0];
+                var deviceType = (TestDeviceType)TestContext.CurrentContext.Test.Arguments[0];
 
                 log = CreateTestDevice(deviceType, Path.Join(MethodTestDir, $"LogCompactBasicTest_{deviceType}.log"));
                 objlog = CreateTestDevice(deviceType, Path.Join(MethodTestDir, $"LogCompactBasicTest_{deviceType}.obj.log"));

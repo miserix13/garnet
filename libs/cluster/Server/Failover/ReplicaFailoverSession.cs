@@ -138,10 +138,16 @@ namespace Garnet.cluster
                 // Update replicationIds and replicationOffset2
                 clusterProvider.replicationManager.TryUpdateForFailover();
 
+                // Reset replay iterators
+                clusterProvider.replicationManager.ResetReplayIterator();
+
                 // Initialize checkpoint history
                 if (!clusterProvider.replicationManager.InitializeCheckpointStore())
                     logger?.LogWarning("Failed acquiring latest memory checkpoint metadata at {method}", nameof(TakeOverAsPrimary));
                 _ = clusterProvider.BumpAndWaitForEpochTransition();
+
+                // Resume all background maintenance that were possibly shutdown when this node became a replica
+                clusterProvider.storeWrapper.StartPrimaryTasks();
             }
             finally
             {

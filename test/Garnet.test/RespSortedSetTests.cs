@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Allure.NUnit;
 using Embedded.server;
 using Garnet.common;
 using Garnet.server;
@@ -26,8 +27,9 @@ namespace Garnet.test
     /* ObjectStoreFunctions */ StoreFunctions<byte[], IGarnetObject, ByteArrayKeyComparer, DefaultRecordDisposer<byte[], IGarnetObject>>,
     GenericAllocator<byte[], IGarnetObject, StoreFunctions<byte[], IGarnetObject, ByteArrayKeyComparer, DefaultRecordDisposer<byte[], IGarnetObject>>>>>;
 
+    [AllureNUnit]
     [TestFixture]
-    public class RespSortedSetTests
+    public class RespSortedSetTests : AllureTestBase
     {
         protected GarnetServer server;
 
@@ -543,7 +545,7 @@ namespace Garnet.test
         }
 
         [Test]
-        public async Task ZCountAndZCardWithExpiredAndExpiringItems()
+        public void ZCountAndZCardWithExpiredAndExpiringItems()
         {
             using var redis = ConnectionMultiplexer.Connect(TestUtils.GetConfig());
             var db = redis.GetDatabase(0);
@@ -558,7 +560,7 @@ namespace Garnet.test
             // Set expiration for the minimum, maximum and middle items
             db.Execute("ZPEXPIRE", "key1", "200", "MEMBERS", "3", "a", "e", "c");
 
-            await Task.Delay(300);
+            Thread.Sleep(300);
 
             // ZCARD
             var count = db.SortedSetLength("key1");
@@ -921,16 +923,9 @@ namespace Garnet.test
             var db = redis.GetDatabase(0);
 
             // ZSCAN without key
-            try
-            {
-                db.Execute("ZSCAN");
-                Assert.Fail();
-            }
-            catch (RedisServerException e)
-            {
-                var expectedErrorMessage = string.Format(CmdStrings.GenericErrWrongNumArgs, nameof(SortedSetOperation.ZSCAN));
-                ClassicAssert.AreEqual(expectedErrorMessage, e.Message);
-            }
+            var e = Assert.Throws<RedisServerException>(() => db.Execute("ZSCAN"));
+            var expectedErrorMessage = string.Format(CmdStrings.GenericErrWrongNumArgs, nameof(SortedSetOperation.ZSCAN));
+            ClassicAssert.AreEqual(expectedErrorMessage, e.Message);
 
             // Use sortedsetscan on non existing key
             var items = db.SortedSetScan(new RedisKey("foo"), new RedisValue("*"), pageSize: 10);
@@ -2140,6 +2135,22 @@ namespace Garnet.test
         }
 
         [Test]
+        public void CanDoSortedSetExpireAndRemove()
+        {
+            using var redis = ConnectionMultiplexer.Connect(TestUtils.GetConfig());
+            var db = redis.GetDatabase(0);
+            db.SortedSetAdd("mysortedset", [new SortedSetEntry("a1", 1.1), new SortedSetEntry("a2", 1.2), new SortedSetEntry("a3", 1.3)]);
+
+            var result = db.Execute("ZEXPIRE", "mysortedset", "60", "MEMBERS", "1", "a1");
+            var results = (RedisResult[])result;
+            ClassicAssert.AreEqual(1, results!.Length);
+            ClassicAssert.AreEqual(1, (long)results[0]);
+
+            result = db.Execute("ZREMRANGEBYLEX", "mysortedset", "[a", "(b");
+            ClassicAssert.AreEqual(3, (long)result);
+        }
+
+        [Test]
         public async Task CanDoSortedSetExpireLTM()
         {
             using var redis = ConnectionMultiplexer.Connect(TestUtils.GetConfig(allowAdmin: true));
@@ -2402,7 +2413,7 @@ namespace Garnet.test
         }
 
         [Test]
-        public async Task ZDiffWithExpiredAndExpiringItems()
+        public void ZDiffWithExpiredAndExpiringItems()
         {
             using var redis = ConnectionMultiplexer.Connect(TestUtils.GetConfig());
             var db = redis.GetDatabase(0);
@@ -2425,7 +2436,7 @@ namespace Garnet.test
             // Set expiration for matching items in key2
             db.Execute("ZPEXPIRE", "key2", "200", "MEMBERS", "1", "a");
 
-            await Task.Delay(300);
+            Thread.Sleep(300);
 
             // Perform ZDIFF
             var diff = db.SortedSetCombine(SetOperation.Difference, ["key1", "key2"]);
@@ -2439,7 +2450,7 @@ namespace Garnet.test
             ClassicAssert.AreEqual("e", diffWithScores[1].Element.ToString());
             ClassicAssert.AreEqual(5, diffWithScores[1].Score);
 
-            await Task.Delay(300);
+            Thread.Sleep(300);
 
             // Perform ZDIFF again after more items have expired
             diff = db.SortedSetCombine(SetOperation.Difference, ["key1", "key2"]);
@@ -2453,7 +2464,7 @@ namespace Garnet.test
         }
 
         [Test]
-        public async Task ZDiffStoreWithExpiredAndExpiringItems()
+        public void ZDiffStoreWithExpiredAndExpiringItems()
         {
             using var redis = ConnectionMultiplexer.Connect(TestUtils.GetConfig());
             var db = redis.GetDatabase(0);
@@ -2476,7 +2487,7 @@ namespace Garnet.test
             // Set expiration for matching items in key2
             db.Execute("ZPEXPIRE", "key2", "200", "MEMBERS", "1", "a");
 
-            await Task.Delay(300);
+            Thread.Sleep(300);
 
             // Perform ZDIFFSTORE
             var diffStoreCount = db.SortedSetCombineAndStore(SetOperation.Difference, "key3", ["key1", "key2"]);
@@ -2490,7 +2501,7 @@ namespace Garnet.test
             ClassicAssert.AreEqual("e", diffStoreResult[1].Element.ToString());
             ClassicAssert.AreEqual(5, diffStoreResult[1].Score);
 
-            await Task.Delay(300);
+            Thread.Sleep(300);
 
             // Perform ZDIFFSTORE again after more items have expired
             diffStoreCount = db.SortedSetCombineAndStore(SetOperation.Difference, "key3", ["key1", "key2"]);
@@ -2504,7 +2515,7 @@ namespace Garnet.test
         }
 
         [Test]
-        public async Task ZIncrByWithExpiringAndExpiredItems()
+        public void ZIncrByWithExpiredAndExpiringItems()
         {
             using var redis = ConnectionMultiplexer.Connect(TestUtils.GetConfig());
             var db = redis.GetDatabase(0);
@@ -2517,7 +2528,7 @@ namespace Garnet.test
             // Set expiration for some items in key1
             db.Execute("ZPEXPIRE", "key1", "200", "MEMBERS", "1", "a");
 
-            await Task.Delay(10);
+            Thread.Sleep(10);
 
             // Try to increment the score of an expiring item
             var newScore = db.SortedSetIncrement("key1", "a", 5);
@@ -2528,7 +2539,7 @@ namespace Garnet.test
             ClassicAssert.LessOrEqual((long)ttl, 200);
             ClassicAssert.Greater((long)ttl, 0);
 
-            await Task.Delay(200);
+            Thread.Sleep(200);
 
             // Check the item has expired
             ttl = db.Execute("ZPTTL", "key1", "MEMBERS", "1", "a");
@@ -2544,7 +2555,7 @@ namespace Garnet.test
         }
 
         [Test]
-        public async Task ZInterWithExpiredAndExpiringItems()
+        public void ZInterWithExpiredAndExpiringItems()
         {
             using var redis = ConnectionMultiplexer.Connect(TestUtils.GetConfig());
             var db = redis.GetDatabase(0);
@@ -2567,21 +2578,21 @@ namespace Garnet.test
             var inter = db.SortedSetCombine(SetOperation.Intersect, ["key1", "key2"]);
             ClassicAssert.AreEqual(3, inter.Length);
 
-            await Task.Delay(300);
+            Thread.Sleep(300);
 
             var interWithScores = db.SortedSetCombineWithScores(SetOperation.Intersect, ["key1", "key2"]);
             ClassicAssert.AreEqual(1, interWithScores.Length);  // Only "b" should remain
             ClassicAssert.AreEqual("b", interWithScores[0].Element.ToString());
             ClassicAssert.AreEqual(4, interWithScores[0].Score); // Sum of scores
 
-            await Task.Delay(300);
+            Thread.Sleep(300);
 
             inter = db.SortedSetCombine(SetOperation.Intersect, ["key1", "key2"]);
             ClassicAssert.AreEqual(0, inter.Length);
         }
 
         [Test]
-        public async Task ZInterCardWithExpiredAndExpiringItems()
+        public void ZInterCardWithExpiredAndExpiringItems()
         {
             using var redis = ConnectionMultiplexer.Connect(TestUtils.GetConfig());
             var db = redis.GetDatabase(0);
@@ -2600,19 +2611,19 @@ namespace Garnet.test
             db.Execute("ZPEXPIRE", "key1", "500", "MEMBERS", "1", "b");
             db.Execute("ZPEXPIRE", "key2", "200", "MEMBERS", "1", "a");
 
-            await Task.Delay(300);
+            Thread.Sleep(300);
 
             var interCardCount = (long)db.Execute("ZINTERCARD", "2", "key1", "key2");
             ClassicAssert.AreEqual(1, interCardCount); // Only "b" should remain
 
-            await Task.Delay(300);
+            Thread.Sleep(300);
 
             interCardCount = (long)db.Execute("ZINTERCARD", "2", "key1", "key2");
             ClassicAssert.AreEqual(0, interCardCount); // No items should remain
         }
 
         [Test]
-        public async Task ZInterStoreWithExpiredAndExpiringItems()
+        public void ZInterStoreWithExpiredAndExpiringItems()
         {
             using var redis = ConnectionMultiplexer.Connect(TestUtils.GetConfig());
             var db = redis.GetDatabase(0);
@@ -2631,7 +2642,7 @@ namespace Garnet.test
             db.Execute("ZPEXPIRE", "key1", "500", "MEMBERS", "1", "b");
             db.Execute("ZPEXPIRE", "key2", "200", "MEMBERS", "1", "a");
 
-            await Task.Delay(300);
+            Thread.Sleep(300);
 
             var interStoreCount = db.SortedSetCombineAndStore(SetOperation.Intersect, "key3", ["key1", "key2"]);
             ClassicAssert.AreEqual(1, interStoreCount); // Only "b" should remain
@@ -2641,7 +2652,7 @@ namespace Garnet.test
             ClassicAssert.AreEqual("b", interStoreResult[0].Element.ToString());
             ClassicAssert.AreEqual(4, interStoreResult[0].Score); // Sum of scores
 
-            await Task.Delay(300);
+            Thread.Sleep(300);
 
             interStoreCount = db.SortedSetCombineAndStore(SetOperation.Intersect, "key3", ["key1", "key2"]);
             ClassicAssert.AreEqual(0, interStoreCount); // No items should remain
@@ -2651,7 +2662,7 @@ namespace Garnet.test
         }
 
         [Test]
-        public async Task ZLexCountWithExpiredAndExpiringItems()
+        public void ZLexCountWithExpiredAndExpiringItems()
         {
             using var redis = ConnectionMultiplexer.Connect(TestUtils.GetConfig());
             var db = redis.GetDatabase(0);
@@ -2665,7 +2676,7 @@ namespace Garnet.test
             db.Execute("ZPEXPIRE", "key1", "200", "MEMBERS", "3", "a", "e", "c");
             db.Execute("ZPEXPIRE", "key1", "500", "MEMBERS", "1", "b");
 
-            await Task.Delay(300);
+            Thread.Sleep(300);
 
             var lexCount = (int)db.Execute("ZLEXCOUNT", "key1", "-", "+"); // SortedSetLengthByValue will check - and + to [- and [+
             ClassicAssert.AreEqual(2, lexCount); // Only "b" and "d" should remain
@@ -2673,7 +2684,7 @@ namespace Garnet.test
             var lexCountRange = db.SortedSetLengthByValue("key1", "b", "d", Exclude.Stop);
             ClassicAssert.AreEqual(1, lexCountRange); // Only "b" should remain within the range
 
-            await Task.Delay(300);
+            Thread.Sleep(300);
 
             lexCount = (int)db.Execute("ZLEXCOUNT", "key1", "-", "+");
             ClassicAssert.AreEqual(1, lexCount); // Only "d" should remain
@@ -3300,7 +3311,7 @@ namespace Garnet.test
         }
 
         [Test]
-        public async Task ZScoreWithExpiringAndExpiredItems()
+        public void ZScoreWithExpiredAndExpiringItems()
         {
             using var redis = ConnectionMultiplexer.Connect(TestUtils.GetConfig());
             var db = redis.GetDatabase(0);
@@ -3313,7 +3324,7 @@ namespace Garnet.test
             // Set expiration for some items in key1
             db.Execute("ZPEXPIRE", "key1", "200", "MEMBERS", "1", "a");
 
-            await Task.Delay(10);
+            Thread.Sleep(10);
 
             // Check the score of an expiring item
             var score = db.SortedSetScore("key1", "a");
@@ -3324,7 +3335,7 @@ namespace Garnet.test
             ClassicAssert.LessOrEqual((long)ttl, 200);
             ClassicAssert.Greater((long)ttl, 0);
 
-            await Task.Delay(200);
+            Thread.Sleep(200);
 
             // Check the item has expired
             ttl = db.Execute("ZPTTL", "key1", "MEMBERS", "1", "a");

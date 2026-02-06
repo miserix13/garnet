@@ -3,14 +3,17 @@
 
 using System;
 using System.IO;
+using Allure.NUnit;
+using Garnet.test;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using Tsavorite.core;
 
 namespace Tsavorite.test
 {
+    [AllureNUnit]
     [TestFixture]
-    internal class DeltaLogStandAloneTests
+    internal class DeltaLogStandAloneTests : AllureTestBase
     {
         private TsavoriteLog log;
         private IDevice device;
@@ -37,7 +40,7 @@ namespace Tsavorite.test
         [Test]
         [Category("TsavoriteLog")]
         [Category("Smoke")]
-        public void DeltaLogTest1([Values] TestUtils.DeviceType deviceType)
+        public void DeltaLogTest1([Values] TestUtils.TestDeviceType deviceType)
         {
             const int TotalCount = 200;
             string filename = Path.Join(TestUtils.MethodTestDir, $"delta_{deviceType}.log");

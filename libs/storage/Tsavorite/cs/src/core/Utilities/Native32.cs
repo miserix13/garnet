@@ -5,6 +5,7 @@ namespace Tsavorite.core
 {
     using System;
     using System.IO;
+    using System.Numerics;
     using System.Runtime.InteropServices;
     using System.Threading;
     using Microsoft.Win32.SafeHandles;
@@ -82,6 +83,15 @@ namespace Tsavorite.core
             public uint ByteOffsetForPartitionAlignment;
         }
 
+        [StructLayout(LayoutKind.Sequential)]
+        public unsafe struct OVERLAPPED_ENTRY
+        {
+            public UIntPtr lpCompletionKey;
+            public NativeOverlapped* lpOverlapped;
+            public uint Internal; // This is the NTSTATUS code
+            public UIntPtr dwNumberOfBytesTransferred;
+        }
+
         #endregion
 
         #region io constants and flags
@@ -141,6 +151,15 @@ namespace Tsavorite.core
             [In] UInt32 dwMilliseconds);
 
         [DllImport("kernel32.dll", SetLastError = true)]
+        internal static extern bool GetQueuedCompletionStatusEx(
+            [In] IntPtr hCompletionPort,
+            [In] OVERLAPPED_ENTRY* lpCompletionPortEntries,
+            [In] uint ulCount,
+            [Out] out uint ulNumEntriesRemoved,
+            [In] uint dwMilliseconds,
+            [In] bool fAlertable);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
         internal static extern bool GetFileSizeEx(
             [In] SafeFileHandle hFile,
             [Out] out long lpFileSize);
@@ -194,8 +213,49 @@ namespace Tsavorite.core
         private static extern int SetThreadGroupAffinity(IntPtr hThread, ref GROUP_AFFINITY GroupAffinity, ref GROUP_AFFINITY PreviousGroupAffinity);
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern int GetThreadGroupAffinity(IntPtr hThread, ref GROUP_AFFINITY PreviousGroupAffinity);
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool GetLogicalProcessorInformation(IntPtr buffer, ref uint returnLength);
 
         private static readonly uint ALL_PROCESSOR_GROUPS = 0xffff;
+
+
+        private enum LOGICAL_PROCESSOR_RELATIONSHIP
+        {
+            RelationProcessorCore = 0,
+            RelationNumaNode = 1,
+            RelationCache = 2,
+            RelationProcessorPackage = 3,
+            RelationGroup = 4,
+            RelationAll = 0xffff
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct SYSTEM_LOGICAL_PROCESSOR_INFORMATION
+        {
+            public UIntPtr ProcessorMask;
+            public LOGICAL_PROCESSOR_RELATIONSHIP Relationship;
+            public ProcessorInfoUnion Info;
+        }
+
+        [StructLayout(LayoutKind.Explicit)]
+        private struct ProcessorInfoUnion
+        {
+            [FieldOffset(0)] public byte ProcessorCoreFlags;
+            [FieldOffset(0)] public uint NumaNodeNumber;
+            [FieldOffset(0)] public CacheDescriptor Cache;
+            [FieldOffset(0)] public ulong Reserved1;
+            [FieldOffset(8)] public ulong Reserved2;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct CacheDescriptor
+        {
+            public byte Level;
+            public byte Associativity;
+            public ushort LineSize;
+            public uint Size;
+            public uint Type;
+        }
 
         [StructLayoutAttribute(LayoutKind.Sequential)]
         private struct GROUP_AFFINITY
@@ -207,6 +267,60 @@ namespace Tsavorite.core
             public uint Reserved3;
         }
 
+        private static uint? cachedLogicalProcessorsPerCore = null;
+
+        /// <summary>
+        /// Gets the number of logical processors per physical core (e.g., 2 for hyperthreading).
+        /// </summary>
+        public static uint GetLogicalProcessorsPerCore()
+        {
+            if (cachedLogicalProcessorsPerCore.HasValue)
+                return cachedLogicalProcessorsPerCore.Value;
+
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                cachedLogicalProcessorsPerCore = 1;
+                return 1;
+            }
+
+            uint returnLength = 0;
+            GetLogicalProcessorInformation(IntPtr.Zero, ref returnLength);
+
+            IntPtr buffer = Marshal.AllocHGlobal((int)returnLength);
+            try
+            {
+                if (!GetLogicalProcessorInformation(buffer, ref returnLength))
+                {
+                    cachedLogicalProcessorsPerCore = 1;
+                    return 1;
+                }
+
+                int structSize = Marshal.SizeOf<SYSTEM_LOGICAL_PROCESSOR_INFORMATION>();
+                int count = (int)returnLength / structSize;
+
+                for (int i = 0; i < count; i++)
+                {
+                    var info = Marshal.PtrToStructure<SYSTEM_LOGICAL_PROCESSOR_INFORMATION>(
+                        IntPtr.Add(buffer, i * structSize));
+
+                    if (info.Relationship == LOGICAL_PROCESSOR_RELATIONSHIP.RelationProcessorCore)
+                    {
+                        // Count bits set in ProcessorMask to get logical processors for this core
+                        uint logicalPerCore = (uint)BitOperations.PopCount((ulong)info.ProcessorMask);
+                        cachedLogicalProcessorsPerCore = logicalPerCore;
+                        return logicalPerCore;
+                    }
+                }
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(buffer);
+            }
+
+            cachedLogicalProcessorsPerCore = 1;
+            return 1;
+        }
+
         /// <summary>
         /// Accepts thread id = 0, 1, 2, ... and sprays them round-robin
         /// across all cores (viewed as a flat space). On NUMA machines,
@@ -215,7 +329,7 @@ namespace Tsavorite.core
         /// to the range [socket 0, core 0] to [socket 0, core N-1].
         /// </summary>
         /// <param name="threadIdx">Index of thread (from 0 onwards)</param>
-        public static void AffinitizeThreadRoundRobin(uint threadIdx)
+        public static void AffinitizeThreadRoundRobin(uint threadIdx, bool skipHyperthreads = true)
         {
             uint nrOfProcessors = GetActiveProcessorCount(ALL_PROCESSOR_GROUPS);
             ushort nrOfProcessorGroups = GetActiveProcessorGroupCount();
@@ -227,7 +341,16 @@ namespace Tsavorite.core
             IntPtr thread = GetCurrentThread();
             GetThreadGroupAffinity(thread, ref groupAffinityThread);
 
-            threadIdx = threadIdx % nrOfProcessors;
+            if (skipHyperthreads)
+            {
+                uint logicalPerCore = GetLogicalProcessorsPerCore();
+                uint nrOfPhysicalCores = nrOfProcessors / logicalPerCore;
+                threadIdx = (threadIdx % nrOfPhysicalCores) * logicalPerCore;
+            }
+            else
+            {
+                threadIdx = threadIdx % nrOfProcessors;
+            }
 
             groupAffinityThread.Mask = (ulong)1L << ((int)(threadIdx % (int)nrOfProcsPerGroup));
             groupAffinityThread.Group = (uint)(threadIdx / nrOfProcsPerGroup);
@@ -416,6 +539,9 @@ namespace Tsavorite.core
         {
             return unchecked(((int)0x80070000) | errorCode);
         }
+
+        [DllImport("ntdll.dll")]
+        internal static extern uint RtlNtStatusToDosError(uint NtStatus);
         #endregion
     }
 }

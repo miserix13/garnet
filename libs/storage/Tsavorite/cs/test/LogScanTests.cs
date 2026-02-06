@@ -3,14 +3,17 @@
 
 using System.IO;
 using System.Threading;
+using Allure.NUnit;
+using Garnet.test;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
 using Tsavorite.core;
 
 namespace Tsavorite.test
 {
+    [AllureNUnit]
     [TestFixture]
-    internal class LogScanTests
+    internal class LogScanTests : AllureTestBase
     {
         private TsavoriteLog log;
         private IDevice device;
@@ -104,7 +107,7 @@ namespace Tsavorite.test
         [Test]
         [Category("TsavoriteLog")]
         [Category("Smoke")]
-        public void ScanBasicDefaultTest([Values] TestUtils.DeviceType deviceType)
+        public void ScanBasicDefaultTest([Values] TestUtils.TestDeviceType deviceType)
         {
             // Create log and device here (not in setup) because using DeviceType Enum which can't be used in Setup
             string filename = Path.Join(TestUtils.MethodTestDir, "LogScanDefault" + deviceType.ToString() + ".log");
@@ -137,7 +140,7 @@ namespace Tsavorite.test
         [Test]
         [Category("TsavoriteLog")]
         [Category("Smoke")]
-        public void ScanBehindBeginAddressTest([Values] TestUtils.DeviceType deviceType)
+        public void ScanBehindBeginAddressTest([Values] TestUtils.TestDeviceType deviceType)
         {
             // Create log and device here (not in setup) because using DeviceType Enum which can't be used in Setup
             string filename = Path.Join(TestUtils.MethodTestDir, "LogScanDefault" + deviceType.ToString() + ".log");
@@ -202,7 +205,7 @@ namespace Tsavorite.test
         [Test]
         [Category("TsavoriteLog")]
         [Category("Smoke")]
-        public void ScanConsumerTest([Values] TestUtils.DeviceType deviceType)
+        public void ScanConsumerTest([Values] TestUtils.TestDeviceType deviceType)
         {
             // Create log and device here (not in setup) because using DeviceType Enum which can't be used in Setup
             string filename = Path.Join(TestUtils.MethodTestDir, "LogScanDefault" + deviceType.ToString() + ".log");
@@ -226,7 +229,7 @@ namespace Tsavorite.test
 
         [Test]
         [Category("TsavoriteLog")]
-        public void ScanNoDefaultTest([Values] TestUtils.DeviceType deviceType)
+        public void ScanNoDefaultTest([Values] TestUtils.TestDeviceType deviceType)
         {
             // Test where all params are set just to make sure handles it ok
 
@@ -258,7 +261,7 @@ namespace Tsavorite.test
         [Test]
         [Category("TsavoriteLog")]
         [Category("Smoke")]
-        public void ScanByNameTest([Values] TestUtils.DeviceType deviceType)
+        public void ScanByNameTest([Values] TestUtils.TestDeviceType deviceType)
         {
             //You can persist iterators(or more precisely, their CompletedUntilAddress) as part of a commit by simply naming them during their creation. 
 
@@ -290,7 +293,7 @@ namespace Tsavorite.test
         [Test]
         [Category("TsavoriteLog")]
         [Category("Smoke")]
-        public void ScanWithoutRecoverTest([Values] TestUtils.DeviceType deviceType)
+        public void ScanWithoutRecoverTest([Values] TestUtils.TestDeviceType deviceType)
         {
             // You may also force an iterator to start at the specified begin address, i.e., without recovering: recover parameter = false
 
@@ -322,7 +325,7 @@ namespace Tsavorite.test
         [Test]
         [Category("TsavoriteLog")]
         [Category("Smoke")]
-        public void ScanBufferingModeDoublePageTest([Values] TestUtils.DeviceType deviceType)
+        public void ScanBufferingModeDoublePageTest([Values] TestUtils.TestDeviceType deviceType)
         {
             // Same as default, but do it just to make sure have test in case default changes
 
@@ -354,7 +357,7 @@ namespace Tsavorite.test
         [Test]
         [Category("TsavoriteLog")]
         [Category("Smoke")]
-        public void ScanBufferingModeSinglePageTest([Values] TestUtils.DeviceType deviceType)
+        public void ScanBufferingModeSinglePageTest([Values] TestUtils.TestDeviceType deviceType)
         {
             // Create log and device here (not in setup) because using DeviceType Enum which can't be used in Setup
             string filename = Path.Join(TestUtils.MethodTestDir, "LogScanSinglePage" + deviceType.ToString() + ".log");
@@ -384,7 +387,7 @@ namespace Tsavorite.test
         [Test]
         [Category("TsavoriteLog")]
         [Category("Smoke")]
-        public void ScanUncommittedTest([Values] TestUtils.DeviceType deviceType)
+        public void ScanUncommittedTest([Values] TestUtils.TestDeviceType deviceType)
         {
             // Create log and device here (not in setup) because using DeviceType Enum which can't be used in Setup
             string filename = Path.Join(TestUtils.MethodTestDir, "LogScan" + deviceType.ToString() + ".log");
