@@ -34,6 +34,11 @@ namespace Tsavorite.core
         AzureStorage = 4,
 
         /// <summary>
+        /// Use device based on SQL Server database. You also need to provide the SQL Server configuration separately.
+        /// </summary>
+        SqlServer = 5,
+
+        /// <summary>
         /// Use null device.
         /// </summary>
         Null = byte.MaxValue,
